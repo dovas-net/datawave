@@ -1,7 +1,5 @@
 package datawave.marking;
 
-import static java.nio.charset.StandardCharsets.UTF_8;
-
 import java.io.IOException;
 import java.lang.reflect.InvocationTargetException;
 import java.util.Arrays;
@@ -10,8 +8,10 @@ import java.util.Collections;
 import java.util.Map;
 import java.util.stream.Collectors;
 
-import org.apache.accumulo.core.security.Authorizations;
-import org.apache.accumulo.core.security.ColumnVisibility;
+import org.apache.accumulo.access.Access;
+import org.apache.accumulo.access.AccessExpression;
+import org.apache.accumulo.access.ParsedAccessExpression;
+import org.apache.accumulo.access.examples.ParseExamples;
 import org.apache.commons.beanutils.BeanUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -19,8 +19,6 @@ import org.springframework.context.support.ClassPathXmlApplicationContext;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.google.common.base.Charsets;
-import com.google.common.collect.Maps;
 
 /**
  * Accumulo marks all data with a columnVisibility that declares and controls access. MarkingFunctions provide a pattern for mapping a user's preferred means of
@@ -29,26 +27,16 @@ import com.google.common.collect.Maps;
  * human-readable marking like "Patient Privileged Information"
  */
 
-public interface MarkingFunctions {
+public interface MarkingFunctions<T extends Markings<?>> {
 
-    ColumnVisibility combine(Collection<ColumnVisibility> columnVisibilities) throws MarkingFunctions.Exception;
+    AccessExpression combine(Collection<AccessExpression> columnVisibilities) throws MarkingFunctions.Exception;
 
-    @SuppressWarnings("unchecked")
-    Map<String,String> combine(Map<String,String>... markings) throws MarkingFunctions.Exception;
+    T combine(T... markings) throws MarkingFunctions.Exception;
 
-    ColumnVisibility translateToColumnVisibility(Map<String,String> markings) throws MarkingFunctions.Exception;
+    AccessExpression translateToColumnVisibility(T markings) throws MarkingFunctions.Exception;
 
-    Map<String,String> translateFromColumnVisibility(ColumnVisibility columnVisibility) throws MarkingFunctions.Exception;
+    T translateFromColumnVisibility(AccessExpression columnVisibility) throws MarkingFunctions.Exception;
 
-    Map<String,String> translateFromColumnVisibilityForAuths(ColumnVisibility columnVisibility, Collection<Authorizations> authorizations)
-                    throws MarkingFunctions.Exception;
-
-    Map<String,String> translateFromColumnVisibilityForAuths(ColumnVisibility columnVisibility, Authorizations authorizations)
-                    throws MarkingFunctions.Exception;
-
-    byte[] flatten(ColumnVisibility vis);
-
-    @SuppressWarnings("serial")
     class Exception extends java.lang.Exception {
 
         public Exception() {
@@ -72,53 +60,44 @@ public interface MarkingFunctions {
         }
     }
 
-    class Default implements MarkingFunctions {
-        public static final String COLUMN_VISIBILITY = "columnVisibility";
+    class Default implements MarkingFunctions<AccessExpressionMarkings> {
+        public static final Access ACCESS = Access.builder().build();
 
         @Override
-        public ColumnVisibility combine(Collection<ColumnVisibility> expressions) {
+        public AccessExpression combine(Collection<AccessExpression> expressions) {
 
-            // filter out any empty expressions, then flatten each one (to de-dupe) and concatenate with '&'
-            // flatten the final combined ColumnVisibility and use that to make the ColumnVisibility to return
-            return new ColumnVisibility(new ColumnVisibility(expressions.stream().map(ColumnVisibility::flatten).filter(b -> b.length > 0)
-                            .map(b -> "(" + new String(b, UTF_8) + ")").collect(Collectors.joining("&")).getBytes(UTF_8)).flatten());
+            // filter out any empty expressions and concatenate with '&'
+            // @formatter:off
+            ParsedAccessExpression expression = ACCESS.newParsedExpression(expressions
+                                                .stream()
+                                                .map(AccessExpression::getExpression)
+                                                .filter(str -> !str.isEmpty())
+                                                .map(str -> "(" + str + ")")
+                                                .collect(Collectors.joining("&"))
+                                                );
+            // @formatter:on
+
+            // normalize the Parsed Expression and then return a copy without the parse tree
+            // FIXME: Using a beta of the accumulo-access API so temporarily using the normalize function from the example code
+            return ACCESS.newExpression(ParseExamples.normalize(expression).expression);
         }
 
         @Override
-        @SafeVarargs
-        public final Map<String,String> combine(Map<String,String>... markings) {
+        public final AccessExpressionMarkings combine(AccessExpressionMarkings... markings) {
             // translate COLUMN_VISIBILITY values to ColumnVisibility, combine them and
             // return translated back to Map
-            return translateFromColumnVisibility(combine(Arrays.stream(markings).filter(m -> m.containsKey(COLUMN_VISIBILITY))
-                            .map(this::translateToColumnVisibility).collect(Collectors.toSet())));
+            return AccessExpressionMarkings.builder().accessExpression(combine(Arrays.stream(markings).map(Markings::getMarkings).collect(Collectors.toSet())))
+                            .build();
         }
 
         @Override
-        public ColumnVisibility translateToColumnVisibility(Map<String,String> markings) {
-            ColumnVisibility cv = new ColumnVisibility(markings.get(COLUMN_VISIBILITY));
-            return new ColumnVisibility(cv.flatten());
+        public AccessExpression translateToColumnVisibility(AccessExpressionMarkings markings) {
+            return markings.getMarkings();
         }
 
         @Override
-        public Map<String,String> translateFromColumnVisibility(ColumnVisibility expression) {
-            Map<String,String> markings = Maps.newHashMap();
-            markings.put(COLUMN_VISIBILITY, new String(expression.getExpression(), Charsets.UTF_8));
-            return markings;
-        }
-
-        @Override
-        public Map<String,String> translateFromColumnVisibilityForAuths(ColumnVisibility columnVisibility, Collection<Authorizations> authorizations) {
-            return translateFromColumnVisibility(columnVisibility);
-        }
-
-        @Override
-        public Map<String,String> translateFromColumnVisibilityForAuths(ColumnVisibility columnVisibility, Authorizations authorizations) {
-            return translateFromColumnVisibility(columnVisibility);
-        }
-
-        @Override
-        public byte[] flatten(ColumnVisibility vis) {
-            return FlattenedVisibilityCache.flatten(vis);
+        public AccessExpressionMarkings translateFromColumnVisibility(AccessExpression expression) {
+            return AccessExpressionMarkings.builder().accessExpression(expression).build();
         }
 
     }
