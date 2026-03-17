@@ -34,7 +34,7 @@ public abstract class EdgeQueryTransformerSupport<I,O> extends BaseQueryLogicTra
     protected ResponseObjectFactory responseObjectFactory;
     protected EdgeModelFields fields;
 
-    public EdgeQueryTransformerSupport(Query settings, MarkingFunctions markingFunctions, ResponseObjectFactory responseObjectFactory, EdgeModelFields fields) {
+    public EdgeQueryTransformerSupport(Query settings, MarkingFunctions<?> markingFunctions, ResponseObjectFactory responseObjectFactory, EdgeModelFields fields) {
         super(markingFunctions);
         this.responseObjectFactory = responseObjectFactory;
         auths = new Authorizations(settings.getQueryAuthorizations().split(","));

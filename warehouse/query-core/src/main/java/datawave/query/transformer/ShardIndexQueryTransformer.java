@@ -42,7 +42,7 @@ public class ShardIndexQueryTransformer extends BaseQueryLogicTransformer<Entry<
     private QueryModel myQueryModel = null;
     private ResponseObjectFactory responseObjectFactory;
 
-    public ShardIndexQueryTransformer(BaseQueryLogic<Entry<Key,Value>> logic, Query settings, MarkingFunctions markingFunctions,
+    public ShardIndexQueryTransformer(BaseQueryLogic<Entry<Key,Value>> logic, Query settings, MarkingFunctions<?> markingFunctions,
                     ResponseObjectFactory responseObjectFactory, QueryModel qm) {
         super(markingFunctions);
         this.responseObjectFactory = responseObjectFactory;

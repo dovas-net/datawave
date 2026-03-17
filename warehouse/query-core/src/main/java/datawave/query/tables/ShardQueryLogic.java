@@ -746,7 +746,7 @@ public class ShardQueryLogic extends BaseQueryLogic<Entry<Key,Value>> implements
             return this.transformerInstance;
         }
 
-        MarkingFunctions markingFunctions = this.getMarkingFunctions();
+        MarkingFunctions<?> markingFunctions = this.getMarkingFunctions();
         ResponseObjectFactory responseObjectFactory = this.getResponseObjectFactory();
 
         boolean reducedInSettings = false;
@@ -774,7 +774,7 @@ public class ShardQueryLogic extends BaseQueryLogic<Entry<Key,Value>> implements
         return this.transformerInstance;
     }
 
-    protected DocumentTransformer createDocumentTransformer(BaseQueryLogic<Entry<Key,Value>> logic, Query settings, MarkingFunctions markingFunctions,
+    protected DocumentTransformer createDocumentTransformer(BaseQueryLogic<Entry<Key,Value>> logic, Query settings, MarkingFunctions<?> markingFunctions,
                     ResponseObjectFactory responseObjectFactory, Boolean reducedResponse) {
         return new DocumentTransformer(logic, settings, markingFunctions, responseObjectFactory, reducedResponse);
     }

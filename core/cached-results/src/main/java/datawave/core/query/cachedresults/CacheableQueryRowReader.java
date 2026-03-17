@@ -24,7 +24,7 @@ public class CacheableQueryRowReader {
 
     @SuppressWarnings("unchecked")
     public static CacheableQueryRow createRow(ResultSet cachedRowSet, Set<String> fixedFieldsInEvent, ResponseObjectFactory responseObjectFactory,
-                    MarkingFunctions markingFunctions) {
+                    MarkingFunctions<?> markingFunctions) {
 
         CacheableQueryRow cqfc = responseObjectFactory.getCacheableQueryRow();
         cqfc.setMarkingFunctions(markingFunctions);

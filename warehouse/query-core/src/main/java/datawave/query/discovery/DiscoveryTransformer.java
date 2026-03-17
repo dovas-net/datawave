@@ -31,7 +31,7 @@ public class DiscoveryTransformer extends BaseQueryLogicTransformer<DiscoveredTh
     private List<String> variableFieldList = null;
     private BaseQueryLogic<DiscoveredThing> logic = null;
     private QueryModel myQueryModel = null;
-    private MarkingFunctions markingFunctions;
+    private MarkingFunctions<?> markingFunctions;
     private ResponseObjectFactory responseObjectFactory;
 
     public DiscoveryTransformer(BaseQueryLogic<DiscoveredThing> logic, Query settings, QueryModel qm) {

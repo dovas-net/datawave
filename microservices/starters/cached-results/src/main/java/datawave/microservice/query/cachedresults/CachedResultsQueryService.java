@@ -21,7 +21,6 @@ import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
-import java.util.TreeMap;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.TimeUnit;
@@ -112,7 +111,7 @@ public class CachedResultsQueryService {
     private final QueryLogicFactory queryLogicFactory;
     private final QueryStorageCache queryStorageCache;
     private final ResponseObjectFactory responseObjectFactory;
-    private final MarkingFunctions markingFunctions;
+    private final MarkingFunctions<?> markingFunctions;
     // Note: CachedResultsQueryParameters needs to be request scoped
     private final RequestScopeBeanSupplier<CachedResultsQueryParameters> scopedCachedResultsQueryParameters;
     private final String fieldDefinitions;
@@ -123,7 +122,7 @@ public class CachedResultsQueryService {
     public CachedResultsQueryService(CachedResultsQueryProperties cachedResultsQueryProperties, JdbcTemplate cachedResultsJdbcTemplate,
                     CachedResultsQueryCache cachedResultsQueryCache, QueryService queryService, AuditClient auditClient, SecurityMarking securityMarking,
                     QueryLogicFactory queryLogicFactory, QueryStorageCache queryStorageCache, ResponseObjectFactory responseObjectFactory,
-                    MarkingFunctions markingFunctions, CachedResultsQueryParameters cachedResultsQueryParameters) {
+                    MarkingFunctions<?> markingFunctions, CachedResultsQueryParameters cachedResultsQueryParameters) {
         this.cachedResultsQueryProperties = cachedResultsQueryProperties;
         this.cachedResultsJdbcTemplate = cachedResultsJdbcTemplate;
         this.cachedResultsQueryCache = cachedResultsQueryCache;

@@ -111,7 +111,7 @@ public class ErrorDataTypeHandler<KEYIN,KEYOUT,VALUEOUT> implements ExtendedData
 
     private byte[] defaultVisibility = null;
     protected MarkingsHelper markingsHelper;
-    protected MarkingFunctions markingFunctions;
+    protected MarkingFunctions<?> markingFunctions;
 
     private String tableName = null;
 

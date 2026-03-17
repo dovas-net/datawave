@@ -69,11 +69,11 @@ import datawave.webservice.result.VoidResponse;
 public class AdminService {
 
     private final Logger log = LoggerFactory.getLogger(this.getClass());
-    private final MarkingFunctions markingFunctions;
+    private final MarkingFunctions<?> markingFunctions;
     private final AccumuloClient warehouseAccumuloClient;
 
     @Autowired
-    public AdminService(@Qualifier("warehouse") AccumuloClient warehouseAccumuloClient, MarkingFunctions markingFunctions) {
+    public AdminService(@Qualifier("warehouse") AccumuloClient warehouseAccumuloClient, MarkingFunctions<?> markingFunctions) {
         this.warehouseAccumuloClient = warehouseAccumuloClient;
         this.markingFunctions = markingFunctions;
     }

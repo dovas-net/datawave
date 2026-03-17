@@ -117,7 +117,7 @@ public class AnnotationHitsTransformerTest {
     private ShardQueryConfiguration shardQueryConfiguration;
 
     private Query settings;
-    private MarkingFunctions markingFunctions;
+    private MarkingFunctions<?> markingFunctions;
 
     private List<Annotation> annotations;
     private AnnotationSource annotationSource;

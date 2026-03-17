@@ -24,6 +24,8 @@ import javax.annotation.PostConstruct;
 import javax.enterprise.context.ApplicationScoped;
 import javax.inject.Inject;
 
+import datawave.core.common.util.AccessExpressionUtil;
+import datawave.marking.Markings;
 import org.apache.accumulo.core.client.AccumuloClient;
 import org.apache.accumulo.core.client.AccumuloException;
 import org.apache.accumulo.core.client.AccumuloSecurityException;
@@ -277,14 +279,12 @@ public class ShardTableQueryMetricHandler extends BaseQueryMetricHandler<QueryMe
         event.setDataType(type);
         event.setTimestamp(storedQueryMetric.getCreateDate().getTime());
         // get security markings from metric, otherwise default to PUBLIC
-        Map<String,String> markings = updatedQueryMetric.getMarkings();
+        Markings<?> markings = updatedQueryMetric.getMarkings();
         if (markings == null || markings.isEmpty()) {
             event.setVisibility(new ColumnVisibility(DEFAULT_SECURITY_MARKING));
         } else {
             try {
-                // Extract the visibility expression from the legacy Map<String,String> markings
-                String visExpr = markings.getOrDefault("columnVisibility", DEFAULT_SECURITY_MARKING);
-                event.setVisibility(new ColumnVisibility(visExpr));
+                event.setVisibility(AccessExpressionUtil.toColumnVisibility(markings));
             } catch (Exception e) {
                 log.error(e.getMessage(), e);
                 event.setVisibility(new ColumnVisibility(DEFAULT_SECURITY_MARKING));

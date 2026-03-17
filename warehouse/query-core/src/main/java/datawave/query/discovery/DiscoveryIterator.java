@@ -38,7 +38,7 @@ import datawave.query.Constants;
 public class DiscoveryIterator implements SortedKeyValueIterator<Key,Value> {
 
     private static final Logger log = Logger.getLogger(DiscoveryIterator.class);
-    private static final MarkingFunctions markingFunctions = MarkingFunctions.Factory.createMarkingFunctions();
+    private static final MarkingFunctions<?> markingFunctions = MarkingFunctions.Factory.createMarkingFunctions();
 
     private Key key;
     private Value value;

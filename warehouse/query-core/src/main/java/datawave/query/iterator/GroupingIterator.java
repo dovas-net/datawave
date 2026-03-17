@@ -51,7 +51,7 @@ public class GroupingIterator implements Iterator<Map.Entry<Key,Document>> {
     // track the number of documents seen by this iterator
     private long documentCount = 0L;
 
-    private final MarkingFunctions markingFunctions;
+    private final MarkingFunctions<?> markingFunctions;
 
     private final int groupFieldsBatchSize;
 
@@ -61,7 +61,7 @@ public class GroupingIterator implements Iterator<Map.Entry<Key,Document>> {
 
     Map.Entry<Key,Document> next;
 
-    public GroupingIterator(Iterator<Map.Entry<Key,Document>> previousIterators, MarkingFunctions markingFunctions, GroupFields groupFields,
+    public GroupingIterator(Iterator<Map.Entry<Key,Document>> previousIterators, MarkingFunctions<?> markingFunctions, GroupFields groupFields,
                     int groupFieldsBatchSize, YieldCallback<Key> yieldCallback) {
         this.previousIterators = previousIterators;
         this.markingFunctions = markingFunctions;

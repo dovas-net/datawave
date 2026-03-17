@@ -14,6 +14,7 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 
+import datawave.marking.AccessExpressionMarkings;
 import org.apache.commons.lang.NotImplementedException;
 import org.apache.hadoop.conf.Configuration;
 import org.slf4j.Logger;
@@ -132,7 +133,7 @@ public interface CompositeIngest {
         protected Map<String,Boolean> allowMissing = new HashMap<>();
         private Set<String> ignoreNormalizationForFields = new HashSet<>();
 
-        protected MarkingFunctions markingFunctions;
+        protected MarkingFunctions<?> markingFunctions;
 
         public void setup(Type type, Configuration config) {
 
@@ -295,14 +296,19 @@ public interface CompositeIngest {
          *            different markings
          * @return the merged markings
          */
-        @SuppressWarnings("unchecked")
         protected Markings<?> mergeMarkings(Markings<?> markings1, Markings<?> markings2) {
             if (markings2 != null) {
                 if (markings1 == null) {
                     markings1 = markings2;
                 } else {
                     try {
-                        markings1 = markingFunctions.combine(markings1, markings2);
+                        if (markings1 instanceof AccessExpressionMarkings && markings2 instanceof AccessExpressionMarkings) {
+                            AccessExpressionMarkings aem1 = (AccessExpressionMarkings) markings1;
+                            AccessExpressionMarkings aem2 = (AccessExpressionMarkings) markings2;
+                            return markingFunctions.fromAccessExpression(markingFunctions.combine(Set.of(aem1.getMarkings(), aem2.getMarkings())));
+                        } else {
+                            throw new RuntimeException(String.format("Unknown markings class %s or %s", markings1.getClass().getName(), markings1.getClass().getName()));
+                        }
                     } catch (MarkingFunctions.Exception e) {
                         throw new RuntimeException("Unable to combine markings.", e);
                     }

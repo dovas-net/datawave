@@ -59,7 +59,7 @@ public abstract class EventQueryTransformerSupport<I,O> extends BaseQueryLogicTr
     protected String tableName;
     protected ResponseObjectFactory responseObjectFactory;
 
-    public EventQueryTransformerSupport(String tableName, Query settings, MarkingFunctions markingFunctions, ResponseObjectFactory responseObjectFactory) {
+    public EventQueryTransformerSupport(String tableName, Query settings, MarkingFunctions<?> markingFunctions, ResponseObjectFactory responseObjectFactory) {
         super(markingFunctions);
         this.settings = settings;
         this.auths = new Authorizations(settings.getQueryAuthorizations().split(","));
@@ -67,7 +67,7 @@ public abstract class EventQueryTransformerSupport<I,O> extends BaseQueryLogicTr
         this.responseObjectFactory = responseObjectFactory;
     }
 
-    public EventQueryTransformerSupport(BaseQueryLogic<Entry<Key,Value>> logic, Query settings, MarkingFunctions markingFunctions,
+    public EventQueryTransformerSupport(BaseQueryLogic<Entry<Key,Value>> logic, Query settings, MarkingFunctions<?> markingFunctions,
                     ResponseObjectFactory responseObjectFactory) {
         this(logic.getTableName(), settings, markingFunctions, responseObjectFactory);
         this.logic = logic;

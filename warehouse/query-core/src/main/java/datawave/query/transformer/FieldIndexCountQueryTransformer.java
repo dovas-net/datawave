@@ -39,7 +39,7 @@ public class FieldIndexCountQueryTransformer extends BaseQueryLogicTransformer<E
     private BaseQueryLogic<Entry<Key,Value>> logic = null;
     private ResponseObjectFactory responseObjectFactory;
 
-    public FieldIndexCountQueryTransformer(BaseQueryLogic<Entry<Key,Value>> logic, Query settings, MarkingFunctions markingFunctions,
+    public FieldIndexCountQueryTransformer(BaseQueryLogic<Entry<Key,Value>> logic, Query settings, MarkingFunctions<?> markingFunctions,
                     ResponseObjectFactory responseObjectFactory) {
         super(markingFunctions);
         this.auths = new Authorizations(settings.getQueryAuthorizations().split(","));

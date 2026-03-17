@@ -19,6 +19,9 @@ import java.util.UUID;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.locks.ReentrantReadWriteLock;
 
+import datawave.core.common.util.AccessExpressionUtil;
+import datawave.marking.Markings;
+import org.apache.accumulo.access.AccessExpression;
 import org.apache.accumulo.core.client.AccumuloClient;
 import org.apache.accumulo.core.client.AccumuloException;
 import org.apache.accumulo.core.client.AccumuloSecurityException;
@@ -106,13 +109,13 @@ public abstract class ShardTableQueryMetricHandler<T extends BaseQueryMetric> ex
     protected QueryMetricFactory metricFactory;
     protected UIDBuilder<UID> uidBuilder = UID.builder();
     protected QueryMetricCombiner queryMetricCombiner;
-    protected MarkingFunctions markingFunctions;
+    protected MarkingFunctions<?> markingFunctions;
     protected DnUtils dnUtils;
     // this lock is necessary for when there is an error condition and the accumuloRecordWriter needs to be replaced
     protected ReentrantReadWriteLock accumuloRecordWriterLock = new ReentrantReadWriteLock();
 
     public ShardTableQueryMetricHandler(QueryMetricHandlerProperties queryMetricHandlerProperties, AccumuloConnectionFactory connectionFactory,
-                    QueryMetricQueryLogicFactory logicFactory, QueryMetricFactory metricFactory, MarkingFunctions markingFunctions,
+                    QueryMetricQueryLogicFactory logicFactory, QueryMetricFactory metricFactory, MarkingFunctions<?> markingFunctions,
                     QueryMetricCombiner queryMetricCombiner, LuceneToJexlQueryParser luceneToJexlQueryParser, DnUtils dnUtils) {
         super(luceneToJexlQueryParser);
         this.queryMetricHandlerProperties = queryMetricHandlerProperties;
@@ -365,10 +368,10 @@ public abstract class ShardTableQueryMetricHandler<T extends BaseQueryMetric> ex
         event.setDataType(type);
         event.setTimestamp(updatedQueryMetric.getCreateDate().getTime());
         // get markings from metric, otherwise use the default markings
-        Map<String,String> markings = updatedQueryMetric.getMarkings();
+        Markings<?> markings = updatedQueryMetric.getMarkings();
         if (markings != null && !markings.isEmpty()) {
             try {
-                event.setVisibility(this.markingFunctions.toAccessExpression(updatedQueryMetric.getMarkings()));
+                event.setVisibility(AccessExpressionUtil.toColumnVisibility(markingFunctions.toAccessExpression(markings)));
             } catch (MarkingFunctions.Exception e) {
                 log.error(e.getMessage(), e);
                 event.setVisibility(this.queryMetricHandlerProperties.getDefaultMetricVisibility());

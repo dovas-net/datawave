@@ -82,13 +82,13 @@ public class Document extends AttributeBag<Document> implements Serializable {
 
     private static final long ONE_DAY_MS = 1000L * 60 * 60 * 24;
 
-    public MarkingFunctions getMarkingFunctions() {
+    public MarkingFunctions<?> getMarkingFunctions() {
         return MarkingFunctions.Factory.createMarkingFunctions();
     }
 
     public Markings<?> getMarkings() {
         try {
-            MarkingFunctions markingFunctions = MarkingFunctions.Factory.createMarkingFunctions();
+            MarkingFunctions<?> markingFunctions = MarkingFunctions.Factory.createMarkingFunctions();
             return markingFunctions.fromAccessExpression(AccessExpressionUtil.toAccessExpression(getColumnVisibility()));
         } catch (MarkingFunctions.Exception e) {}
         return null;

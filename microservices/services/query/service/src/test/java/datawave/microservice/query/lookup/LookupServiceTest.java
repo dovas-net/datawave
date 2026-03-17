@@ -877,7 +877,7 @@ public class LookupServiceTest extends AbstractQueryServiceTest {
                 List<DefaultField> fields = new ArrayList<>();
                 for (Map.Entry<String,List<String>> entry : fieldValues.entrySet()) {
                     for (String value : entry.getValue()) {
-                        fields.add(new DefaultField(entry.getKey(), visibility, new HashMap<>(), currentTime, value));
+                        fields.add(new DefaultField(entry.getKey(), visibility, null, currentTime, value));
                     }
                 }
                 event.setFields(fields);

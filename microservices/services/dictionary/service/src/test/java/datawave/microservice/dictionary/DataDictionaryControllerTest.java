@@ -31,9 +31,6 @@ import com.google.common.collect.Multimap;
 
 import datawave.accumulo.inmemory.InMemoryAccumuloClient;
 import datawave.accumulo.inmemory.InMemoryInstance;
-import datawave.marking.AccessExpressionMarkings;
-import datawave.marking.MarkingFunctions;
-import datawave.marking.Markings;
 import datawave.microservice.ControllerIT;
 import datawave.microservice.dictionary.config.DataDictionaryProperties;
 import datawave.webservice.dictionary.data.DefaultDataDictionary;
@@ -130,10 +127,9 @@ public class DataDictionaryControllerTest extends ControllerIT {
                 .build();
         // @formatter:on
 
-        Markings<?> markings = AccessExpressionMarkings.builder().accessExpression(MarkingFunctions.Default.ACCESS.newExpression("USER|ADMIN")).build();
         Multimap<Map.Entry<String,String>,DefaultDescription> descriptions = HashMultimap.create();
-        descriptions.put(new AbstractMap.SimpleEntry<>("fooField", "fooType"), new DefaultDescription("my foo field", markings));
-        descriptions.put(new AbstractMap.SimpleEntry<>("barField", "barType"), new DefaultDescription("my bar field", markings));
+        descriptions.put(new AbstractMap.SimpleEntry<>("fooField", "fooType"), new DefaultDescription("my foo field", Map.of("columnVisibility", "USER")));
+        descriptions.put(new AbstractMap.SimpleEntry<>("barField", "barType"), new DefaultDescription("my bar field", Map.of("columnVisibility", "ADMIN")));
         DefaultFields postBody = new DefaultFields(descriptions);
         MultiValueMap<String,String> additionalHeaders = new LinkedMultiValueMap<>();
         additionalHeaders.set(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_JSON_VALUE);

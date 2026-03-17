@@ -50,17 +50,17 @@ public class DocumentTransformer extends DocumentTransformerSupport<Entry<Key,Va
      * @param markingFunctions
      *            the marking functions
      */
-    public DocumentTransformer(BaseQueryLogic<Entry<Key,Value>> logic, Query settings, MarkingFunctions markingFunctions,
+    public DocumentTransformer(BaseQueryLogic<Entry<Key,Value>> logic, Query settings, MarkingFunctions<?> markingFunctions,
                     ResponseObjectFactory responseObjectFactory) {
         super(logic, settings, markingFunctions, responseObjectFactory);
     }
 
-    public DocumentTransformer(BaseQueryLogic<Entry<Key,Value>> logic, Query settings, MarkingFunctions markingFunctions,
+    public DocumentTransformer(BaseQueryLogic<Entry<Key,Value>> logic, Query settings, MarkingFunctions<?> markingFunctions,
                     ResponseObjectFactory responseObjectFactory, Boolean reducedResponse) {
         super(logic, settings, markingFunctions, responseObjectFactory, reducedResponse);
     }
 
-    public DocumentTransformer(String tableName, Query settings, MarkingFunctions markingFunctions, ResponseObjectFactory responseObjectFactory,
+    public DocumentTransformer(String tableName, Query settings, MarkingFunctions<?> markingFunctions, ResponseObjectFactory responseObjectFactory,
                     Boolean reducedResponse) {
         super(tableName, settings, markingFunctions, responseObjectFactory, reducedResponse);
     }

@@ -65,7 +65,7 @@ public class AtomDataTypeHandler<KEYIN,KEYOUT,VALUEOUT> implements ExtendedDataT
     protected String[] fieldOverrides = null;
     protected HashMap<String,Set<String>> subCategories;
     protected String[] sCategories = null;
-    protected MarkingFunctions markingFunctions;
+    protected MarkingFunctions<?> markingFunctions;
 
     protected Configuration conf;
 

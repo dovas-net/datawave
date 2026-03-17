@@ -45,7 +45,7 @@ public class TagCloudTransformer extends BaseQueryLogicTransformer<Entry<Key,Val
     }
 
     // TODO-crwill9 pass in state data, not the state object so this is more reusable
-    public TagCloudTransformer(String responseVersion, Query query, KeywordQueryState state, MarkingFunctions markingFunctions,
+    public TagCloudTransformer(String responseVersion, Query query, KeywordQueryState state, MarkingFunctions<?> markingFunctions,
                     ResponseObjectFactory responseObjectFactory, Set<TagCloudInputTransformer<?>> transformers) {
         super(markingFunctions);
         this.responseVersion = getResponseVersion(responseVersion);

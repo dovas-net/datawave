@@ -34,11 +34,11 @@ public class ContentQueryTransformer extends BaseQueryLogicTransformer<Entry<Key
     protected final Map<Metadata,String> metadataIdMap;
     protected final boolean decodeView;
 
-    public ContentQueryTransformer(Query query, MarkingFunctions markingFunctions, ResponseObjectFactory responseObjectFactory) {
+    public ContentQueryTransformer(Query query, MarkingFunctions<?> markingFunctions, ResponseObjectFactory responseObjectFactory) {
         this(query, markingFunctions, responseObjectFactory, false);
     }
 
-    public ContentQueryTransformer(Query query, MarkingFunctions markingFunctions, ResponseObjectFactory responseObjectFactory, boolean decodeView) {
+    public ContentQueryTransformer(Query query, MarkingFunctions<?> markingFunctions, ResponseObjectFactory responseObjectFactory, boolean decodeView) {
         super(markingFunctions);
         this.auths = new Authorizations(query.getQueryAuthorizations().split(","));
         this.responseObjectFactory = responseObjectFactory;

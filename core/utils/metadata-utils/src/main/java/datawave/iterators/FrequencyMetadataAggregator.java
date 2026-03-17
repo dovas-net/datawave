@@ -59,7 +59,7 @@ public class FrequencyMetadataAggregator extends WrappingIterator implements Opt
 
     private static final Logger log = Logger.getLogger(FrequencyMetadataAggregator.class);
     private static final String NULL_BYTE = "\0";
-    private static final MarkingFunctions markingFunctions = MarkingFunctions.Factory.createMarkingFunctions();
+    private static final MarkingFunctions<?> markingFunctions = MarkingFunctions.Factory.createMarkingFunctions();
 
     private boolean combineVisibilities;
     private String columnsOption;

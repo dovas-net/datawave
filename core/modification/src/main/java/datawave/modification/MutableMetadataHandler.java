@@ -206,7 +206,7 @@ public class MutableMetadataHandler extends ModificationServiceConfiguration {
     protected String reverseIndexTableName = null;
     protected String metadataTableName = null;
     protected MetadataHelperFactory metadataHelperFactory;
-    protected MarkingFunctions markingFunctions = null;
+    protected MarkingFunctions<?> markingFunctions = null;
 
     // a map of event fields to index only/derived fields to enable appropriate deleting of event fields and all derivatives
     protected Multimap<String,String> indexOnlyMap = null;
@@ -249,11 +249,11 @@ public class MutableMetadataHandler extends ModificationServiceConfiguration {
         this.metadataTableName = metadataTableName;
     }
 
-    public MarkingFunctions getMarkingFunctions() {
+    public MarkingFunctions<?> getMarkingFunctions() {
         return markingFunctions;
     }
 
-    public void setMarkingFunctions(MarkingFunctions markingFunctions) {
+    public void setMarkingFunctions(MarkingFunctions<?> markingFunctions) {
         this.markingFunctions = markingFunctions;
     }
 

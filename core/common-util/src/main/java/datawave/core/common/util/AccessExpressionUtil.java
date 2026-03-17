@@ -2,6 +2,8 @@ package datawave.core.common.util;
 
 import static java.nio.charset.StandardCharsets.UTF_8;
 
+import datawave.marking.AccessExpressionMarkings;
+import datawave.marking.Markings;
 import org.apache.accumulo.access.Access;
 import org.apache.accumulo.access.AccessExpression;
 import org.apache.accumulo.core.security.ColumnVisibility;
@@ -33,6 +35,24 @@ public final class AccessExpressionUtil {
             return EMPTY_EXPRESSION;
         }
         return ACCESS.newExpression(new String(expr, UTF_8));
+    }
+
+    /**
+     * Convert an {@link Markings} to a {@link ColumnVisibility}.
+     *
+     * @param markings
+     *            the access expression
+     * @return the equivalent column visibility
+     */
+    public static ColumnVisibility toColumnVisibility(Markings<?> markings) {
+        if (markings instanceof AccessExpressionMarkings) {
+            return toColumnVisibility((AccessExpression) markings.getMarkings());
+        }
+        String m = markings.toString();
+        if (m.isEmpty()) {
+            return new ColumnVisibility();
+        }
+        return new ColumnVisibility(m);
     }
 
     /**

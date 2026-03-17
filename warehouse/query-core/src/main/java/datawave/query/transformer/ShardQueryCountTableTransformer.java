@@ -36,7 +36,7 @@ public class ShardQueryCountTableTransformer extends BaseQueryLogicTransformer<E
     private List<String> variableFieldList = null;
     private ResponseObjectFactory responseObjectFactory;
 
-    public ShardQueryCountTableTransformer(Query settings, MarkingFunctions markingFunctions, ResponseObjectFactory responseObjectFactory) {
+    public ShardQueryCountTableTransformer(Query settings, MarkingFunctions<?> markingFunctions, ResponseObjectFactory responseObjectFactory) {
         super(markingFunctions);
         this.responseObjectFactory = responseObjectFactory;
         this.auths = new Authorizations(settings.getQueryAuthorizations().split(","));

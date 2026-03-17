@@ -46,7 +46,7 @@ public class ValueToAttributes implements Function<Entry<Key,String>,Iterable<En
 
     private Map<String,Multimap<String,String>> compositeToFieldMap;
     private Map<String,Map<String,String>> compositeFieldSeparatorsByType;
-    private final MarkingFunctions markingFunctions;
+    private final MarkingFunctions<?> markingFunctions;
     private final Multimap<String,Attribute<?>> componentFieldToValues = ArrayListMultimap.create();
 
     private final EventDataQueryFilter attrFilter;
@@ -68,7 +68,7 @@ public class ValueToAttributes implements Function<Entry<Key,String>,Iterable<En
      * @param fromIndex
      *            flag denoting if this class is operating on values from the field index
      */
-    public ValueToAttributes(CompositeMetadata compositeMetadata, TypeMetadata typeMetadata, EventDataQueryFilter attrFilter, MarkingFunctions markingFunctions,
+    public ValueToAttributes(CompositeMetadata compositeMetadata, TypeMetadata typeMetadata, EventDataQueryFilter attrFilter, MarkingFunctions<?> markingFunctions,
                     boolean fromIndex) {
         // in Java 25 we can create the attribute factory first
         this(new AttributeFactory(typeMetadata), compositeMetadata, attrFilter, markingFunctions, fromIndex);
@@ -89,7 +89,7 @@ public class ValueToAttributes implements Function<Entry<Key,String>,Iterable<En
      *            flag denoting if this class is operating on values from the field index
      */
     public ValueToAttributes(AttributeFactory attributeFactory, CompositeMetadata compositeMetadata, EventDataQueryFilter attrFilter,
-                    MarkingFunctions markingFunctions, boolean fromIndex) {
+                    MarkingFunctions<?> markingFunctions, boolean fromIndex) {
         this.attrFactory = attributeFactory;
         this.markingFunctions = markingFunctions;
         this.attrFilter = attrFilter;

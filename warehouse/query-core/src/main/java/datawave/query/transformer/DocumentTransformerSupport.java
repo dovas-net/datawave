@@ -113,19 +113,19 @@ public abstract class DocumentTransformerSupport<I,O> extends EventQueryTransfor
      * @param responseObjectFactory
      *            the response object factory
      */
-    public DocumentTransformerSupport(BaseQueryLogic<Entry<Key,Value>> logic, Query settings, MarkingFunctions markingFunctions,
+    public DocumentTransformerSupport(BaseQueryLogic<Entry<Key,Value>> logic, Query settings, MarkingFunctions<?> markingFunctions,
                     ResponseObjectFactory responseObjectFactory) {
         this(logic, settings, markingFunctions, responseObjectFactory, false);
     }
 
-    public DocumentTransformerSupport(BaseQueryLogic<Entry<Key,Value>> logic, Query settings, MarkingFunctions markingFunctions,
+    public DocumentTransformerSupport(BaseQueryLogic<Entry<Key,Value>> logic, Query settings, MarkingFunctions<?> markingFunctions,
                     ResponseObjectFactory responseObjectFactory, Boolean reducedResponse) {
 
         this(null != logic ? logic.getTableName() : null, settings, markingFunctions, responseObjectFactory, reducedResponse);
         this.logic = logic;
     }
 
-    public DocumentTransformerSupport(String tableName, Query settings, MarkingFunctions markingFunctions, ResponseObjectFactory responseObjectFactory,
+    public DocumentTransformerSupport(String tableName, Query settings, MarkingFunctions<?> markingFunctions, ResponseObjectFactory responseObjectFactory,
                     Boolean reducedResponse) {
         super(tableName, settings, markingFunctions, responseObjectFactory);
 
@@ -188,7 +188,7 @@ public abstract class DocumentTransformerSupport<I,O> extends EventQueryTransfor
      * @return a collection of the document fields
      */
     protected Collection<FieldBase<?>> buildDocumentFields(Key documentKey, String documentName, Document document, ColumnVisibility topLevelColumnVisibility,
-                    MarkingFunctions markingFunctions) {
+                    MarkingFunctions<?> markingFunctions) {
 
         // Whether the fields were added to projectFields or removed from disallowlistedFields, they user does not want them returned
         // If neither a projection nor a disallowlist was used then the suppressFields set should remain empty
@@ -452,7 +452,7 @@ public abstract class DocumentTransformerSupport<I,O> extends EventQueryTransfor
      * @return a collection of fields
      */
     protected Collection<FieldBase<?>> buildDocumentFields(Key documentKey, String fieldName, Attribute<?> attr, ColumnVisibility topLevelColumnVisibility,
-                    MarkingFunctions markingFunctions) {
+                    MarkingFunctions<?> markingFunctions) {
 
         Set<FieldBase<?>> myFields = new HashSet<>();
 

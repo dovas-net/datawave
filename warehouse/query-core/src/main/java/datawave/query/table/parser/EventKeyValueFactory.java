@@ -12,7 +12,7 @@ import datawave.query.Constants;
 
 public class EventKeyValueFactory {
 
-    public static EventKeyValue parse(Key key, Value value, Authorizations auths, MarkingFunctions markingFunctions) throws MarkingFunctions.Exception {
+    public static EventKeyValue parse(Key key, Value value, Authorizations auths, MarkingFunctions<?> markingFunctions) throws MarkingFunctions.Exception {
 
         if (null == key)
             throw new IllegalArgumentException("Cannot pass null key to EventKeyValueFactory");
@@ -39,7 +39,7 @@ public class EventKeyValueFactory {
         return e;
     }
 
-    protected static void parseColumnVisibility(EventKeyValue event, Key key, Authorizations auths, MarkingFunctions markingFunctions)
+    protected static void parseColumnVisibility(EventKeyValue event, Key key, Authorizations auths, MarkingFunctions<?> markingFunctions)
                     throws MarkingFunctions.Exception {
         event.setMarkings(markingFunctions.fromAccessExpression(AccessExpressionUtil.toAccessExpression(new ColumnVisibility(key.getColumnVisibility()))));
     }

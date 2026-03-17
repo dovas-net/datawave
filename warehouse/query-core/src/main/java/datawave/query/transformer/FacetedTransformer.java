@@ -41,17 +41,17 @@ public class FacetedTransformer extends DocumentTransformerSupport<Entry<Key,Val
     /*
      * By default, assume each cell still has the visibility attached to it
      */
-    public FacetedTransformer(BaseQueryLogic<Entry<Key,Value>> logic, Query settings, MarkingFunctions markingFunctions,
+    public FacetedTransformer(BaseQueryLogic<Entry<Key,Value>> logic, Query settings, MarkingFunctions<?> markingFunctions,
                     ResponseObjectFactory responseObjectFactory) {
         super(logic, settings, markingFunctions, responseObjectFactory);
     }
 
-    public FacetedTransformer(BaseQueryLogic<Entry<Key,Value>> logic, Query settings, MarkingFunctions markingFunctions,
+    public FacetedTransformer(BaseQueryLogic<Entry<Key,Value>> logic, Query settings, MarkingFunctions<?> markingFunctions,
                     ResponseObjectFactory responseObjectFactory, Boolean reducedResponse) {
         super(logic, settings, markingFunctions, responseObjectFactory, reducedResponse);
     }
 
-    public FacetedTransformer(String tableName, Query settings, MarkingFunctions markingFunctions, ResponseObjectFactory responseObjectFactory,
+    public FacetedTransformer(String tableName, Query settings, MarkingFunctions<?> markingFunctions, ResponseObjectFactory responseObjectFactory,
                     Boolean reducedResponse) {
         super(tableName, settings, markingFunctions, responseObjectFactory, reducedResponse);
     }
@@ -72,7 +72,7 @@ public class FacetedTransformer extends DocumentTransformerSupport<Entry<Key,Val
      * @return list of facets
      */
     protected Collection<FieldCardinalityBase> buildFacets(Key documentKey, String fieldName, Document document, ColumnVisibility topLevelColumnVisibility,
-                    MarkingFunctions markingFunctions) {
+                    MarkingFunctions<?> markingFunctions) {
 
         Set<FieldCardinalityBase> myFields = new HashSet<>();
 
@@ -106,7 +106,7 @@ public class FacetedTransformer extends DocumentTransformerSupport<Entry<Key,Val
      * @return list of facets
      */
     protected Collection<FieldCardinalityBase> buildFacets(Key documentKey, String fieldName, Attribute<?> attr, ColumnVisibility topLevelColumnVisibility,
-                    MarkingFunctions markingFunctions) {
+                    MarkingFunctions<?> markingFunctions) {
 
         Set<FieldCardinalityBase> myFields = new HashSet<>();
 

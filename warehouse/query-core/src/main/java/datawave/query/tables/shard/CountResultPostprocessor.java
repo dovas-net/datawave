@@ -20,9 +20,9 @@ import datawave.webservice.query.result.event.FieldBase;
 public class CountResultPostprocessor implements ResultPostprocessor {
     private static final Logger log = Logger.getLogger(CountResultPostprocessor.class);
 
-    private final MarkingFunctions markingFunctions;
+    private final MarkingFunctions<?> markingFunctions;
 
-    public CountResultPostprocessor(MarkingFunctions markingFunctions) {
+    public CountResultPostprocessor(MarkingFunctions<?> markingFunctions) {
         this.markingFunctions = markingFunctions;
     }
 

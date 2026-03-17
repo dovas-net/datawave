@@ -82,7 +82,7 @@ public class LookupService {
     }
 
     private final SecurityMarking auditSecurityMarking;
-    private final MarkingFunctions markingFunctions;
+    private final MarkingFunctions<?> markingFunctions;
     private final AccumuloClient connection;
     private final LookupAuditProperties lookupAuditProperties;
     private final LookupProperties lookupProperties;
@@ -97,7 +97,7 @@ public class LookupService {
     public LookupService(
         @Qualifier("auditLookupSecurityMarking")
         SecurityMarking auditSecurityMarking,
-        MarkingFunctions markingFunctions,
+        MarkingFunctions<?> markingFunctions,
         @Qualifier("warehouse")
         AccumuloClient connection,
         LookupAuditProperties lookupAuditProperties,

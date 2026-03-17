@@ -87,7 +87,7 @@ public class SSDeepIngestQueryTest extends AbstractFunctionalQuery {
 
     @Before
     public void setupQuery() {
-        MarkingFunctions markingFunctions = new MarkingFunctions.Default();
+        MarkingFunctions<?> markingFunctions = new MarkingFunctions.Default();
         ResponseObjectFactory responseFactory = new DefaultResponseObjectFactory();
         MetadataHelperFactory metadataHelperFactory = new MetadataHelperFactory();
 

@@ -54,7 +54,7 @@ public class AtomErrorDataTypeHandler<KEYIN,KEYOUT,VALUEOUT> extends AtomDataTyp
     private AccessExpression defaultVisibility = null;
     private Configuration conf = null;
     private ErrorShardedIngestHelper errorHelper = null;
-    private MarkingFunctions markingFunctions;
+    private MarkingFunctions<?> markingFunctions;
 
     @Override
     public void setup(TaskAttemptContext context) {

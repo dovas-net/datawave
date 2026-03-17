@@ -223,7 +223,7 @@ public abstract class ShardedDataTypeHandler<KEYIN> extends StatsDEnabledDataTyp
     private RawRecordMetadata metadata = null;
     private ShardIdFactory shardIdFactory = null;
     private LoadingCache<String,String> dCache = null;
-    protected MarkingFunctions markingFunctions;
+    protected MarkingFunctions<?> markingFunctions;
     protected IngestConfiguration ingestConfig = IngestConfigurationFactory.getIngestConfiguration();
 
     // default setting is a standard index with uid and event keys

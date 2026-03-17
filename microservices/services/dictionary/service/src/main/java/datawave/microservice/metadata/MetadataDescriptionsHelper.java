@@ -50,14 +50,14 @@ import datawave.webservice.dictionary.data.DescriptionBase;
 public class MetadataDescriptionsHelper<DESC extends DescriptionBase<DESC>> {
     private static final Logger log = LoggerFactory.getLogger(MetadataDescriptionsHelper.class);
 
-    private final MarkingFunctions markingFunctions;
+    private final MarkingFunctions<?> markingFunctions;
     private final ResponseObjectFactory<DESC,?,?,?,?> responseObjectFactory;
 
     private String metadataTableName;
     private AccumuloClient accumuloClient;
     private Set<Authorizations> fullUserAuths;
 
-    public MetadataDescriptionsHelper(MarkingFunctions markingFunctions, ResponseObjectFactory<DESC,?,?,?,?> responseObjectFactory) {
+    public MetadataDescriptionsHelper(MarkingFunctions<?> markingFunctions, ResponseObjectFactory<DESC,?,?,?,?> responseObjectFactory) {
         this.markingFunctions = markingFunctions;
         this.responseObjectFactory = responseObjectFactory;
     }

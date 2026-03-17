@@ -19,6 +19,10 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
+import datawave.marking.AccessExpressionMarkings;
+import datawave.marking.MarkingFunctions;
+import datawave.marking.Markings;
+import org.apache.accumulo.access.AccessExpression;
 import org.apache.accumulo.core.client.AccumuloClient;
 import org.apache.accumulo.core.client.BatchScanner;
 import org.apache.accumulo.core.client.BatchWriter;
@@ -144,14 +148,14 @@ public class QueryMetricTestBase {
     protected DatawaveUserDetails nonAdminUser;
     protected static boolean isHazelCast;
     protected static CacheManager staticCacheManager;
-    protected static Map<String,String> metricMarkings;
+    protected static Markings<?> metricMarkings;
     protected List<String> tables;
     protected Collection<String> auths;
     protected AccumuloClient accumuloClient;
 
     static {
-        metricMarkings = new HashMap<>();
-        metricMarkings.put(ColumnVisibilitySecurityMarking.VISIBILITY_MARKING, "A&C");
+        AccessExpression ae = MarkingFunctions.Default.ACCESS.newExpression("A&C");
+        metricMarkings = AccessExpressionMarkings.builder().accessExpression(ae).build();
     }
 
     @AfterAll

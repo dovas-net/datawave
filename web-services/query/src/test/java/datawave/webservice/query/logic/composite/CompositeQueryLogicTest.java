@@ -185,7 +185,7 @@ public class CompositeQueryLogicTest {
 
     public static class TestQueryLogicTransformer extends BaseQueryLogicTransformer<Entry<?,?>,TestQueryResponse> {
 
-        public TestQueryLogicTransformer(MarkingFunctions markingFunctions) {
+        public TestQueryLogicTransformer(MarkingFunctions<?> markingFunctions) {
             super(markingFunctions);
         }
 
@@ -225,7 +225,7 @@ public class CompositeQueryLogicTest {
 
     public static class DifferentTestQueryLogicTransformer extends BaseQueryLogicTransformer<Entry<?,?>,TestQueryResponse> {
 
-        public DifferentTestQueryLogicTransformer(MarkingFunctions markingFunctions) {
+        public DifferentTestQueryLogicTransformer(MarkingFunctions<?> markingFunctions) {
             super(markingFunctions);
         }
 

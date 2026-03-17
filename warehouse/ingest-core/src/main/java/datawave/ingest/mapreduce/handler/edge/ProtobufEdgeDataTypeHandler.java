@@ -146,7 +146,7 @@ public class ProtobufEdgeDataTypeHandler<KEYIN,KEYOUT,VALUEOUT> implements Exten
     protected String edgeTableName = null;
     protected String metadataTableName = null;
     protected boolean enableMetadata = false;
-    protected MarkingFunctions markingFunctions;
+    protected MarkingFunctions<?> markingFunctions;
 
     protected Map<String,EdgeDefinitionConfigurationHelper> edges = null;
 

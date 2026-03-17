@@ -59,7 +59,7 @@ public class DataDictionaryImplTest {
     private AccumuloClient accumuloClient;
 
     @Mock
-    private MarkingFunctions markingFunctions;
+    private MarkingFunctions<?> markingFunctions;
 
     @Mock
     private ResponseObjectFactory<DefaultDescription,DefaultDataDictionary,DefaultMetadataField,DefaultDictionaryField,DefaultFields> responseObjectFactory;

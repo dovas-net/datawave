@@ -260,7 +260,7 @@ public abstract class ValueToAttributesTest {
         TypeMetadata typeMetadata = new TypeMetadata(
                         "dts:[0:beep];types:[0:datawave.data.type.DateType,1:datawave.data.type.IpAddressType,2:datawave.data.type.LcNoDiacriticsType,3:datawave.data.type.NoOpType,4:datawave.data.type.NumberType];MAKE:[0:2];MAKE_COLOR:[0:3];START_DATE:[0:0];TYPE_NOEVAL:[0:2];IP_ADDR:[0:1];WHEELS:[0:2,0:4];COLOR:[0:2];COLOR_WHEELS:[0:3];TYPE:[0:2]");
 
-        MarkingFunctions markingFunctions = new MarkingFunctions.Default();
+        MarkingFunctions<?> markingFunctions = new MarkingFunctions.Default();
         ValueToAttributes valueToAttributes = new ValueToAttributes(compositeMetadata, typeMetadata, null, markingFunctions, true);
     }
 }

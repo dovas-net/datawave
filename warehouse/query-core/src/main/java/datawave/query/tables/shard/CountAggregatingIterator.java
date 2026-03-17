@@ -27,7 +27,6 @@ import com.esotericsoftware.kryo.io.Input;
 import com.google.common.collect.Maps;
 
 import datawave.core.common.util.AccessExpressionUtil;
-import datawave.core.iterators.ResultCountingIterator;
 import datawave.marking.MarkingFunctions;
 import datawave.webservice.query.result.event.DefaultEvent;
 
@@ -60,7 +59,7 @@ public class CountAggregatingIterator extends TransformIterator {
      * @param markingFunctions
      *            the marking functions
      */
-    public CountAggregatingIterator(Iterator<Entry<Key,Value>> iterator, Transformer transformer, MarkingFunctions markingFunctions) {
+    public CountAggregatingIterator(Iterator<Entry<Key,Value>> iterator, Transformer transformer, MarkingFunctions<?> markingFunctions) {
         this(iterator, transformer, markingFunctions, DEFAULT_PAGE_WAIT_TIME_MILLIS);
     }
 
@@ -77,7 +76,8 @@ public class CountAggregatingIterator extends TransformIterator {
      *            the time to wait for the next page
      */
     @SuppressWarnings("unchecked")
-    public CountAggregatingIterator(Iterator<Entry<Key,Value>> iterator, Transformer transformer, MarkingFunctions markingFunctions, long pageWaitTimeMillis) {
+    public CountAggregatingIterator(Iterator<Entry<Key,Value>> iterator, Transformer transformer, MarkingFunctions<?> markingFunctions,
+                    long pageWaitTimeMillis) {
         super(iterator, transformer);
         this.aggregator = new CountEntryAggregator(transformer, markingFunctions);
         this.pageWaitTimeMillis = pageWaitTimeMillis;
@@ -127,9 +127,9 @@ public class CountAggregatingIterator extends TransformIterator {
         private final Set<ColumnVisibility> columnVisibilities = new HashSet<>();
 
         private final Transformer transformer;
-        private final MarkingFunctions markingFunctions;
+        private final MarkingFunctions<?> markingFunctions;
 
-        public CountEntryAggregator(Transformer transformer, MarkingFunctions markingFunctions) {
+        public CountEntryAggregator(Transformer transformer, MarkingFunctions<?> markingFunctions) {
             this.transformer = transformer;
             this.markingFunctions = markingFunctions;
         }

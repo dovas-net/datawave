@@ -27,6 +27,22 @@ public class DefaultDescriptionTest {
     public void testMarshall() throws JAXBException {
         JAXBContext j = JAXBContext.newInstance(DefaultFields.class);
 
+        DefaultFields dicFieldsList = getDefaultFields();
+
+        Marshaller m = j.createMarshaller();
+        m.setProperty(Marshaller.JAXB_FORMATTED_OUTPUT, true);
+
+        ByteArrayOutputStream out = new ByteArrayOutputStream();
+        m.marshal(dicFieldsList, out);
+
+        String result = out.toString();
+
+        assertTrue(result.contains("<key>columnVisibility</key>"));
+        assertTrue(result.contains("<value>PRIVATE</value>"));
+        assertTrue(result.contains("<description>my description</description>"));
+    }
+
+    private static DefaultFields getDefaultFields() {
         Map<String,String> markings = new HashMap<>();
         markings.put("columnVisibility", "PRIVATE");
 
@@ -47,18 +63,7 @@ public class DefaultDescriptionTest {
 
         DefaultFields dicFieldsList = new DefaultFields();
         dicFieldsList.setFields(dicFields);
-
-        Marshaller m = j.createMarshaller();
-        m.setProperty(Marshaller.JAXB_FORMATTED_OUTPUT, true);
-
-        ByteArrayOutputStream out = new ByteArrayOutputStream();
-        m.marshal(dicFieldsList, out);
-
-        String result = out.toString();
-
-        assertTrue(result.contains("<key>columnVisibility</key>"));
-        assertTrue(result.contains("<value>PRIVATE</value>"));
-        assertTrue(result.contains("<description>my description</description>"));
+        return dicFieldsList;
     }
 
     @Test

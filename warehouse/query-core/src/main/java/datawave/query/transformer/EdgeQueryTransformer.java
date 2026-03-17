@@ -27,7 +27,7 @@ import datawave.webservice.query.result.event.ResponseObjectFactory;
 public class EdgeQueryTransformer extends EdgeQueryTransformerSupport<Entry<Key,Value>,EdgeBase> implements CacheableLogic {
     private Logger log = Logger.getLogger(EdgeQueryTransformer.class);
 
-    public EdgeQueryTransformer(Query settings, MarkingFunctions markingFunctions, ResponseObjectFactory responseObjectFactory, EdgeModelFields fields) {
+    public EdgeQueryTransformer(Query settings, MarkingFunctions<?> markingFunctions, ResponseObjectFactory responseObjectFactory, EdgeModelFields fields) {
         super(settings, markingFunctions, responseObjectFactory, fields);
     }
 

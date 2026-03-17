@@ -42,19 +42,19 @@ public class GroupingDocumentTransformer extends DocumentTransformer {
     private List<String> groupFieldsList;
     private Map<String,FieldBase<?>> fieldMap = Maps.newHashMap();
 
-    public GroupingDocumentTransformer(BaseQueryLogic<Entry<Key,Value>> logic, Query settings, MarkingFunctions markingFunctions,
+    public GroupingDocumentTransformer(BaseQueryLogic<Entry<Key,Value>> logic, Query settings, MarkingFunctions<?> markingFunctions,
                     ResponseObjectFactory responseObjectFactory, Collection<String> groupFieldsSet) {
         super(logic, settings, markingFunctions, responseObjectFactory);
         createGroupFieldsList(groupFieldsSet);
     }
 
-    public GroupingDocumentTransformer(BaseQueryLogic<Entry<Key,Value>> logic, Query settings, MarkingFunctions markingFunctions,
+    public GroupingDocumentTransformer(BaseQueryLogic<Entry<Key,Value>> logic, Query settings, MarkingFunctions<?> markingFunctions,
                     ResponseObjectFactory responseObjectFactory, Collection<String> groupFieldsSet, Boolean reducedResponse) {
         super(logic, settings, markingFunctions, responseObjectFactory, reducedResponse);
         createGroupFieldsList(groupFieldsSet);
     }
 
-    public GroupingDocumentTransformer(String tableName, Query settings, MarkingFunctions markingFunctions, ResponseObjectFactory responseObjectFactory,
+    public GroupingDocumentTransformer(String tableName, Query settings, MarkingFunctions<?> markingFunctions, ResponseObjectFactory responseObjectFactory,
                     Collection<String> groupFieldsSet, Boolean reducedResponse) {
         super(tableName, settings, markingFunctions, responseObjectFactory, reducedResponse);
         createGroupFieldsList(groupFieldsSet);

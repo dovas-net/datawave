@@ -44,7 +44,7 @@ public class GroupingUtils {
      *            combined, it will be logged and a new, blank {@link ColumnVisibility} will be returned.
      * @return the combined column visibility
      */
-    public static ColumnVisibility combineVisibilities(Collection<AccessExpression> expressions, MarkingFunctions markingFunctions, boolean failOnError) {
+    public static ColumnVisibility combineVisibilities(Collection<AccessExpression> expressions, MarkingFunctions<?> markingFunctions, boolean failOnError) {
         try {
             return AccessExpressionUtil.toColumnVisibility(markingFunctions.combine(expressions));
         } catch (MarkingFunctions.Exception e) {
@@ -73,7 +73,7 @@ public class GroupingUtils {
      * @return the new document
      */
     @Deprecated
-    public static Document createDocument(Group group, List<Key> keys, MarkingFunctions markingFunctions, AverageAggregatorWriteFormat averageWriteFormat) {
+    public static Document createDocument(Group group, List<Key> keys, MarkingFunctions<?> markingFunctions, AverageAggregatorWriteFormat averageWriteFormat) {
         Preconditions.checkState(!keys.isEmpty(), "No available keys for grouping results");
 
         // Use the last (most recent) key so a new iterator will know where to start.
@@ -94,7 +94,7 @@ public class GroupingUtils {
      *            the format to use when writing aggregated averages to the document
      * @return the new document
      */
-    public static Document createDocument(Group group, Key key, MarkingFunctions markingFunctions, AverageAggregatorWriteFormat averageWriteFormat) {
+    public static Document createDocument(Group group, Key key, MarkingFunctions<?> markingFunctions, AverageAggregatorWriteFormat averageWriteFormat) {
         Preconditions.checkNotNull(key, "document key cannot be null");
         Document document = new Document(key, true);
 
@@ -169,7 +169,7 @@ public class GroupingUtils {
      * @param markingFunctions
      *            the marking functions to use when combining column visibilities
      */
-    private static void addSumAggregation(Document document, String field, SumAggregator aggregator, MarkingFunctions markingFunctions) {
+    private static void addSumAggregation(Document document, String field, SumAggregator aggregator, MarkingFunctions<?> markingFunctions) {
         NumberType type = new NumberType();
         type.setDelegate(aggregator.getAggregation());
         TypeAttribute<BigDecimal> sumAttribute = new TypeAttribute<>(type, new Key(field + "_sum"), true);
@@ -189,7 +189,7 @@ public class GroupingUtils {
      * @param markingFunctions
      *            the marking functions to use when combining column visibilities
      */
-    private static void addCountAggregation(Document document, String field, CountAggregator aggregator, MarkingFunctions markingFunctions) {
+    private static void addCountAggregation(Document document, String field, CountAggregator aggregator, MarkingFunctions<?> markingFunctions) {
         NumberType type = new NumberType();
         type.setDelegate(BigDecimal.valueOf(aggregator.getAggregation()));
         TypeAttribute<BigDecimal> sumAttribute = new TypeAttribute<>(type, new Key(field + "_count"), true);
@@ -240,7 +240,7 @@ public class GroupingUtils {
      * @param markingFunctions
      *            the marking functions to use when combining column visibilities
      */
-    private static void addAverage(Document document, String field, AverageAggregator aggregator, MarkingFunctions markingFunctions) {
+    private static void addAverage(Document document, String field, AverageAggregator aggregator, MarkingFunctions<?> markingFunctions) {
         NumberType type = new NumberType();
         type.setDelegate(aggregator.getAggregation());
         TypeAttribute<BigDecimal> attribute = new TypeAttribute<>(type, new Key(field + "_average"), true);
@@ -260,7 +260,7 @@ public class GroupingUtils {
      * @param markingFunctions
      *            the marking functions to use when combining column visibilities
      */
-    private static void addAverageNumeratorAndDivisor(Document document, String field, AverageAggregator aggregator, MarkingFunctions markingFunctions) {
+    private static void addAverageNumeratorAndDivisor(Document document, String field, AverageAggregator aggregator, MarkingFunctions<?> markingFunctions) {
         ColumnVisibility visibility = combineVisibilities(aggregator.getAccessExpressions(), markingFunctions, false);
 
         // Add an attribute for the average's numerator. This is required to properly combine additional aggregations in future groupings.

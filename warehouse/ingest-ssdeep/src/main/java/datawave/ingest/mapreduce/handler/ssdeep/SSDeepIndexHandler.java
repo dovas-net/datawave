@@ -69,7 +69,7 @@ public class SSDeepIndexHandler<KEYIN,KEYOUT,VALUEOUT> implements ExtendedDataTy
 
     protected Text ssdeepIndexTableName;
 
-    protected MarkingFunctions markingFunctions;
+    protected MarkingFunctions<?> markingFunctions;
 
     protected TaskAttemptContext taskAttemptContext;
 
