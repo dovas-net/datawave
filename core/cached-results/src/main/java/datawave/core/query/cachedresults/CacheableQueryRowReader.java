@@ -9,10 +9,12 @@ import java.util.Map;
 import java.util.Set;
 import java.util.TreeSet;
 
+import org.apache.accumulo.access.AccessExpression;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import datawave.marking.MarkingFunctions;
+import datawave.marking.Markings;
 import datawave.webservice.query.cachedresults.CacheableQueryRow;
 import datawave.webservice.query.result.event.ResponseObjectFactory;
 
@@ -20,6 +22,7 @@ public class CacheableQueryRowReader {
 
     private static Logger log = LoggerFactory.getLogger(CacheableQueryRowReader.class);
 
+    @SuppressWarnings("unchecked")
     public static CacheableQueryRow createRow(ResultSet cachedRowSet, Set<String> fixedFieldsInEvent, ResponseObjectFactory responseObjectFactory,
                     MarkingFunctions markingFunctions) {
 
@@ -86,23 +89,37 @@ public class CacheableQueryRowReader {
             }
             if (columnToIndexMap.get("_markings_") != null) {
                 String mStr = cachedRowSet.getString(columnToIndexMap.get("_markings_"));
-                cqfc.setMarkings(MarkingFunctions.Encoding.fromString(mStr));
+                if (mStr != null && !mStr.isEmpty()) {
+                    try {
+                        AccessExpression ae = MarkingFunctions.Default.ACCESS.newExpression(mStr);
+                        cqfc.setMarkings(markingFunctions.fromAccessExpression(ae));
+                    } catch (MarkingFunctions.Exception e) {
+                        log.error("could not deserialize markings {}", mStr, e);
+                    }
+                }
             }
             if (columnToIndexMap.get("_column_markings_") != null) {
                 String columnMarkings = cachedRowSet.getString(columnToIndexMap.get("_column_markings_"));
                 Map<String,String> combinedColumnMarkings = parseColumnMarkings(columnMarkings, columnToIndexMap);
-                Map<String,Map<String,String>> columnMarkingsMap = new HashMap<>();
+                Map<String,Markings<?>> columnMarkingsMap = new HashMap<>();
                 Map<String,String> columnVisibilityMap = new HashMap<>();
                 for (Map.Entry<String,String> entry : combinedColumnMarkings.entrySet()) {
                     String columnName = entry.getKey();
                     String combinedString = entry.getValue();
                     int x = combinedString.lastIndexOf(':');
-                    if (x >= 0) {
-                        columnMarkingsMap.put(columnName, MarkingFunctions.Encoding.fromString(combinedString.substring(0, x)));
-                        columnVisibilityMap.put(columnName, combinedString.substring(x + 1));
-                    } else {
-                        columnMarkingsMap.put(columnName, MarkingFunctions.Encoding.fromString(combinedString));
-                        columnVisibilityMap.put(columnName, "");
+                    try {
+                        if (x >= 0) {
+                            String markingStr = combinedString.substring(0, x);
+                            AccessExpression ae = MarkingFunctions.Default.ACCESS.newExpression(markingStr);
+                            columnMarkingsMap.put(columnName, markingFunctions.fromAccessExpression(ae));
+                            columnVisibilityMap.put(columnName, combinedString.substring(x + 1));
+                        } else {
+                            AccessExpression ae = MarkingFunctions.Default.ACCESS.newExpression(combinedString);
+                            columnMarkingsMap.put(columnName, markingFunctions.fromAccessExpression(ae));
+                            columnVisibilityMap.put(columnName, "");
+                        }
+                    } catch (MarkingFunctions.Exception e) {
+                        log.error("could not deserialize column markings for {}: {}", columnName, combinedString, e);
                     }
                 }
                 cqfc.setColumnMarkingsMap(columnMarkingsMap);

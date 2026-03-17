@@ -29,6 +29,8 @@ import datawave.ingest.data.config.NormalizedContentInterface;
 import datawave.ingest.data.config.NormalizedFieldAndValue;
 import datawave.ingest.data.config.ingest.BaseIngestHelper;
 import datawave.ingest.data.config.ingest.IngestHelperInterface;
+import datawave.marking.ColumnVisibilitySecurityMarking;
+import datawave.marking.Markings;
 
 public class NormalizedContentInterfaceTest {
     private static final Logger log = LoggerFactory.getLogger(NormalizedContentInterfaceTest.class);
@@ -178,10 +180,10 @@ public class NormalizedContentInterfaceTest {
         return fieldAndValue;
     }
 
-    private Map<String,String> createDefaultMarkings() {
-        Map<String,String> defaultMarkings = new HashMap<>(1);
-        defaultMarkings.put("columnVisibility", "PRIVATE");
-        return defaultMarkings;
+    private Markings<?> createDefaultMarkings() {
+        ColumnVisibilitySecurityMarking sm = new ColumnVisibilitySecurityMarking();
+        sm.setColumnVisibility("PRIVATE");
+        return sm.toMarkings();
     }
 
     private void compare(Multimap<String,NormalizedContentInterface> actualValues, Multimap<String,NormalizedContentInterface> expectedValues) {

@@ -30,6 +30,7 @@ import com.google.common.collect.ArrayListMultimap;
 import com.google.common.collect.Multimap;
 import com.google.protobuf.InvalidProtocolBufferException;
 
+import datawave.core.common.util.AccessExpressionUtil;
 import datawave.ingest.protobuf.Uid;
 import datawave.marking.MarkingFunctions;
 import datawave.query.Constants;
@@ -162,10 +163,12 @@ public class DiscoveryIterator implements SortedKeyValueIterator<Key,Value> {
             } else {
                 // Otherwise, combine the visibilities, and return the aggregated result.
                 try {
-                    ColumnVisibility visibility = markingFunctions.combine(visibilities);
+                    ColumnVisibility visibility = AccessExpressionUtil.toColumnVisibility(markingFunctions
+                                    .combine(visibilities.stream().map(AccessExpressionUtil::toAccessExpression).collect(java.util.stream.Collectors.toSet())));
                     MapWritable countsByVis = new MapWritable();
                     visibilityToCounts.forEach((key, value) -> countsByVis.put(new Text(key), new LongWritable(value)));
-                    return new DiscoveredThing(term, first.getField(), first.getDatatype(), date, new String(visibility.flatten()), count, countsByVis);
+                    String normalizedVis = MarkingFunctions.normalize(AccessExpressionUtil.toAccessExpression(visibility)).getExpression();
+                    return new DiscoveredThing(term, first.getField(), first.getDatatype(), date, normalizedVis, count, countsByVis);
                 } catch (Exception e) {
                     if (log.isTraceEnabled()) {
                         log.warn("Invalid column visibilities after combining " + visibilities);

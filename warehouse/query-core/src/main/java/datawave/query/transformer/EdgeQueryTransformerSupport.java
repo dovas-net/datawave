@@ -6,9 +6,9 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
+import org.apache.accumulo.access.AccessExpression;
 import org.apache.accumulo.core.data.Value;
 import org.apache.accumulo.core.security.Authorizations;
-import org.apache.accumulo.core.security.ColumnVisibility;
 import org.apache.commons.lang.StringUtils;
 import org.apache.commons.lang.builder.HashCodeBuilder;
 
@@ -20,6 +20,7 @@ import datawave.core.query.logic.BaseQueryLogicTransformer;
 import datawave.edge.model.EdgeModelFields;
 import datawave.edge.util.EdgeValue;
 import datawave.marking.MarkingFunctions;
+import datawave.marking.Markings;
 import datawave.microservice.query.Query;
 import datawave.webservice.query.cachedresults.CacheableQueryRow;
 import datawave.webservice.query.exception.QueryException;
@@ -99,16 +100,16 @@ public abstract class EdgeQueryTransformerSupport<I,O> extends BaseQueryLogicTra
         try {
             EdgeQueryResponseBase response = responseObjectFactory.getEdgeQueryResponse();
 
-            Set<ColumnVisibility> uniqueColumnVisibilities = Sets.newHashSet();
+            Set<AccessExpression> uniqueExpressions = Sets.newHashSet();
             for (Object result : resultList) {
                 EdgeBase edge = (EdgeBase) result;
-                Map<String,String> markings = edge.getMarkings();
-                uniqueColumnVisibilities.add(this.markingFunctions.translateToColumnVisibility(markings));
+                Markings<?> markings = edge.getMarkings();
+                uniqueExpressions.add(this.markingFunctions.toAccessExpression(markings));
                 response.addEdge(edge);
             }
 
-            ColumnVisibility combinedVisibility = this.markingFunctions.combine(uniqueColumnVisibilities);
-            response.setMarkings(this.markingFunctions.translateFromColumnVisibility(combinedVisibility));
+            AccessExpression combinedExpression = this.markingFunctions.combine(uniqueExpressions);
+            response.setMarkings(this.markingFunctions.fromAccessExpression(combinedExpression));
             return response;
         } catch (Exception ex) {
             throw new RuntimeException("could not handle markings in resultList ", ex);
@@ -171,7 +172,7 @@ public abstract class EdgeQueryTransformerSupport<I,O> extends BaseQueryLogicTra
 
     @Override
     public Object readFromCache(CacheableQueryRow cacheableQueryRow) {
-        Map<String,String> markings = cacheableQueryRow.getMarkings();
+        Markings<?> markings = cacheableQueryRow.getMarkings();
 
         EdgeBase edge = (EdgeBase) responseObjectFactory.getEdge();
 

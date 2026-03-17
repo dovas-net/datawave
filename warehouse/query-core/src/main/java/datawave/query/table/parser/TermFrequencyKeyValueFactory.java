@@ -9,6 +9,7 @@ import org.apache.accumulo.core.security.Authorizations;
 
 import com.google.protobuf.InvalidProtocolBufferException;
 
+import datawave.core.common.util.AccessExpressionUtil;
 import datawave.ingest.protobuf.TermWeight;
 import datawave.marking.MarkingFunctions;
 import datawave.query.table.parser.EventKeyValueFactory.EventKeyValue;
@@ -56,7 +57,7 @@ public class TermFrequencyKeyValueFactory {
 
     protected static void parseColumnVisibility(TermFrequencyKeyValue tfkv, Key key, Authorizations auths, MarkingFunctions markingFunctions)
                     throws MarkingFunctions.Exception {
-        tfkv.setMarkings(markingFunctions.translateFromColumnVisibilityForAuths(key.getColumnVisibilityParsed(), auths));
+        tfkv.setMarkings(markingFunctions.fromAccessExpression(AccessExpressionUtil.toAccessExpression(key.getColumnVisibilityParsed())));
     }
 
     public static class TermFrequencyKeyValue extends EventKeyValue {

@@ -1,16 +1,13 @@
 package datawave.query.table.parser;
 
-import java.util.HashMap;
-import java.util.Map;
-
 import org.apache.accumulo.core.data.Key;
 import org.apache.accumulo.core.data.Value;
 import org.apache.accumulo.core.security.Authorizations;
 import org.apache.accumulo.core.security.ColumnVisibility;
 
-import com.google.common.collect.Maps;
-
+import datawave.core.common.util.AccessExpressionUtil;
 import datawave.marking.MarkingFunctions;
+import datawave.marking.Markings;
 import datawave.query.Constants;
 
 public class EventKeyValueFactory {
@@ -44,7 +41,7 @@ public class EventKeyValueFactory {
 
     protected static void parseColumnVisibility(EventKeyValue event, Key key, Authorizations auths, MarkingFunctions markingFunctions)
                     throws MarkingFunctions.Exception {
-        event.setMarkings(markingFunctions.translateFromColumnVisibilityForAuths(new ColumnVisibility(key.getColumnVisibility()), auths));
+        event.setMarkings(markingFunctions.fromAccessExpression(AccessExpressionUtil.toAccessExpression(new ColumnVisibility(key.getColumnVisibility()))));
     }
 
     public static class EventKeyValue {
@@ -53,7 +50,7 @@ public class EventKeyValueFactory {
         protected String uid = null;
         protected String fieldName = null;
         protected String fieldValue = null;
-        protected Map<String,String> markings = null;
+        protected Markings<?> markings = null;
         protected long timestamp = 0L;
 
         public String getShardId() {
@@ -104,14 +101,12 @@ public class EventKeyValueFactory {
             this.timestamp = timestamp;
         }
 
-        public Map<String,String> getMarkings() {
-            if (this.markings == null)
-                this.markings = Maps.newHashMap();
-            return Maps.newHashMap(markings);
+        public Markings<?> getMarkings() {
+            return this.markings;
         }
 
-        public void setMarkings(Map<String,String> markings) {
-            this.markings = (markings == null ? new HashMap<>() : new HashMap<>(markings));
+        public void setMarkings(Markings<?> markings) {
+            this.markings = markings;
         }
 
     }

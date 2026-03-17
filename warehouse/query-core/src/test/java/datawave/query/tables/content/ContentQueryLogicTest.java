@@ -55,7 +55,7 @@ public class ContentQueryLogicTest {
     private ContentQueryConfiguration mockContentConfig;
     private Query query;
 
-    private final MarkingFunctions markingFunctions = MarkingFunctionsFactory.createMarkingFunctions();
+    private final MarkingFunctions<?> markingFunctions = MarkingFunctionsFactory.createMarkingFunctions();
 
     @BeforeEach
     public void setup() throws TableNotFoundException {
@@ -171,7 +171,7 @@ public class ContentQueryLogicTest {
         Value viewValue = new Value(Base64.encodeBytes("my happy message".getBytes()));
         Map.Entry<Key,Value> entry = new AbstractMap.SimpleImmutableEntry<>(dataKey, viewValue);
 
-        markingFunctions.translateFromColumnVisibilityForAuths(new ColumnVisibility("A"), auths);
+        markingFunctions.fromAccessExpression(new ColumnVisibility("A"), auths);
 
         // test with decode view
         logic.initialize(mockClient, settings, Set.of(auths));

@@ -1,9 +1,10 @@
 package datawave.ingest.mapreduce.handler.error;
 
+import static java.nio.charset.StandardCharsets.UTF_8;
+
 import java.io.IOException;
 import java.io.PrintStream;
 import java.util.Date;
-import java.util.Map;
 
 import org.apache.accumulo.core.data.Key;
 import org.apache.accumulo.core.data.Value;
@@ -19,6 +20,7 @@ import org.apache.log4j.Logger;
 
 import com.google.common.collect.Multimap;
 
+import datawave.core.common.util.AccessExpressionUtil;
 import datawave.data.hash.UID;
 import datawave.data.hash.UIDBuilder;
 import datawave.ingest.config.IngestConfiguration;
@@ -134,10 +136,9 @@ public class ErrorDataTypeHandler<KEYIN,KEYOUT,VALUEOUT> implements ExtendedData
         this.conf = context.getConfiguration();
 
         try {
-            Map<String,String> defaultMarkings = markingsHelper.getDefaultMarkings();
-            defaultVisibility = flatten(markingFunctions.translateToColumnVisibility(defaultMarkings));
+            defaultVisibility = markingFunctions.toAccessExpression(markingsHelper.getDefaultMarkings()).getExpression().getBytes(UTF_8);
         } catch (MarkingFunctions.Exception e) {
-            throw new IllegalArgumentException("Failed to convert default markings to a ColumnVisibility.", e);
+            throw new IllegalArgumentException("Failed to convert default markings to an AccessExpression.", e);
         }
 
         // Initialize a UID builder based on the configuration
@@ -317,11 +318,12 @@ public class ErrorDataTypeHandler<KEYIN,KEYOUT,VALUEOUT> implements ExtendedData
      *            the value holding the markings
      * @return the visibility
      */
+    @SuppressWarnings("unchecked")
     protected byte[] getVisibility(RawRecordContainer event, NormalizedContentInterface value) {
         byte[] visibility;
         if (value != null && value.getMarkings() != null && !value.getMarkings().isEmpty()) {
             try {
-                visibility = flatten(markingFunctions.translateToColumnVisibility(value.getMarkings()));
+                visibility = markingFunctions.toAccessExpression(value.getMarkings()).getExpression().getBytes(UTF_8);
             } catch (MarkingFunctions.Exception e) {
                 log.error("Failed to create visibility from markings, using default", e);
                 visibility = defaultVisibility;
@@ -335,14 +337,14 @@ public class ErrorDataTypeHandler<KEYIN,KEYOUT,VALUEOUT> implements ExtendedData
     }
 
     /**
-     * Create a flattened visibility, using the cache if possible
+     * Normalize a ColumnVisibility expression via AccessExpression and return the expression bytes.
      *
      * @param vis
      *            the visibility
-     * @return the flattened visibility
+     * @return the normalized visibility bytes
      */
     protected byte[] flatten(ColumnVisibility vis) {
-        return markingFunctions.flatten(vis);
+        return MarkingFunctions.normalize(AccessExpressionUtil.toAccessExpression(vis)).getExpression().getBytes(UTF_8);
     }
 
     @Override

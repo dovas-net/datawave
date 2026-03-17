@@ -5,20 +5,22 @@ import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashSet;
-import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Set;
 
+import org.apache.accumulo.access.AccessExpression;
 import org.apache.accumulo.core.data.Key;
 import org.apache.accumulo.core.data.Value;
 import org.apache.accumulo.core.security.ColumnVisibility;
 
 import com.esotericsoftware.kryo.io.Input;
 
+import datawave.core.common.util.AccessExpressionUtil;
 import datawave.core.query.cachedresults.CacheableLogic;
 import datawave.core.query.logic.BaseQueryLogic;
 import datawave.marking.MarkingFunctions;
 import datawave.marking.MarkingFunctions.Exception;
+import datawave.marking.Markings;
 import datawave.microservice.query.Query;
 import datawave.query.Constants;
 import datawave.query.parser.EventFields;
@@ -52,9 +54,9 @@ public class EventQueryTransformer extends EventQueryTransformerSupport<Entry<Ke
         }
         EventBase event = this.responseObjectFactory.getEvent();
 
-        Map<String,String> markings = null;
+        Markings<?> markings = null;
         try {
-            markings = this.markingFunctions.translateFromColumnVisibilityForAuths(new ColumnVisibility(key.getColumnVisibility()), this.auths);
+            markings = this.markingFunctions.fromAccessExpression(AccessExpressionUtil.toAccessExpression(new ColumnVisibility(key.getColumnVisibility())));
         } catch (Exception e) {
             log.error("could not translate " + key.getColumnVisibility() + " to markings, skipping entry");
             return null;
@@ -86,9 +88,9 @@ public class EventQueryTransformer extends EventQueryTransformerSupport<Entry<Ke
         String origFieldName = null;
         String fieldName = null;
 
-        // Hold unique Column Visibilities and merge them at the end
-        // for the overall event ColumnVisibility.
-        Set<ColumnVisibility> visibilitiesToMerge = new HashSet<>();
+        // Hold unique AccessExpressions and merge them at the end
+        // for the overall event visibility.
+        Set<AccessExpression> expressionsToMerge = new HashSet<>();
 
         for (Entry<String,Collection<FieldValue>> e : eventFields.asMap().entrySet()) {
             origFieldName = e.getKey();
@@ -99,27 +101,28 @@ public class EventQueryTransformer extends EventQueryTransformerSupport<Entry<Ke
             }
 
             for (FieldValue fv : e.getValue()) {
-                visibilitiesToMerge.add(fv.getVisibility());
+                AccessExpression fvExpression = AccessExpressionUtil.toAccessExpression(fv.getVisibility());
+                expressionsToMerge.add(fvExpression);
                 try {
-                    Map<String,String> fieldMarkings = this.markingFunctions.translateFromColumnVisibility(fv.getVisibility());
+                    Markings<?> fieldMarkings = this.markingFunctions.fromAccessExpression(fvExpression);
                     String value = new String(fv.getValue(), StandardCharsets.UTF_8);
                     // if this is a content field name, then replace the value with the uid
                     if (getContentFieldNames().contains(fieldName)) {
                         value = baseUid;
                     }
-                    values.add(this.makeField(fieldName, fieldMarkings, new String(fv.getVisibility().getExpression()), entry.getKey().getTimestamp(), value));
+                    values.add(this.makeField(fieldName, fieldMarkings, fvExpression.getExpression(), entry.getKey().getTimestamp(), value));
                 } catch (Exception e1) {
-                    throw new RuntimeException("could not make markings from: " + fv.getVisibility());
+                    throw new RuntimeException("could not make markings from: " + fvExpression);
                 }
             }
         }
 
-        ColumnVisibility columnVisibility = null;
+        AccessExpression combinedExpression = null;
         try {
-            columnVisibility = this.markingFunctions.combine(visibilitiesToMerge);
-            event.setMarkings(this.markingFunctions.translateFromColumnVisibility(columnVisibility));
+            combinedExpression = this.markingFunctions.combine(expressionsToMerge);
+            event.setMarkings(this.markingFunctions.fromAccessExpression(combinedExpression));
         } catch (Exception e1) {
-            throw new RuntimeException("could not make markings from: " + columnVisibility);
+            throw new RuntimeException("could not make markings from: " + combinedExpression);
         }
         event.setFields(new ArrayList<>(values));
 

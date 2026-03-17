@@ -33,7 +33,9 @@ import com.google.common.cache.LoadingCache;
 import com.google.common.collect.Iterators;
 import com.google.common.collect.Sets;
 
+import datawave.core.common.util.AccessExpressionUtil;
 import datawave.marking.MarkingFunctions;
+import datawave.marking.Markings;
 import datawave.query.Constants;
 import datawave.query.collections.FunctionalSet;
 import datawave.query.composite.CompositeMetadata;
@@ -84,12 +86,12 @@ public class Document extends AttributeBag<Document> implements Serializable {
         return MarkingFunctions.Factory.createMarkingFunctions();
     }
 
-    public Map<String,String> getMarkings() {
+    public Markings<?> getMarkings() {
         try {
             MarkingFunctions markingFunctions = MarkingFunctions.Factory.createMarkingFunctions();
-            return markingFunctions.translateFromColumnVisibility(getColumnVisibility());
+            return markingFunctions.fromAccessExpression(AccessExpressionUtil.toAccessExpression(getColumnVisibility()));
         } catch (MarkingFunctions.Exception e) {}
-        return Collections.emptyMap();
+        return null;
     }
 
     public Document() {

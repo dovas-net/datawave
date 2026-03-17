@@ -8,6 +8,7 @@ import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Set;
 
+import org.apache.accumulo.access.AccessExpression;
 import org.apache.accumulo.core.data.Key;
 import org.apache.accumulo.core.data.Value;
 import org.apache.accumulo.core.security.ColumnVisibility;
@@ -16,6 +17,7 @@ import org.apache.log4j.Logger;
 
 import com.google.common.base.Preconditions;
 
+import datawave.core.common.util.AccessExpressionUtil;
 import datawave.core.query.exception.EmptyObjectException;
 import datawave.core.query.logic.BaseQueryLogic;
 import datawave.data.type.StringType;
@@ -126,9 +128,11 @@ public class FacetedTransformer extends DocumentTransformerSupport<Entry<Key,Val
 
                     FieldCardinalityBase fc = this.responseObjectFactory.getFieldCardinality();
                     fc.setField(v.getFieldName());
-                    fc.setMarkings(markingFunctions.translateFromColumnVisibilityForAuths(attr.getColumnVisibility(), auths)); // reduces colvis based on
-                                                                                                                               // visibility
-                    fc.setColumnVisibility(new String(markingFunctions.translateToColumnVisibility(fc.getMarkings()).flatten()));
+                    fc.setMarkings(markingFunctions.fromAccessExpression(AccessExpressionUtil.toAccessExpression(attr.getColumnVisibility()))); // reduces
+                                                                                                                                                // colvis based
+                                                                                                                                                // on
+                    // visibility
+                    fc.setColumnVisibility(MarkingFunctions.normalize(markingFunctions.toAccessExpression(fc.getMarkings())).getExpression());
                     fc.setLower(v.getFloorValue());
                     fc.setUpper(v.getCeilingValue());
                     fc.setCardinality(v.getEstimate().cardinality());
@@ -152,7 +156,7 @@ public class FacetedTransformer extends DocumentTransformerSupport<Entry<Key,Val
 
         final Collection<FieldCardinalityBase> documentFields = buildFacets(documentKey, null, document, eventCV, mf);
 
-        facetedResponse.setMarkings(mf.translateFromColumnVisibility(eventCV));
+        facetedResponse.setMarkings(mf.fromAccessExpression(AccessExpressionUtil.toAccessExpression(eventCV)));
         facetedResponse.setFields(new ArrayList<>(documentFields));
 
         // assign an estimate of the event size based on the document size
@@ -166,7 +170,7 @@ public class FacetedTransformer extends DocumentTransformerSupport<Entry<Key,Val
     @Override
     public BaseQueryResponse createResponse(List<Object> resultList) {
         FacetQueryResponseBase response = responseObjectFactory.getFacetQueryResponse();
-        Set<ColumnVisibility> combinedColumnVisibility = new HashSet<>();
+        Set<AccessExpression> combinedExpressions = new HashSet<>();
 
         for (Object result : resultList) {
             FacetsBase facet = (FacetsBase) result;
@@ -177,14 +181,14 @@ public class FacetedTransformer extends DocumentTransformerSupport<Entry<Key,Val
 
             for (FieldCardinalityBase fcb : facet.getFields()) {
                 if (StringUtils.isNotBlank(fcb.getColumnVisibility())) {
-                    combinedColumnVisibility.add(new ColumnVisibility(fcb.getColumnVisibility()));
+                    combinedExpressions.add(AccessExpressionUtil.toAccessExpression(new ColumnVisibility(fcb.getColumnVisibility())));
                 }
             }
         }
 
         try {
-            ColumnVisibility columnVisibility = this.markingFunctions.combine(combinedColumnVisibility);
-            response.setMarkings(this.markingFunctions.translateFromColumnVisibility(columnVisibility));
+            AccessExpression combinedExpression = this.markingFunctions.combine(combinedExpressions);
+            response.setMarkings(this.markingFunctions.fromAccessExpression(combinedExpression));
 
         } catch (MarkingFunctions.Exception e) {
             log.warn(e);

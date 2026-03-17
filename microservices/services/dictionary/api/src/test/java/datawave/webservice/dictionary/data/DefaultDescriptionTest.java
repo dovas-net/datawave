@@ -31,7 +31,7 @@ public class DefaultDescriptionTest {
         markings.put("columnVisibility", "PRIVATE");
 
         DefaultDescription desc = new DefaultDescription();
-        desc.setMarkings(markings);
+        desc.setMarkingsMap(markings);
         desc.setDescription("my description");
 
         Set<DefaultDescription> descs = new HashSet<>();
@@ -107,7 +107,7 @@ public class DefaultDescriptionTest {
             assertEquals("myType", f.getDatatype());
             for (DefaultDescription d : f.getDescriptions()) {
                 assertEquals("my description", d.getDescription());
-                Map<String,String> m = d.getMarkings();
+                Map<String,String> m = d.getMarkingsMap();
                 assertEquals("PRIVATE", m.get("columnVisibility"));
                 markingCount = m.size();
                 descriptionCount++;

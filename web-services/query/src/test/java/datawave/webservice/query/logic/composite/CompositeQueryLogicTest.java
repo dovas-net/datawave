@@ -41,6 +41,7 @@ import datawave.core.query.logic.composite.CompositeLogicException;
 import datawave.core.query.logic.composite.CompositeQueryLogic;
 import datawave.core.query.logic.filtered.FilteredQueryLogic;
 import datawave.marking.MarkingFunctions;
+import datawave.marking.Markings;
 import datawave.microservice.query.Query;
 import datawave.microservice.query.QueryImpl;
 import datawave.security.authorization.AuthorizationException;
@@ -152,13 +153,13 @@ public class CompositeQueryLogicTest {
         }
 
         @Override
-        public void setMarkings(Map<String,String> markings) {
+        public void setMarkings(Markings<?> markings) {
             this.markings = markings;
         }
 
         @Override
-        public Map<String,String> getMarkings() {
-            return Collections.unmodifiableMap(markings);
+        public Markings<?> getMarkings() {
+            return this.markings;
         }
     }
 

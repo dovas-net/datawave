@@ -368,7 +368,7 @@ public abstract class ShardTableQueryMetricHandler<T extends BaseQueryMetric> ex
         Map<String,String> markings = updatedQueryMetric.getMarkings();
         if (markings != null && !markings.isEmpty()) {
             try {
-                event.setVisibility(this.markingFunctions.translateToColumnVisibility(updatedQueryMetric.getMarkings()));
+                event.setVisibility(this.markingFunctions.toAccessExpression(updatedQueryMetric.getMarkings()));
             } catch (MarkingFunctions.Exception e) {
                 log.error(e.getMessage(), e);
                 event.setVisibility(this.queryMetricHandlerProperties.getDefaultMetricVisibility());

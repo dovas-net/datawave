@@ -43,6 +43,7 @@ import org.apache.lucene.util.fst.FST;
 
 import com.google.common.collect.Maps;
 
+import datawave.core.common.util.AccessExpressionUtil;
 import datawave.core.iterators.DatawaveFieldIndexListIteratorJexl;
 import datawave.marking.MarkingFunctions;
 import datawave.marking.MarkingFunctionsFactory;
@@ -469,7 +470,8 @@ public class DatawaveInterpreter extends Interpreter {
         }
 
         try {
-            cv = MarkingFunctionsFactory.createMarkingFunctions().combine(cvs);
+            cv = AccessExpressionUtil.toColumnVisibility(MarkingFunctionsFactory.createMarkingFunctions()
+                            .combine(cvs.stream().map(AccessExpressionUtil::toAccessExpression).collect(java.util.stream.Collectors.toSet())));
         } catch (MarkingFunctions.Exception e) {
             log.error("Failed to combine column visibilities while generating HIT_TERM for phrase function for field [" + field + "]");
             log.error("msg: ", e);

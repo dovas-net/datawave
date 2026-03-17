@@ -1,5 +1,7 @@
 package datawave.ingest.mapreduce.handler.dateindex;
 
+import static java.nio.charset.StandardCharsets.UTF_8;
+
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Calendar;
@@ -26,6 +28,7 @@ import com.google.common.collect.HashMultimap;
 import com.google.common.collect.Multimap;
 
 import datawave.core.common.logging.ThreadConfigurableLogger;
+import datawave.core.common.util.AccessExpressionUtil;
 import datawave.data.normalizer.DateNormalizer;
 import datawave.ingest.data.RawRecordContainer;
 import datawave.ingest.data.Type;
@@ -364,7 +367,7 @@ public class DateIndexDataTypeHandler<KEYIN> implements DataTypeHandler<KEYIN>, 
      * @return the flattened visibility
      */
     protected byte[] flatten(ColumnVisibility vis) {
-        return MarkingFunctions.Factory.createMarkingFunctions().flatten(vis);
+        return MarkingFunctions.normalize(AccessExpressionUtil.toAccessExpression(vis)).getExpression().getBytes(UTF_8);
     }
 
     public Text getDateIndexTableName() {

@@ -2,7 +2,6 @@ package datawave.query.transformer;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Map;
 import java.util.Map.Entry;
 
 import org.apache.accumulo.core.data.Key;
@@ -12,12 +11,14 @@ import org.apache.log4j.Logger;
 
 import com.google.protobuf.InvalidProtocolBufferException;
 
+import datawave.core.common.util.AccessExpressionUtil;
 import datawave.core.query.cachedresults.CacheableLogic;
 import datawave.edge.model.EdgeModelFields;
 import datawave.edge.util.EdgeKey;
 import datawave.edge.util.EdgeValue;
 import datawave.edge.util.EdgeValueHelper;
 import datawave.marking.MarkingFunctions;
+import datawave.marking.Markings;
 import datawave.microservice.query.Query;
 import datawave.util.time.DateHelper;
 import datawave.webservice.query.result.edge.EdgeBase;
@@ -40,7 +41,7 @@ public class EdgeQueryTransformer extends EdgeQueryTransformerSupport<Entry<Key,
 
         boolean statsEdge = edgeKey.isStatsKey();
         try {
-            Map<String,String> markings = markingFunctions.translateFromColumnVisibilityForAuths(new ColumnVisibility(edgeKey.getColvis()), auths);
+            Markings<?> markings = markingFunctions.fromAccessExpression(AccessExpressionUtil.toAccessExpression(new ColumnVisibility(edgeKey.getColvis())));
             edge.setMarkings(markings);
             edge.setEdgeType(edgeKey.getType());
             edge.setEdgeRelationship(edgeKey.getRelationship());

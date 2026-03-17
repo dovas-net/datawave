@@ -14,12 +14,14 @@ import org.apache.log4j.Logger;
 
 import com.google.protobuf.InvalidProtocolBufferException;
 
+import datawave.core.common.util.AccessExpressionUtil;
 import datawave.core.query.cachedresults.CacheableLogic;
 import datawave.core.query.logic.BaseQueryLogic;
 import datawave.core.query.logic.BaseQueryLogicTransformer;
 import datawave.ingest.protobuf.Uid;
 import datawave.marking.MarkingFunctions;
 import datawave.marking.MarkingFunctions.Exception;
+import datawave.marking.Markings;
 import datawave.microservice.query.Query;
 import datawave.query.model.QueryModel;
 import datawave.webservice.query.cachedresults.CacheableQueryRow;
@@ -66,9 +68,9 @@ public class ShardIndexQueryTransformer extends BaseQueryLogicTransformer<Entry<
 
         EventBase event = responseObjectFactory.getEvent();
         ColumnVisibility columnVisibility = new ColumnVisibility(entry.getKey().getColumnVisibility());
-        Map<String,String> markings;
+        Markings<?> markings;
         try {
-            markings = this.markingFunctions.translateFromColumnVisibilityForAuths(columnVisibility, this.auths);
+            markings = this.markingFunctions.fromAccessExpression(AccessExpressionUtil.toAccessExpression(columnVisibility));
         } catch (Exception e1) {
             throw new RuntimeException("could not make markings from: " + columnVisibility);
         }
@@ -113,7 +115,7 @@ public class ShardIndexQueryTransformer extends BaseQueryLogicTransformer<Entry<
         return event;
     }
 
-    private FieldBase makeField(String name, Map<String,String> markings, String columnVisibility, Long timestamp, Object value) {
+    private FieldBase makeField(String name, Markings<?> markings, String columnVisibility, Long timestamp, Object value) {
         FieldBase field = this.responseObjectFactory.getField();
         field.setName(name);
         field.setMarkings(markings);
@@ -166,7 +168,7 @@ public class ShardIndexQueryTransformer extends BaseQueryLogicTransformer<Entry<
         if (this.variableFieldList == null) {
             this.variableFieldList = cacheableQueryRow.getVariableColumnNames();
         }
-        Map<String,String> markings = cacheableQueryRow.getMarkings();
+        Markings<?> markings = cacheableQueryRow.getMarkings();
         String dataType = cacheableQueryRow.getDataType();
         String internalId = cacheableQueryRow.getEventId();
         String row = cacheableQueryRow.getRow();
@@ -189,7 +191,7 @@ public class ShardIndexQueryTransformer extends BaseQueryLogicTransformer<Entry<
             String columnValue = entry.getValue();
             String columnVisibility = cacheableQueryRow.getColumnVisibility(columnName);
             Long columnTimestamp = cacheableQueryRow.getColumnTimestamp(columnName);
-            Map<String,String> columnMarkings = cacheableQueryRow.getColumnMarkings(columnName);
+            Markings<?> columnMarkings = cacheableQueryRow.getColumnMarkings(columnName);
             FieldBase field = responseObjectFactory.getField();
             field.setName(columnName);
             field.setMarkings(columnMarkings);

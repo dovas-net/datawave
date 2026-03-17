@@ -29,6 +29,7 @@ import org.apache.commons.collections4.iterators.TransformIterator;
 import org.apache.hadoop.io.Text;
 import org.apache.log4j.Logger;
 
+import datawave.core.common.util.AccessExpressionUtil;
 import datawave.core.query.configuration.GenericQueryConfiguration;
 import datawave.core.query.logic.QueryLogicTransformer;
 import datawave.data.type.Type;
@@ -507,7 +508,8 @@ public class FieldIndexCountQueryLogic extends ShardQueryLogic {
                 for (Text t : this.uniqueVisibilities) {
                     columnVisibilities.add(new ColumnVisibility(t));
                 }
-                return tupleMarkingFunctions.combine(columnVisibilities);
+                return AccessExpressionUtil.toColumnVisibility(tupleMarkingFunctions.combine(
+                                columnVisibilities.stream().map(AccessExpressionUtil::toAccessExpression).collect(java.util.stream.Collectors.toSet())));
 
             } catch (MarkingFunctions.Exception e) {
                 logger.error("Could not create combined column visibility for the count", e);

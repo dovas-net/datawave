@@ -28,6 +28,7 @@ import datawave.ingest.data.config.GroupedNormalizedContentInterface;
 import datawave.ingest.data.config.NormalizedContentInterface;
 import datawave.ingest.data.config.NormalizedFieldAndValue;
 import datawave.marking.MarkingFunctions;
+import datawave.marking.Markings;
 
 public interface VirtualIngest {
 
@@ -339,15 +340,16 @@ public interface VirtualIngest {
         }
 
         /**
-         * A helper routine to merge markings maps when merging fields of a NormalizedContentInterface
+         * A helper routine to merge markings when merging fields of a NormalizedContentInterface
          *
          * @param markings1
-         *            a map of markings
+         *            markings
          * @param markings2
-         *            a different map of markings
+         *            different markings
          * @return the merged markings
          */
-        protected Map<String,String> mergeMarkings(Map<String,String> markings1, Map<String,String> markings2) {
+        @SuppressWarnings("unchecked")
+        protected Markings<?> mergeMarkings(Markings<?> markings1, Markings<?> markings2) {
             if (markings2 != null) {
                 if (markings1 == null) {
                     markings1 = markings2;
@@ -544,7 +546,7 @@ public interface VirtualIngest {
         public void addVirtualFields(List<NormalizedContentInterface> virtualFields, Multimap<String,NormalizedContentInterface> eventFields,
                         Map<String,Multimap<VirtualFieldGrouping,NormalizedContentInterface>> groupings, String virtualFieldName, String replacement,
                         VirtualFieldGrouping grouping, GroupingPolicy groupingPolicy, boolean allowMissing, String[] fields, int pos, String startSeparator,
-                        String endSeparator, StringBuilder originalValue, StringBuilder normalizedValue, Map<String,String> markings) {
+                        String endSeparator, StringBuilder originalValue, StringBuilder normalizedValue, Markings<?> markings) {
             String separator = "";
             // append any constants that have been specified
             while (pos < fields.length && isConstant(fields[pos])) {

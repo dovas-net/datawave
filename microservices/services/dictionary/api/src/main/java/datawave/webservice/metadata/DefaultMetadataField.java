@@ -250,9 +250,10 @@ public class DefaultMetadataField extends MetadataFieldBase<DefaultMetadataField
                         int size = input.readInt32();
                         message.descriptions = new HashSet<>(size);
                         for (int i = 0; i < size; i++) {
-                            Map<String,String> markings = new HashMap<>();
-                            input.mergeObject(markings, MapSchema.SCHEMA);
-                            message.descriptions.add(new DefaultDescription(input.readString(), markings));
+                            // legacy markings map — consume but discard
+                            HashMap<String,String> legacyMarkings = new HashMap<>();
+                            input.mergeObject(legacyMarkings, MapSchema.SCHEMA);
+                            message.descriptions.add(new DefaultDescription(input.readString()));
                         }
                         break;
                     case 10:
@@ -295,7 +296,8 @@ public class DefaultMetadataField extends MetadataFieldBase<DefaultMetadataField
             output.writeInt32(9, message.getDescriptions().size(), false);
             for (DescriptionBase desc : message.getDescriptions()) {
                 output.writeString(9, desc.getDescription(), true);
-                output.writeObject(9, desc.getMarkings(), MapSchema.SCHEMA, false);
+                // Write empty markings map for backward compat with old protostuff readers
+                output.writeObject(9, new HashMap<String,String>(), MapSchema.SCHEMA, false);
             }
             output.writeString(10, message.lastUpdated, false);
             output.writeBool(11, message.tokenized, false);

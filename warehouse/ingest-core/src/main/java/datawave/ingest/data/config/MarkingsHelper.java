@@ -4,11 +4,13 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.Map.Entry;
 
+import org.apache.accumulo.access.Access;
 import org.apache.hadoop.conf.Configuration;
 
 import datawave.ingest.data.Type;
 import datawave.ingest.data.config.ingest.BaseIngestHelper;
-import datawave.marking.MarkingFunctions;
+import datawave.marking.AccessExpressionMarkings;
+import datawave.marking.Markings;
 
 public interface MarkingsHelper {
 
@@ -28,7 +30,7 @@ public interface MarkingsHelper {
      *
      * @return markings
      */
-    Map<String,String> getDefaultMarkings();
+    Markings<?> getDefaultMarkings();
 
     /**
      * Returns the markings override for the field
@@ -37,7 +39,7 @@ public interface MarkingsHelper {
      *            the field name
      * @return markings
      */
-    Map<String,String> getFieldMarking(String fieldName);
+    Markings<?> getFieldMarking(String fieldName);
 
     /**
      * Method to set the markings on a field
@@ -48,12 +50,14 @@ public interface MarkingsHelper {
     void markField(NormalizedContentInterface field);
 
     /**
-     * No-op helper for default ColumnVisibility implementation. Should only be used for testing purposes.
+     * No-op helper for default AccessExpression implementation. Should only be used for testing purposes.
      */
     class NoOp implements MarkingsHelper {
 
-        private Map<String,Map<String,String>> fieldMarkingMap = new HashMap<>();
-        private Map<String,String> defaultMarkings = null;
+        private static final Access ACCESS = Access.builder().build();
+
+        private Map<String,Markings<?>> fieldMarkingMap = new HashMap<>();
+        private Markings<?> defaultMarkings = null;
 
         Configuration conf;
         Type dataType;
@@ -67,15 +71,13 @@ public interface MarkingsHelper {
         private void initDefaultMarkings() {
             String marking = conf.get(dataType.typeName() + DEFAULT_MARKING);
             if (null != marking) {
-                defaultMarkings = new HashMap<>();
-                defaultMarkings.put(MarkingFunctions.Default.COLUMN_VISIBILITY, marking);
+                defaultMarkings = AccessExpressionMarkings.builder().accessExpression(ACCESS.newExpression(marking)).build();
             }
             for (Entry<String,String> property : conf) {
                 if (property.getKey().startsWith(dataType.typeName()) && property.getKey().endsWith(FIELD_MARKING)) {
                     String fieldName = null;
                     if (null != (fieldName = BaseIngestHelper.getFieldName(dataType, property.getKey(), FIELD_MARKING))) {
-                        Map<String,String> fieldMarking = new HashMap<>();
-                        fieldMarking.put(MarkingFunctions.Default.COLUMN_VISIBILITY, property.getValue());
+                        Markings<?> fieldMarking = AccessExpressionMarkings.builder().accessExpression(ACCESS.newExpression(property.getValue())).build();
                         fieldMarkingMap.put(fieldName, fieldMarking);
                     }
                 }
@@ -83,12 +85,12 @@ public interface MarkingsHelper {
         }
 
         @Override
-        public Map<String,String> getDefaultMarkings() {
+        public Markings<?> getDefaultMarkings() {
             return defaultMarkings;
         }
 
         @Override
-        public Map<String,String> getFieldMarking(String fieldName) {
+        public Markings<?> getFieldMarking(String fieldName) {
             return fieldMarkingMap.get(fieldName);
         }
 

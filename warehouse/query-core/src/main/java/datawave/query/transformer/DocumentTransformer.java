@@ -2,7 +2,6 @@ package datawave.query.transformer;
 
 import java.util.ArrayList;
 import java.util.Collection;
-import java.util.Map;
 import java.util.Map.Entry;
 
 import org.apache.accumulo.core.data.Key;
@@ -12,12 +11,14 @@ import org.apache.log4j.Logger;
 
 import com.google.common.base.Preconditions;
 
+import datawave.core.common.util.AccessExpressionUtil;
 import datawave.core.query.exception.EmptyObjectException;
 import datawave.core.query.logic.BaseQueryLogic;
 import datawave.core.query.logic.Flushable;
 import datawave.core.query.logic.WritesQueryMetrics;
 import datawave.core.query.logic.WritesResultCardinalities;
 import datawave.marking.MarkingFunctions;
+import datawave.marking.Markings;
 import datawave.microservice.query.Query;
 import datawave.query.attributes.Document;
 import datawave.webservice.query.result.event.EventBase;
@@ -165,7 +166,7 @@ public class DocumentTransformer extends DocumentTransformerSupport<Entry<Key,Va
     protected EventBase buildResponse(Document document, Key documentKey, ColumnVisibility eventCV, String colf, String row, MarkingFunctions mf)
                     throws MarkingFunctions.Exception {
 
-        Map<String,String> markings = mf.translateFromColumnVisibility(eventCV);
+        Markings<?> markings = mf.fromAccessExpression(AccessExpressionUtil.toAccessExpression(eventCV));
 
         EventBase event = null;
         final Collection<FieldBase<?>> documentFields = buildDocumentFields(documentKey, null, document, eventCV, mf);

@@ -75,7 +75,6 @@ import datawave.ingest.mapreduce.handler.shard.AbstractColumnBasedHandler;
 import datawave.ingest.mapreduce.job.BulkIngestKey;
 import datawave.ingest.mapreduce.job.writer.LiveContextWriter;
 import datawave.ingest.table.config.TableConfigHelper;
-import datawave.marking.MarkingFunctions;
 import datawave.microservice.query.Query;
 import datawave.microservice.query.QueryImpl;
 import datawave.microservice.query.QueryImpl.Parameter;
@@ -283,8 +282,9 @@ public class ShardTableQueryMetricHandler extends BaseQueryMetricHandler<QueryMe
             event.setVisibility(new ColumnVisibility(DEFAULT_SECURITY_MARKING));
         } else {
             try {
-                MarkingFunctions markingFunctions = MarkingFunctions.Factory.createMarkingFunctions();
-                event.setVisibility(markingFunctions.translateToColumnVisibility(markings));
+                // Extract the visibility expression from the legacy Map<String,String> markings
+                String visExpr = markings.getOrDefault("columnVisibility", DEFAULT_SECURITY_MARKING);
+                event.setVisibility(new ColumnVisibility(visExpr));
             } catch (Exception e) {
                 log.error(e.getMessage(), e);
                 event.setVisibility(new ColumnVisibility(DEFAULT_SECURITY_MARKING));

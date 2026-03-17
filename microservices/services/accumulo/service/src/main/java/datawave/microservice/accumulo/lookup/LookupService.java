@@ -18,7 +18,6 @@ import org.apache.accumulo.core.data.PartialKey;
 import org.apache.accumulo.core.data.Range;
 import org.apache.accumulo.core.data.Value;
 import org.apache.accumulo.core.security.Authorizations;
-import org.apache.accumulo.core.security.ColumnVisibility;
 import org.apache.commons.codec.binary.Base64;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.builder.ToStringBuilder;
@@ -36,6 +35,7 @@ import com.google.common.base.Preconditions;
 
 import datawave.accumulo.util.security.UserAuthFunctions;
 import datawave.marking.MarkingFunctions;
+import datawave.marking.Markings;
 import datawave.marking.SecurityMarking;
 import datawave.microservice.accumulo.lookup.config.LookupAuditProperties;
 import datawave.microservice.accumulo.lookup.config.LookupProperties;
@@ -218,12 +218,8 @@ public class LookupService {
                     continue;
                 }
 
-                //@formatter:off
-                final Map<String,String> markings = markingFunctions.translateFromColumnVisibilityForAuths(
-                    new ColumnVisibility(k.getColumnVisibility()),
-                    mergedAuths
-                );
-                //@formatter:on
+                final Markings<?> markings = markingFunctions
+                                .fromAccessExpression(MarkingFunctions.Default.ACCESS.newExpression(k.getColumnVisibility().toString()));
 
                 final KeyBase responseKey = responseObjectFactory.createKey();
                 responseKey.setRow(currRow);

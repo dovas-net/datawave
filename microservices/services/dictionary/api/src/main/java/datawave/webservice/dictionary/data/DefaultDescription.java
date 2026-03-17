@@ -12,6 +12,11 @@ import javax.xml.bind.annotation.XmlAccessorOrder;
 import javax.xml.bind.annotation.XmlAccessorType;
 import javax.xml.bind.annotation.XmlTransient;
 
+import org.apache.accumulo.access.AccessExpression;
+
+import datawave.marking.AccessExpressionMarkings;
+import datawave.marking.MarkingFunctions;
+import datawave.marking.Markings;
 import datawave.webservice.query.result.event.MapSchema;
 import io.protostuff.Input;
 import io.protostuff.Message;
@@ -23,15 +28,17 @@ import io.protostuff.Schema;
 public class DefaultDescription extends DescriptionBase<DefaultDescription> implements Serializable, Message<DefaultDescription> {
     private static final long serialVersionUID = 6756537335803261872L;
 
+    private static final String CV_KEY = "columnVisibility";
+
     public DefaultDescription() {}
 
     public DefaultDescription(String description) {
         this.description = description;
     }
 
-    public DefaultDescription(String description, Map<String,String> markings) {
+    public DefaultDescription(String description, Map<String,String> markingsMap) {
         this.description = description;
-        this.markings = markings;
+        this.markingsMap = markingsMap;
     }
 
     public String getDescription() {
@@ -43,12 +50,25 @@ public class DefaultDescription extends DescriptionBase<DefaultDescription> impl
     }
 
     @Override
-    public void setMarkings(Map<String,String> markings) {
-        this.markings = markings;
+    public void setMarkings(Markings<?> markings) {
+        if (markings == null || markings.isEmpty()) {
+            this.markingsMap = null;
+        } else {
+            Object m = markings.getMarkings();
+            if (m instanceof AccessExpression) {
+                this.markingsMap = new HashMap<>();
+                this.markingsMap.put(CV_KEY, ((AccessExpression) m).getExpression());
+            }
+        }
     }
 
-    public Map<String,String> getMarkings() {
-        return this.markings;
+    @Override
+    public Markings<?> getMarkings() {
+        if (this.markingsMap != null && this.markingsMap.containsKey(CV_KEY)) {
+            String expr = this.markingsMap.get(CV_KEY);
+            return AccessExpressionMarkings.builder().accessExpression(MarkingFunctions.Default.ACCESS.newExpression(expr)).build();
+        }
+        return null;
     }
 
     @Override
@@ -111,8 +131,7 @@ public class DefaultDescription extends DescriptionBase<DefaultDescription> impl
             if (message.description != null) {
                 output.writeString(1, message.description, false);
             }
-            if (message.markings != null)
-                output.writeObject(1, message.markings, MapSchema.SCHEMA, false);
+            // markings field 2 no longer written via MapSchema; markingsMap is bridged via Markings<?>
         }
 
         public void mergeFrom(Input input, DefaultDescription message) throws IOException {
@@ -123,8 +142,9 @@ public class DefaultDescription extends DescriptionBase<DefaultDescription> impl
                         message.description = input.readString();
                         break;
                     case 2:
-                        message.markings = new HashMap<String,String>();
-                        input.mergeObject(message.markings, MapSchema.SCHEMA);
+                        // legacy markings map — consume but discard
+                        HashMap<String,String> legacyMarkings = new HashMap<>();
+                        input.mergeObject(legacyMarkings, MapSchema.SCHEMA);
                         break;
                     default:
                         input.handleUnknownField(number, this);

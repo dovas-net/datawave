@@ -33,6 +33,7 @@ import org.apache.log4j.Logger;
 
 import com.google.common.collect.Sets;
 
+import datawave.core.common.util.AccessExpressionUtil;
 import datawave.iterators.IteratorSettingHelper;
 import datawave.marking.MarkingFunctions;
 import datawave.query.Constants;
@@ -565,7 +566,8 @@ public class FieldIndexCountingIteratorPerVisibility extends WrappingIterator im
             ColumnVisibility cv = null;
             try {
                 // Calculate the columnVisibility for this key from the combiner.
-                cv = MarkingFunctions.Factory.createMarkingFunctions().combine(columnVisibilities);
+                cv = AccessExpressionUtil.toColumnVisibility(MarkingFunctions.Factory.createMarkingFunctions().combine(
+                                columnVisibilities.stream().map(AccessExpressionUtil::toAccessExpression).collect(java.util.stream.Collectors.toSet())));
             } catch (Exception e) {
                 log.error("Could not create combined columnVisibility for the count", e);
                 return null;

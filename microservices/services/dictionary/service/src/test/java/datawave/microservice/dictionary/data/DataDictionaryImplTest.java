@@ -92,7 +92,7 @@ public class DataDictionaryImplTest {
         markings.put("columnVisibility", "PRIVATE");
 
         DefaultDescription description = new DefaultDescription();
-        description.setMarkings(markings);
+        description.setMarkingsMap(markings);
         description.setDescription("my ultra cool description");
 
         // Ensure no alias will be found.
@@ -114,7 +114,7 @@ public class DataDictionaryImplTest {
         markings.put("columnVisibility", "PRIVATE");
 
         DefaultDescription description = new DefaultDescription();
-        description.setMarkings(markings);
+        description.setMarkingsMap(markings);
         description.setDescription("my ultra cool description");
 
         Set<DefaultDescription> descriptions = Collections.singleton(description);
@@ -142,7 +142,7 @@ public class DataDictionaryImplTest {
         markings.put("columnVisibility", "PRIVATE");
 
         DefaultDescription description = new DefaultDescription();
-        description.setMarkings(markings);
+        description.setMarkingsMap(markings);
         description.setDescription("my ultra cool description");
 
         Set<DefaultDescription> descriptions = Collections.singleton(description);
@@ -165,7 +165,7 @@ public class DataDictionaryImplTest {
         markings.put("columnVisibility", "PRIVATE");
 
         DefaultDescription description = new DefaultDescription();
-        description.setMarkings(markings);
+        description.setMarkingsMap(markings);
         description.setDescription("my ultra cool description");
 
         Set<DefaultDescription> descriptions = Collections.singleton(description);
@@ -298,7 +298,7 @@ public class DataDictionaryImplTest {
         markings.put("columnVisibility", "PRIVATE");
 
         DefaultDescription description = new DefaultDescription();
-        description.setMarkings(markings);
+        description.setMarkingsMap(markings);
         description.setDescription("my ultra cool description");
 
         // Ensure no alias will be found.
@@ -319,7 +319,7 @@ public class DataDictionaryImplTest {
         markings.put("columnVisibility", "PRIVATE");
 
         DefaultDescription description = new DefaultDescription();
-        description.setMarkings(markings);
+        description.setMarkingsMap(markings);
         description.setDescription("my ultra cool description");
 
         // Ensure an alias will be found.

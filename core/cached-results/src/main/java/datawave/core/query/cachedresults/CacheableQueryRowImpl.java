@@ -7,26 +7,29 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
-import java.util.TreeMap;
 import java.util.TreeSet;
 
-import org.apache.accumulo.core.security.ColumnVisibility;
+import org.apache.accumulo.access.AccessExpression;
 import org.apache.commons.lang.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import com.google.common.collect.Maps;
 import com.google.common.collect.Sets;
 
 import datawave.data.type.Type;
+import datawave.marking.AccessExpressionMarkings;
 import datawave.marking.MarkingFunctions;
+import datawave.marking.Markings;
 import datawave.webservice.query.cachedresults.CacheableQueryRow;
 import datawave.webservice.query.data.ObjectSizeOf;
 import datawave.webservice.query.util.TypedValue;
 
+@SuppressWarnings("unchecked")
 public class CacheableQueryRowImpl extends CacheableQueryRow implements ObjectSizeOf {
 
     private static Logger log = LoggerFactory.getLogger(CacheableQueryRowImpl.class);
+    private static final Markings<?> EMPTY_MARKINGS = AccessExpressionMarkings.builder().accessExpression(MarkingFunctions.Default.ACCESS.newExpression(""))
+                    .build();
 
     private String user = null;
     private String queryId = null;
@@ -35,31 +38,31 @@ public class CacheableQueryRowImpl extends CacheableQueryRow implements ObjectSi
     private String eventId = null;
     private String row = null;
     private String colFam = null;
-    private Map<String,String> markings = new HashMap<>();
-    private Map<String,Map<String,String>> columnMarkingsMap = new HashMap<>();
+    private Markings<?> markings = EMPTY_MARKINGS;
+    private Map<String,Markings<?>> columnMarkingsMap = new HashMap<>();
     private Map<String,String> columnColumnVisibilityMap = new HashMap<>();
-    private Map<String,String> columnTypeMap = Maps.newHashMap();
+    private Map<String,String> columnTypeMap = new HashMap<>();
     private Map<String,Long> columnTimestampMap = new HashMap<>();
     private Map<String,Set<String>> columnValues = new HashMap<>();
     private Set<String> variableColumnNames = new TreeSet<>();
     private String queryOrigin = null;
     private String resultOrigin = null;
 
-    public void addColumn(String columnName, String columnValueString, Map<String,String> markings, String columnVisibility, Long timestamp) {
+    public void addColumn(String columnName, String columnValueString, Markings<?> markings, String columnVisibility, Long timestamp) {
         addColumn(columnName, new TypedValue(columnValueString), markings, columnVisibility, timestamp);
     }
 
-    public void addColumn(String columnName, TypedValue columnTypedValue, Map<String,String> markings, String columnVisibility, Long timestamp) {
+    public void addColumn(String columnName, TypedValue columnTypedValue, Markings<?> markings, String columnVisibility, Long timestamp) {
 
         columnName = columnName.replaceAll(" ", "_");
 
         // if new markings are the same as the old markings, skip all of this
         // they are the same and the markings value has already been validated
-        if (this.markings.equals(markings) == false) {
+        if (!this.markings.equals(markings)) {
             if (this.markings.isEmpty()) {
                 // validate the markings
                 try {
-                    markingFunctions.translateToColumnVisibility(markings);
+                    markingFunctions.toAccessExpression(markings);
                     if (this.markings.isEmpty()) {
                         // markings were empty, so use the one passed in.
                         this.markings = markings;
@@ -70,13 +73,13 @@ public class CacheableQueryRowImpl extends CacheableQueryRow implements ObjectSi
                 }
             } else {
                 try {
-                    Set<ColumnVisibility> columnVisibilities = Sets.newHashSet();
-                    columnVisibilities.add(markingFunctions.translateToColumnVisibility(this.markings));
-                    columnVisibilities.add(markingFunctions.translateToColumnVisibility(markings));
-                    ColumnVisibility combinedVisibility = markingFunctions.combine(columnVisibilities);
+                    Set<AccessExpression> expressions = new HashSet<>();
+                    expressions.add(markingFunctions.toAccessExpression(this.markings));
+                    expressions.add(markingFunctions.toAccessExpression(markings));
+                    AccessExpression combined = markingFunctions.combine(expressions);
 
                     // use combined marking as new markings
-                    this.markings = markingFunctions.translateFromColumnVisibility(combinedVisibility);
+                    this.markings = markingFunctions.fromAccessExpression(combined);
                 } catch (MarkingFunctions.Exception e) {
                     log.error("Invalid markings {} skipping column {} = {}", markings, columnName, columnTypedValue, e);
                     return;
@@ -98,14 +101,13 @@ public class CacheableQueryRowImpl extends CacheableQueryRow implements ObjectSi
         }
 
         manageColumnInsert(datawaveType, columnName, columnTypedValue, markings, columnVisibility);
-        if (!typedColumnName.isEmpty() && typedColumnName.startsWith("XS_STRING") == false) {
+        if (!typedColumnName.isEmpty() && !typedColumnName.startsWith("XS_STRING")) {
             manageColumnInsert(datawaveType, typedColumnName, columnTypedValue, markings, columnVisibility);
         }
     }
 
-    private void manageColumnInsert(Type<?> datawaveType, String columnName, TypedValue columnTypedValue, Map<String,String> markings,
-                    String columnVisibility) {
-        if (this.columnValues.containsKey(columnName) == false) {
+    private void manageColumnInsert(Type<?> datawaveType, String columnName, TypedValue columnTypedValue, Markings<?> markings, String columnVisibility) {
+        if (!this.columnValues.containsKey(columnName)) {
 
             Set<String> valuesSet = Sets.newLinkedHashSet();
             if (datawaveType != null) {
@@ -133,18 +135,18 @@ public class CacheableQueryRowImpl extends CacheableQueryRow implements ObjectSi
             } else {
                 columnValues.get(columnName).add(columnTypedValue.getValue().toString());
             }
-            Map<String,String> currMarkings = columnMarkingsMap.get(columnName);
+            Markings<?> currMarkings = columnMarkingsMap.get(columnName);
 
-            if (currMarkings.equals(markings) == false) {
+            if (!currMarkings.equals(markings)) {
                 try {
-                    Set<ColumnVisibility> columnVisibilities = Sets.newHashSet();
-                    columnVisibilities.add(markingFunctions.translateToColumnVisibility(currMarkings));
-                    columnVisibilities.add(markingFunctions.translateToColumnVisibility(markings));
-                    ColumnVisibility combinedVisibility = markingFunctions.combine(columnVisibilities);
-                    Map<String,String> minMarkings = markingFunctions.translateFromColumnVisibility(combinedVisibility);
+                    Set<AccessExpression> expressions = new HashSet<>();
+                    expressions.add(markingFunctions.toAccessExpression(currMarkings));
+                    expressions.add(markingFunctions.toAccessExpression(markings));
+                    AccessExpression combined = markingFunctions.combine(expressions);
+                    Markings<?> combinedMarkings = markingFunctions.fromAccessExpression(combined);
 
                     // use combined marking as new markings
-                    columnMarkingsMap.put(columnName, minMarkings);
+                    columnMarkingsMap.put(columnName, combinedMarkings);
                     // new combined marking means that this colVis is greater than old colVis
                     columnColumnVisibilityMap.put(columnName, columnVisibility);
                 } catch (MarkingFunctions.Exception e) {
@@ -183,13 +185,13 @@ public class CacheableQueryRowImpl extends CacheableQueryRow implements ObjectSi
         return colFam;
     }
 
-    public Map<String,String> getMarkings() {
-        return Maps.newHashMap(markings);
+    public Markings<?> getMarkings() {
+        return markings;
     }
 
-    public Map<String,String> getColumnMarkings(String columnName) {
+    public Markings<?> getColumnMarkings(String columnName) {
         columnName = columnName.replaceAll(" ", "_");
-        Map<String,String> markings = null;
+        Markings<?> markings = null;
         if (this.columnMarkingsMap.containsKey(columnName)) {
             markings = this.columnMarkingsMap.get(columnName);
         } else {
@@ -197,7 +199,7 @@ public class CacheableQueryRowImpl extends CacheableQueryRow implements ObjectSi
         }
 
         if (markings == null)
-            markings = Maps.newHashMap();
+            markings = EMPTY_MARKINGS;
         return markings;
     }
 
@@ -209,11 +211,7 @@ public class CacheableQueryRowImpl extends CacheableQueryRow implements ObjectSi
             Integer currColumnNumber = columnMap.get(currColumnName);
             if (currColumnNumber != null) {
                 Long currLong = entry.getValue();
-                Set<String> columnSet = timestampMap.get(currLong);
-                if (columnSet == null) {
-                    columnSet = new TreeSet<>();
-                    timestampMap.put(currLong, columnSet);
-                }
+                Set<String> columnSet = timestampMap.computeIfAbsent(currLong, k -> new TreeSet<>());
                 columnSet.add(currColumnName);
             }
         }
@@ -289,17 +287,17 @@ public class CacheableQueryRowImpl extends CacheableQueryRow implements ObjectSi
         this.colFam = colFam;
     }
 
-    public void setMarkings(Map<String,String> markings) {
+    public void setMarkings(Markings<?> markings) {
         // validate the markings
         try {
-            markingFunctions.translateToColumnVisibility(markings);
+            markingFunctions.toAccessExpression(markings);
             this.markings = markings;
         } catch (MarkingFunctions.Exception e) {
             log.error("Invalid markings {}", markings, e);
         }
     }
 
-    public void setColumnMarkingsMap(Map<String,Map<String,String>> columnMarkingsMap) {
+    public void setColumnMarkingsMap(Map<String,Markings<?>> columnMarkingsMap) {
         this.columnMarkingsMap = columnMarkingsMap;
     }
 
@@ -317,14 +315,16 @@ public class CacheableQueryRowImpl extends CacheableQueryRow implements ObjectSi
 
         for (String field : columnMarkingsMap.keySet()) {
 
-            // sort the map
-            Map<String,String> m = columnMarkingsMap.get(field);
+            Markings<?> m = columnMarkingsMap.get(field);
             String v = columnColumnVisibilityMap.get(field);
-            if (m == null) {
-                m = new HashMap<>();
+            String mStr = "";
+            if (m != null && !m.isEmpty()) {
+                try {
+                    mStr = markingFunctions.toAccessExpression(m).getExpression();
+                } catch (MarkingFunctions.Exception e) {
+                    log.error("could not serialize markings {}", m, e);
+                }
             }
-            // use TreeMap to sort the map
-            String mStr = MarkingFunctions.Encoding.toString(new TreeMap<>(m));
             if (v == null) {
                 combinedMap.put(field, mStr);
             } else {
@@ -338,11 +338,7 @@ public class CacheableQueryRowImpl extends CacheableQueryRow implements ObjectSi
         Map<String,Set<String>> markingToField = new HashMap<>();
         for (Map.Entry<String,String> entry : combinedMap.entrySet()) {
             String combinedMarking = entry.getValue();
-            Set<String> fields = markingToField.get(combinedMarking);
-            if (fields == null) {
-                fields = new HashSet<>();
-                markingToField.put(combinedMarking, fields);
-            }
+            Set<String> fields = markingToField.computeIfAbsent(combinedMarking, k -> new HashSet<>());
             fields.add(entry.getKey());
             if (fields.size() > largestSetCount) {
                 largestSetCount = fields.size();
@@ -377,9 +373,7 @@ public class CacheableQueryRowImpl extends CacheableQueryRow implements ObjectSi
     }
 
     public List<String> getVariableColumnNames() {
-        List<String> l = new ArrayList<>();
-        l.addAll(variableColumnNames);
-        return l;
+        return new ArrayList<>(variableColumnNames);
     }
 
     public void setVariableColumnNames(Collection<String> c) {

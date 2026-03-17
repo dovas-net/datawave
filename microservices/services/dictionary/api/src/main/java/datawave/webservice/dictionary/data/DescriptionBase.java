@@ -17,9 +17,23 @@ public abstract class DescriptionBase<T> implements HasMarkings, Message<T> {
     @XmlElement(name = "description")
     protected String description;
 
+    /**
+     * JAXB-serialized markings map. The {@link HasMarkings} interface methods {@link #getMarkings()}/{@link #setMarkings} operate on {@code Markings<?>};
+     * subclasses must bridge between this map and the Markings type.
+     */
     @XmlElement(name = "markings")
     @XmlJavaTypeAdapter(StringMapAdapter.class)
-    protected Map<String,String> markings;
+    protected Map<String,String> markingsMap;
+
+    /** Direct access to the JAXB markings map. */
+    public Map<String,String> getMarkingsMap() {
+        return markingsMap;
+    }
+
+    /** Direct access to set the JAXB markings map. */
+    public void setMarkingsMap(Map<String,String> markingsMap) {
+        this.markingsMap = markingsMap;
+    }
 
     public abstract String getDescription();
 

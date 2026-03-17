@@ -24,6 +24,8 @@ import javax.xml.bind.annotation.XmlElement;
 import javax.xml.bind.annotation.XmlElementWrapper;
 import javax.xml.bind.annotation.adapters.XmlJavaTypeAdapter;
 
+import org.apache.accumulo.access.Access;
+import org.apache.accumulo.access.AccessExpression;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.builder.CompareToBuilder;
 import org.apache.commons.lang3.builder.EqualsBuilder;
@@ -34,7 +36,8 @@ import org.slf4j.LoggerFactory;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 
-import datawave.marking.MarkingFunctions;
+import datawave.marking.AccessExpressionMarkings;
+import datawave.marking.Markings;
 import datawave.microservice.query.Query;
 import datawave.microservice.query.QueryImpl.Parameter;
 import datawave.webservice.query.exception.QueryException;
@@ -1164,22 +1167,26 @@ public abstract class BaseQueryMetric implements HasMarkings, Serializable {
         this.predictions = predictions;
     }
 
+    private static final Access ACCESS = Access.builder().build();
+
     @Override
-    public void setMarkings(Map<String,String> markings) {
+    public void setMarkings(Markings<?> markings) {
         if (markings == null || markings.isEmpty()) {
             this.columnVisibility = null;
         } else {
-            this.columnVisibility = markings.get(MarkingFunctions.Default.COLUMN_VISIBILITY);
+            Object m = markings.getMarkings();
+            if (m instanceof AccessExpression) {
+                this.columnVisibility = ((AccessExpression) m).getExpression();
+            }
         }
     }
 
     @Override
-    public Map<String,String> getMarkings() {
-        Map<String,String> markings = new HashMap<>();
+    public Markings<?> getMarkings() {
         if (this.columnVisibility != null) {
-            markings.put(MarkingFunctions.Default.COLUMN_VISIBILITY, this.columnVisibility);
+            return AccessExpressionMarkings.builder().accessExpression(ACCESS.newExpression(this.columnVisibility)).build();
         }
-        return markings;
+        return null;
     }
 
     public Schema<? extends BaseQueryMetric> getSchemaInstance() {

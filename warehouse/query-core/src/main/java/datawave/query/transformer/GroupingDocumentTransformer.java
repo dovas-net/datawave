@@ -21,8 +21,11 @@ import com.google.common.collect.Multiset;
 import com.google.common.collect.Sets;
 import com.google.common.collect.TreeMultimap;
 
+import datawave.core.common.util.AccessExpressionUtil;
 import datawave.core.query.logic.BaseQueryLogic;
+import datawave.marking.AccessExpressionMarkings;
 import datawave.marking.MarkingFunctions;
+import datawave.marking.Markings;
 import datawave.microservice.query.Query;
 import datawave.query.model.QueryModel;
 import datawave.query.tables.ShardQueryLogic;
@@ -86,7 +89,7 @@ public class GroupingDocumentTransformer extends DocumentTransformer {
     }
 
     protected BaseQueryResponse createGroupedResponse(Multiset<Collection<FieldBase<?>>> multiset) {
-        Map<String,String> markings = Maps.newHashMap();
+        Markings<?> markings = AccessExpressionMarkings.builder().build();
         EventQueryResponseBase response = this.responseObjectFactory.getEventQueryResponse();
         List<EventBase> events = new ArrayList<>();
         for (Collection<FieldBase<?>> entry : multiset.elementSet()) {
@@ -128,7 +131,9 @@ public class GroupingDocumentTransformer extends DocumentTransformer {
                     log.trace(this.groupFieldsList + " contains " + shorterName);
                 FieldBase<?> created = null;
                 try {
-                    created = this.makeField(shortName, this.markingFunctions.translateFromColumnVisibility(new ColumnVisibility(field.getColumnVisibility())),
+                    created = this.makeField(shortName,
+                                    this.markingFunctions.fromAccessExpression(
+                                                    AccessExpressionUtil.toAccessExpression(new ColumnVisibility(field.getColumnVisibility()))),
                                     field.getColumnVisibility(), 0L, field.getValueOfTypedValue());
                 } catch (Exception ex) {
                     log.error(ex);

@@ -1,5 +1,7 @@
 package datawave.ingest.mapreduce.handler.shard;
 
+import static java.nio.charset.StandardCharsets.UTF_8;
+
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.BitSet;
@@ -32,6 +34,7 @@ import com.google.common.collect.Multimap;
 import com.google.common.hash.BloomFilter;
 
 import datawave.core.common.logging.ThreadConfigurableLogger;
+import datawave.core.common.util.AccessExpressionUtil;
 import datawave.ingest.config.IngestConfiguration;
 import datawave.ingest.config.IngestConfigurationFactory;
 import datawave.ingest.data.RawRecordContainer;
@@ -50,6 +53,7 @@ import datawave.ingest.util.BloomFilterUtil;
 import datawave.ingest.util.BloomFilterWrapper;
 import datawave.ingest.util.DiskSpaceStarvationStrategy;
 import datawave.marking.MarkingFunctions;
+import datawave.marking.Markings;
 import datawave.query.model.Direction;
 import datawave.util.CompositeTimestamp;
 import datawave.util.TableName;
@@ -1127,27 +1131,28 @@ public abstract class ShardedDataTypeHandler<KEYIN> extends StatsDEnabledDataTyp
      *            the entry value
      * @return the visibility
      */
+    @SuppressWarnings("unchecked")
     public byte[] getVisibility(RawRecordContainer event, NormalizedContentInterface value) {
-        ColumnVisibility visibility = event.getVisibility();
-        if (value.getMarkings() != null && !value.getMarkings().isEmpty()) {
+        Markings<?> markings = value.getMarkings();
+        if (markings != null && !markings.isEmpty()) {
             try {
-                visibility = markingFunctions.translateToColumnVisibility(value.getMarkings());
+                return markingFunctions.toAccessExpression(markings).getExpression().getBytes(UTF_8);
             } catch (MarkingFunctions.Exception e) {
                 throw new RuntimeException("Cannot convert record-level markings into a column visibility", e);
             }
         }
-        return flatten(visibility);
+        return flatten(event.getVisibility());
     }
 
     /**
-     * Create a flattened visibility, using the cache if possible
+     * Normalize a ColumnVisibility expression via AccessExpression and return the expression bytes.
      *
      * @param vis
      *            the visibility
-     * @return the flattened visibility
+     * @return the normalized visibility bytes
      */
     protected byte[] flatten(ColumnVisibility vis) {
-        return markingFunctions == null ? vis.flatten() : markingFunctions.flatten(vis);
+        return MarkingFunctions.normalize(AccessExpressionUtil.toAccessExpression(vis)).getExpression().getBytes(UTF_8);
     }
 
     /**

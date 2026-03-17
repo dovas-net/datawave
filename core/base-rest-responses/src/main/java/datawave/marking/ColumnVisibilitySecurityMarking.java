@@ -1,8 +1,5 @@
 package datawave.marking;
 
-import static com.google.common.base.Charsets.UTF_8;
-
-import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 
@@ -12,7 +9,8 @@ import javax.xml.bind.annotation.XmlAccessorOrder;
 import javax.xml.bind.annotation.XmlAccessorType;
 import javax.xml.bind.annotation.XmlAttribute;
 
-import org.apache.accumulo.core.security.ColumnVisibility;
+import org.apache.accumulo.access.Access;
+import org.apache.accumulo.access.AccessExpression;
 
 import com.google.common.base.Preconditions;
 
@@ -21,6 +19,8 @@ import com.google.common.base.Preconditions;
 public class ColumnVisibilitySecurityMarking implements SecurityMarking {
 
     public static final String VISIBILITY_MARKING = "columnVisibility";
+
+    private static final Access ACCESS = Access.builder().build();
 
     @XmlAttribute(name = "columnVisibility")
     private String columnVisibility = null;
@@ -31,7 +31,7 @@ public class ColumnVisibilitySecurityMarking implements SecurityMarking {
         if (null == values) {
             throw new IllegalArgumentException("Required parameter " + VISIBILITY_MARKING + " not found");
         }
-        if (values.isEmpty() || values.size() > 1) {
+        if (values.size() != 1) {
             throw new IllegalArgumentException("Required parameter " + VISIBILITY_MARKING + " only accepts one value");
         }
         columnVisibility = values.get(0);
@@ -47,8 +47,16 @@ public class ColumnVisibilitySecurityMarking implements SecurityMarking {
     }
 
     @Override
-    public ColumnVisibility toColumnVisibility() {
-        return new ColumnVisibility(columnVisibility);
+    public AccessExpression toAccessExpression() {
+        if (columnVisibility == null || columnVisibility.isEmpty()) {
+            return ACCESS.newExpression("");
+        }
+        return ACCESS.newExpression(columnVisibility);
+    }
+
+    @Override
+    public Markings<AccessExpression> toMarkings() {
+        return AccessExpressionMarkings.builder().accessExpression(toAccessExpression()).build();
     }
 
     @Override
@@ -72,65 +80,29 @@ public class ColumnVisibilitySecurityMarking implements SecurityMarking {
             if (this.columnVisibility == null && other.columnVisibility != null) {
                 return false;
             }
-            if (this.columnVisibility == null && other.columnVisibility == null) {
+            if (this.columnVisibility == null) {
                 return true;
             }
-            if (this.columnVisibility.equals(other.columnVisibility)) {
-                return true;
-            } else {
-                return false;
-            }
+            return this.columnVisibility.equals(other.columnVisibility);
         }
         return false;
     }
 
     @Override
     public String toString() {
-        return toColumnVisibilityString();
+        return toAccessExpressionString();
     }
 
     @Override
-    public String toColumnVisibilityString() {
+    public String toAccessExpressionString() {
         if (null == this.columnVisibility) {
             return null;
         }
-        return new String(toColumnVisibility().flatten(), UTF_8);
+        return toAccessExpression().getExpression();
     }
 
     public void clear() {
         this.columnVisibility = null;
-    }
-
-    @Override
-    public Map<String,String> toMap() {
-        return Collections.singletonMap(VISIBILITY_MARKING, this.columnVisibility);
-    }
-
-    @Override
-    public void fromMap(Map<String,String> map) {
-        this.columnVisibility = map.get(VISIBILITY_MARKING);
-    }
-
-    /**
-     * Turn this set of markings into a serializable string
-     *
-     * @return String
-     */
-    @Override
-    public String mapToString() {
-        return MarkingFunctions.Encoding.toString(toMap());
-    }
-
-    /**
-     * Fill this security markings given an encoded string
-     *
-     * @param encodedMarkings
-     */
-    @Override
-    public void fromString(String encodedMarkings) {
-        Map<String,String> markings = MarkingFunctions.Encoding.fromString(encodedMarkings);
-        this.columnVisibility = markings.get(VISIBILITY_MARKING);
-        Preconditions.checkNotNull(columnVisibility);
     }
 
 }

@@ -31,10 +31,6 @@ public class DefaultTagCloud extends TagCloudBase<DefaultTagCloud,DefaultTagClou
 
     private static final long serialVersionUID = 6614332701390895105L;
 
-    @XmlElement(name = "markings")
-    @XmlJavaTypeAdapter(StringMapAdapter.class)
-    private HashMap<String,String> markings = null;
-
     @XmlElement(name = "language")
     private String language = null;
 
@@ -45,24 +41,6 @@ public class DefaultTagCloud extends TagCloudBase<DefaultTagCloud,DefaultTagClou
     @XmlElementWrapper(name = "tags")
     @XmlElement(name = "tag")
     private List<DefaultTagCloudEntry> tags = null;
-
-    @Override
-    public Map<String,String> getMarkings() {
-        if (markings != null) {
-            return markings;
-        } else {
-            return super.getMarkings();
-        }
-    }
-
-    public void setMarkings(Map<String,String> markings) {
-        if (null != markings) {
-            this.markings = new HashMap<>(markings);
-        } else {
-            this.markings = null;
-        }
-        super.setMarkings(this.markings);
-    }
 
     @Override
     public String getLanguage() {
@@ -120,9 +98,6 @@ public class DefaultTagCloud extends TagCloudBase<DefaultTagCloud,DefaultTagClou
         }
 
         public void writeTo(Output output, DefaultTagCloud message) throws IOException {
-            if (message.markings != null)
-                output.writeObject(1, message.markings, MapSchema.SCHEMA, false);
-
             if (message.language != null) {
                 output.writeString(2, message.language, false);
             }
@@ -150,8 +125,9 @@ public class DefaultTagCloud extends TagCloudBase<DefaultTagCloud,DefaultTagClou
             while ((number = input.readFieldNumber(this)) != 0) {
                 switch (number) {
                     case 1:
-                        message.markings = new HashMap<String,String>();
-                        input.mergeObject(message.markings, MapSchema.SCHEMA);
+                        // legacy markings map — consume but discard
+                        HashMap<String,String> legacyMarkings = new HashMap<>();
+                        input.mergeObject(legacyMarkings, MapSchema.SCHEMA);
                         break;
                     case 2:
                         message.language = input.readString();
@@ -217,13 +193,13 @@ public class DefaultTagCloud extends TagCloudBase<DefaultTagCloud,DefaultTagClou
         }
 
         DefaultTagCloud otherCloud = (DefaultTagCloud) other;
-        return Objects.equals(this.markings, otherCloud.markings) && Objects.equals(this.language, otherCloud.language)
+        return Objects.equals(this.getMarkings(), otherCloud.getMarkings()) && Objects.equals(this.language, otherCloud.language)
                         && Objects.equals(this.metadata, otherCloud.metadata) && this.tags.size() == otherCloud.tags.size()
                         && new HashSet<>(this.tags).containsAll(otherCloud.tags);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(markings, language, metadata, tags);
+        return Objects.hash(getMarkings(), language, metadata, tags);
     }
 }

@@ -11,6 +11,7 @@ import org.apache.log4j.Logger;
 
 import com.google.common.collect.Sets;
 
+import datawave.core.common.util.AccessExpressionUtil;
 import datawave.core.query.logic.ResultPostprocessor;
 import datawave.marking.MarkingFunctions;
 import datawave.webservice.query.result.event.EventBase;
@@ -70,7 +71,8 @@ public class CountResultPostprocessor implements ResultPostprocessor {
             if (success) {
                 ColumnVisibility columnVisibility = null;
                 try {
-                    columnVisibility = markingFunctions.combine(columnVisibilities);
+                    columnVisibility = AccessExpressionUtil.toColumnVisibility(markingFunctions.combine(
+                                    columnVisibilities.stream().map(AccessExpressionUtil::toAccessExpression).collect(java.util.stream.Collectors.toSet())));
                 } catch (Exception e) {
                     log.error("Could not create combined columnVisibilities for the count", e);
                 }
@@ -81,7 +83,7 @@ public class CountResultPostprocessor implements ResultPostprocessor {
                     // update the first result
                     FieldBase<?> countField = getCountField(firstResult.getFields());
                     countField.setValue(count);
-                    countField.setColumnVisibility(columnVisibility);
+                    countField.setColumnVisibility(new String(columnVisibility.getExpression()));
                 }
             }
         }

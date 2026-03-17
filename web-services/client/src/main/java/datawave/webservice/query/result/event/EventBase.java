@@ -1,22 +1,20 @@
 package datawave.webservice.query.result.event;
 
 import java.util.List;
-import java.util.Map;
 
 import javax.xml.bind.annotation.XmlAccessType;
 import javax.xml.bind.annotation.XmlAccessorType;
 import javax.xml.bind.annotation.XmlSeeAlso;
 import javax.xml.bind.annotation.XmlTransient;
 
-import com.google.common.collect.Maps;
-
+import datawave.marking.Markings;
 import io.protostuff.Message;
 
 @XmlAccessorType(XmlAccessType.NONE)
 @XmlSeeAlso(DefaultEvent.class)
 public abstract class EventBase<T,F extends FieldBase<F>> implements HasMarkings, Message<T> {
 
-    protected transient Map<String,String> markings;
+    protected transient Markings<?> markings;
 
     protected transient boolean intermediateResult;
 
@@ -50,17 +48,11 @@ public abstract class EventBase<T,F extends FieldBase<F>> implements HasMarkings
     @XmlTransient
     public abstract List<F> getFields();
 
-    public Map<String,String> getMarkings() {
-        assureMarkings();
+    public Markings<?> getMarkings() {
         return markings;
     }
 
-    protected void assureMarkings() {
-        if (this.markings == null)
-            this.markings = Maps.newHashMap();
-    }
-
-    public void setMarkings(Map<String,String> markings) {
+    public void setMarkings(Markings<?> markings) {
         this.markings = markings;
     }
 

@@ -9,6 +9,8 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
+import org.apache.accumulo.access.Access;
+import org.apache.accumulo.access.AccessExpression;
 import org.apache.accumulo.core.data.Key;
 import org.apache.accumulo.core.security.ColumnVisibility;
 import org.assertj.core.util.Sets;
@@ -37,6 +39,12 @@ public class DocumentGrouperTest {
     private static final ColumnVisibility COLVIS_E = new ColumnVisibility("E");
     private static final ColumnVisibility COLVIS_I = new ColumnVisibility("I");
     private static final ColumnVisibility COLVIS_ALL_E_I = new ColumnVisibility("ALL&E&I");
+
+    private static final Access ACCESS = Access.builder().build();
+    private static final AccessExpression AE_ALL = ACCESS.newExpression("ALL");
+    private static final AccessExpression AE_E = ACCESS.newExpression("E");
+    private static final AccessExpression AE_I = ACCESS.newExpression("I");
+    private static final AccessExpression AE_ALL_E_I = ACCESS.newExpression("ALL&E&I");
     private static final Key key = new Key("test_key");
     private static final Multimap<String,String> inverseReverseMap = HashMultimap.create();
     private static final Map<String,String> reverseMap = new HashMap<>();
@@ -526,10 +534,10 @@ public class DocumentGrouperTest {
         GroupsAssert groupsAssert = GroupsAssert.assertThat(groups);
         groupsAssert.hasTotalGroups(2);
 
-        groupsAssert.assertGroup(textKey("GENDER", "MALE")).hasCount(4).hasDocumentVisibilities(COLVIS_ALL, COLVIS_I)
-                        .hasVisibilitiesForKey(textKey("GENDER", "MALE"), COLVIS_ALL, COLVIS_I);
-        groupsAssert.assertGroup(textKey("GENDER", "FEMALE")).hasCount(3).hasDocumentVisibilities(COLVIS_I, COLVIS_E)
-                        .hasVisibilitiesForKey(textKey("GENDER", "FEMALE"), COLVIS_I, COLVIS_E);
+        groupsAssert.assertGroup(textKey("GENDER", "MALE")).hasCount(4).hasDocumentExpressions(AE_ALL, AE_I)
+                        .hasAccessExpressionsForKey(textKey("GENDER", "MALE"), AE_ALL, AE_I);
+        groupsAssert.assertGroup(textKey("GENDER", "FEMALE")).hasCount(3).hasDocumentExpressions(AE_I, AE_E)
+                        .hasAccessExpressionsForKey(textKey("GENDER", "FEMALE"), AE_I, AE_E);
     }
 
     @Test
@@ -613,18 +621,18 @@ public class DocumentGrouperTest {
         GroupsAssert groupsAssert = GroupsAssert.assertThat(groups);
         groupsAssert.hasTotalGroups(7);
 
-        groupsAssert.assertGroup(textKey("GENDER", "MALE"), textKey("BUILDING", "West")).hasCount(1).hasDocumentVisibilities(COLVIS_ALL_E_I)
-                        .hasVisibilitiesForKey(textKey("GENDER", "MALE"), COLVIS_ALL).hasVisibilitiesForKey(textKey("BUILDING", "West"), COLVIS_E);
-        groupsAssert.assertGroup(textKey("GENDER", "MALE"), textKey("BUILDING", "East")).hasCount(1).hasDocumentVisibilities(COLVIS_ALL_E_I)
-                        .hasVisibilitiesForKey(textKey("GENDER", "MALE"), COLVIS_ALL).hasVisibilitiesForKey(textKey("BUILDING", "East"), COLVIS_I);
-        groupsAssert.assertGroup(textKey("GENDER", "FEMALE"), textKey("BUILDING", "West")).hasCount(1).hasDocumentVisibilities(COLVIS_ALL_E_I)
-                        .hasVisibilitiesForKey(textKey("GENDER", "FEMALE"), COLVIS_ALL).hasVisibilitiesForKey(textKey("BUILDING", "West"), COLVIS_E);
-        groupsAssert.assertGroup(textKey("GENDER", "FEMALE"), textKey("BUILDING", "East")).hasCount(1).hasDocumentVisibilities(COLVIS_ALL_E_I)
-                        .hasVisibilitiesForKey(textKey("GENDER", "FEMALE"), COLVIS_ALL).hasVisibilitiesForKey(textKey("BUILDING", "East"), COLVIS_I);
-        groupsAssert.assertGroup(textKey("GENDER", "MALE"), textKey("BUILDING", "Center")).hasCount(2).hasDocumentVisibilities(COLVIS_ALL)
-                        .hasVisibilitiesForKey(textKey("GENDER", "MALE"), COLVIS_ALL).hasVisibilitiesForKey(textKey("BUILDING", "Center"), COLVIS_ALL);
-        groupsAssert.assertGroup(textKey("BUILDING", "North")).hasCount(1).hasDocumentVisibilities(COLVIS_ALL);
-        groupsAssert.assertGroup(textKey("BUILDING", "South")).hasCount(1).hasDocumentVisibilities(COLVIS_ALL);
+        groupsAssert.assertGroup(textKey("GENDER", "MALE"), textKey("BUILDING", "West")).hasCount(1).hasDocumentExpressions(AE_ALL_E_I)
+                        .hasAccessExpressionsForKey(textKey("GENDER", "MALE"), AE_ALL).hasAccessExpressionsForKey(textKey("BUILDING", "West"), AE_E);
+        groupsAssert.assertGroup(textKey("GENDER", "MALE"), textKey("BUILDING", "East")).hasCount(1).hasDocumentExpressions(AE_ALL_E_I)
+                        .hasAccessExpressionsForKey(textKey("GENDER", "MALE"), AE_ALL).hasAccessExpressionsForKey(textKey("BUILDING", "East"), AE_I);
+        groupsAssert.assertGroup(textKey("GENDER", "FEMALE"), textKey("BUILDING", "West")).hasCount(1).hasDocumentExpressions(AE_ALL_E_I)
+                        .hasAccessExpressionsForKey(textKey("GENDER", "FEMALE"), AE_ALL).hasAccessExpressionsForKey(textKey("BUILDING", "West"), AE_E);
+        groupsAssert.assertGroup(textKey("GENDER", "FEMALE"), textKey("BUILDING", "East")).hasCount(1).hasDocumentExpressions(AE_ALL_E_I)
+                        .hasAccessExpressionsForKey(textKey("GENDER", "FEMALE"), AE_ALL).hasAccessExpressionsForKey(textKey("BUILDING", "East"), AE_I);
+        groupsAssert.assertGroup(textKey("GENDER", "MALE"), textKey("BUILDING", "Center")).hasCount(2).hasDocumentExpressions(AE_ALL)
+                        .hasAccessExpressionsForKey(textKey("GENDER", "MALE"), AE_ALL).hasAccessExpressionsForKey(textKey("BUILDING", "Center"), AE_ALL);
+        groupsAssert.assertGroup(textKey("BUILDING", "North")).hasCount(1).hasDocumentExpressions(AE_ALL);
+        groupsAssert.assertGroup(textKey("BUILDING", "South")).hasCount(1).hasDocumentExpressions(AE_ALL);
     }
 
     @Test

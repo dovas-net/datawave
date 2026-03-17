@@ -32,8 +32,10 @@ import com.google.common.collect.HashMultimap;
 import com.google.common.collect.Multimaps;
 import com.google.common.collect.SetMultimap;
 
+import datawave.core.common.util.AccessExpressionUtil;
 import datawave.data.ColumnFamilyConstants;
 import datawave.marking.MarkingFunctions;
+import datawave.marking.Markings;
 import datawave.microservice.dictionary.config.ResponseObjectFactory;
 import datawave.query.util.MetadataEntry;
 import datawave.security.util.ScannerHelper;
@@ -126,8 +128,8 @@ public class MetadataDescriptionsHelper<DESC extends DescriptionBase<DESC>> {
             bw = accumuloClient.createBatchWriter(metadataTableName, bwConfig);
             Mutation m = new Mutation(entry.getFieldName());
             for (DescriptionBase desc : descs) {
-                m.put(ColumnFamilyConstants.COLF_DESC, new Text(entry.getDatatype()), markingFunctions.translateToColumnVisibility(desc.getMarkings()),
-                                new Value(desc.getDescription().getBytes(UTF_8)));
+                ColumnVisibility cv = AccessExpressionUtil.toColumnVisibility(markingFunctions.toAccessExpression(desc.getMarkings()));
+                m.put(ColumnFamilyConstants.COLF_DESC, new Text(entry.getDatatype()), cv, new Value(desc.getDescription().getBytes(UTF_8)));
             }
             bw.addMutation(m);
         } finally {
@@ -160,7 +162,8 @@ public class MetadataDescriptionsHelper<DESC extends DescriptionBase<DESC>> {
             BatchWriterConfig bwConfig = new BatchWriterConfig().setMaxMemory(10000L).setMaxLatency(100L, TimeUnit.MILLISECONDS).setMaxWriteThreads(1);
             bw = accumuloClient.createBatchWriter(metadataTableName, bwConfig);
             Mutation m = new Mutation(entry.getFieldName());
-            m.putDelete(ColumnFamilyConstants.COLF_DESC, new Text(entry.getDatatype()), this.markingFunctions.translateToColumnVisibility(desc.getMarkings()));
+            ColumnVisibility cv = AccessExpressionUtil.toColumnVisibility(this.markingFunctions.toAccessExpression(desc.getMarkings()));
+            m.putDelete(ColumnFamilyConstants.COLF_DESC, new Text(entry.getDatatype()), cv);
             bw.addMutation(m);
         } finally {
             if (null != bw) {
@@ -199,11 +202,7 @@ public class MetadataDescriptionsHelper<DESC extends DescriptionBase<DESC>> {
 
     }
 
-    private Map<String,String> getMarkings(Key k) throws MarkingFunctions.Exception {
-        return getMarkings(k.getColumnVisibilityParsed());
-    }
-
-    private Map<String,String> getMarkings(ColumnVisibility visibility) throws MarkingFunctions.Exception {
-        return markingFunctions.translateFromColumnVisibility(visibility);
+    private Markings<?> getMarkings(Key k) throws MarkingFunctions.Exception {
+        return markingFunctions.fromAccessExpression(AccessExpressionUtil.toAccessExpression(k.getColumnVisibilityParsed()));
     }
 }

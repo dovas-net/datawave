@@ -29,6 +29,7 @@ import org.apache.hadoop.conf.Configuration;
 import org.apache.hadoop.io.Text;
 import org.apache.log4j.Logger;
 
+import datawave.core.common.util.AccessExpressionUtil;
 import datawave.core.common.util.TypeFilter;
 import datawave.iterators.IteratorSettingHelper;
 import datawave.marking.MarkingFunctions;
@@ -587,7 +588,8 @@ public class FieldIndexCountingIterator extends WrappingIterator implements Sort
         }
         ColumnVisibility cv;
         try {
-            cv = MarkingFunctions.Factory.createMarkingFunctions().combine(columnVisibilities);
+            cv = AccessExpressionUtil.toColumnVisibility(MarkingFunctions.Factory.createMarkingFunctions()
+                            .combine(columnVisibilities.stream().map(AccessExpressionUtil::toAccessExpression).collect(java.util.stream.Collectors.toSet())));
         } catch (MarkingFunctions.Exception e) {
             log.error("Could not combine visibilities: " + visibilitySet + "  " + e);
             return null;

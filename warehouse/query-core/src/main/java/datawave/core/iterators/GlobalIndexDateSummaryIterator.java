@@ -25,6 +25,7 @@ import com.google.common.collect.Maps;
 import com.google.common.collect.Sets;
 import com.google.protobuf.InvalidProtocolBufferException;
 
+import datawave.core.common.util.AccessExpressionUtil;
 import datawave.ingest.protobuf.Uid;
 import datawave.ingest.protobuf.Uid.List.Builder;
 import datawave.marking.MarkingFunctions;
@@ -256,7 +257,8 @@ public class GlobalIndexDateSummaryIterator implements SortedKeyValueIterator<Ke
                     Set<ColumnVisibility> columnVisibilities = this.columnVisibilitiesMap.get(datatype);
 
                     // Note that the access controls found in the combined ColumnVisibility will be pulled out appropriately here
-                    ColumnVisibility cv = MarkingFunctions.Factory.createMarkingFunctions().combine(columnVisibilities);
+                    ColumnVisibility cv = AccessExpressionUtil.toColumnVisibility(MarkingFunctions.Factory.createMarkingFunctions().combine(
+                                    columnVisibilities.stream().map(AccessExpressionUtil::toAccessExpression).collect(java.util.stream.Collectors.toSet())));
 
                     // Create a new Key compatible with the shardIndex key format
                     Key k = new Key(this.fieldValue, this.fieldName, this.date + '\0' + datatype, new String(cv.getExpression()));

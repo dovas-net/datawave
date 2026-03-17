@@ -5,6 +5,7 @@ import java.util.Date;
 import java.util.HashSet;
 import java.util.Set;
 
+import org.apache.accumulo.access.AccessExpression;
 import org.apache.accumulo.core.data.Key;
 import org.apache.accumulo.core.security.ColumnVisibility;
 import org.apache.hadoop.conf.Configuration;
@@ -29,6 +30,7 @@ import datawave.ingest.mapreduce.handler.error.ErrorShardedDataTypeHandler;
 import datawave.ingest.mapreduce.job.BulkIngestKey;
 import datawave.ingest.mapreduce.job.writer.ContextWriter;
 import datawave.marking.MarkingFunctions;
+import datawave.marking.Markings;
 
 /**
  * This class differs from the parent in that when it sees a field name of ERROR it creates a category name using the field name and value.
@@ -48,10 +50,8 @@ public class AtomErrorDataTypeHandler<KEYIN,KEYOUT,VALUEOUT> extends AtomDataTyp
     public static final String ERROR_FIELD = "ERROR";
     public static final String STACK_TRACE_FIELD = "STACKTRACE";
     public static final String EVENT_CONTENT_FIELD = "EVENT";
-    public static final String COLUMN_VISIBILITY = "columnVisibility";
-
     private MarkingsHelper mHelper = null;
-    private ColumnVisibility defaultVisibility = null;
+    private AccessExpression defaultVisibility = null;
     private Configuration conf = null;
     private ErrorShardedIngestHelper errorHelper = null;
     private MarkingFunctions markingFunctions;
@@ -78,8 +78,8 @@ public class AtomErrorDataTypeHandler<KEYIN,KEYOUT,VALUEOUT> extends AtomDataTyp
 
         mHelper = IngestConfigurationFactory.getIngestConfiguration().getMarkingsHelper(conf, record.getDataType());
         try {
-            defaultVisibility = markingFunctions.translateToColumnVisibility(mHelper.getDefaultMarkings());
-        } catch (Exception e) {
+            defaultVisibility = markingFunctions.toAccessExpression(mHelper.getDefaultMarkings());
+        } catch (MarkingFunctions.Exception e) {
             throw new IllegalArgumentException("Failed to parse security marking configuration", e);
         }
 
@@ -179,23 +179,20 @@ public class AtomErrorDataTypeHandler<KEYIN,KEYOUT,VALUEOUT> extends AtomDataTyp
         return count;
     }
 
+    @SuppressWarnings("unchecked")
     protected String getVisibilityColumnString(RawRecordContainer event, NormalizedContentInterface value) {
-
-        ColumnVisibility visibility = getVisibilityColumnVisibility(event, value);
-        return visibility.toString();
-
-    }
-
-    protected ColumnVisibility getVisibilityColumnVisibility(RawRecordContainer event, NormalizedContentInterface value) {
-        ColumnVisibility visibility = event.getVisibility();
-        if (value.getMarkings() != null && !value.getMarkings().isEmpty()) {
+        Markings<?> markings = value.getMarkings();
+        if (markings != null && !markings.isEmpty()) {
             try {
-                visibility = markingFunctions.translateToColumnVisibility(value.getMarkings());
+                return markingFunctions.toAccessExpression(markings).getExpression();
             } catch (MarkingFunctions.Exception e) {
                 throw new RuntimeException("Cannot convert record-level markings into a column visibility", e);
-
             }
         }
-        return visibility == null ? defaultVisibility : visibility;
+        ColumnVisibility vis = event.getVisibility();
+        if (vis != null) {
+            return new String(vis.getExpression());
+        }
+        return defaultVisibility != null ? defaultVisibility.getExpression() : "";
     }
 }

@@ -428,7 +428,7 @@ public class CachedResultsQueryService {
                         ps.setString(5, cacheableQueryRow.getEventId());
                         ps.setString(6, cacheableQueryRow.getRow());
                         ps.setString(7, cacheableQueryRow.getColFam());
-                        ps.setString(8, MarkingFunctions.Encoding.toString(new TreeMap<>(cacheableQueryRow.getMarkings())));
+                        ps.setString(8, cacheableQueryRow.getMarkings().toString());
 
                         // keep track of the populated columns
                         Set<Integer> populatedColumns = new HashSet<>();
@@ -769,7 +769,7 @@ public class CachedResultsQueryService {
 
         // if we haven't already, validate the markings
         SecurityMarking securityMarking = scopedSecurityMarking.get();
-        if (securityMarking.toColumnVisibilityString() == null) {
+        if (securityMarking.toAccessExpressionString() == null) {
             validateSecurityMarkings(parameters);
         }
 
@@ -817,7 +817,7 @@ public class CachedResultsQueryService {
         // These are parameters that aren't passed in by the user, but rather are computed from other sources.
         PrivateAuditConstants.stripPrivateParameters(parameters);
         parameters.add(PrivateAuditConstants.LOGIC_CLASS, queryLogicName);
-        parameters.set(PrivateAuditConstants.COLUMN_VISIBILITY, scopedSecurityMarking.get().toColumnVisibilityString());
+        parameters.set(PrivateAuditConstants.COLUMN_VISIBILITY, scopedSecurityMarking.get().toAccessExpressionString());
         parameters.add(PrivateAuditConstants.USER_DN, userDn);
     }
 

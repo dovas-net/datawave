@@ -15,6 +15,7 @@ import org.apache.log4j.Logger;
 import com.google.common.base.Function;
 import com.google.common.collect.Sets;
 
+import datawave.core.common.util.AccessExpressionUtil;
 import datawave.marking.MarkingFunctions;
 
 public class TermInfoAggregation implements Function<Collection<TermInfo>,DiscoveredThing> {
@@ -73,7 +74,8 @@ public class TermInfoAggregation implements Function<Collection<TermInfo>,Discov
                 chosenCount = showReferenceCountInsteadOfTermCount ? referenceCount : termCount;
 
                 try {
-                    MarkingFunctions.Factory.createMarkingFunctions().translateFromColumnVisibility(ti.vis); // just to test parsing
+                    MarkingFunctions.Factory.createMarkingFunctions().fromAccessExpression(AccessExpressionUtil.toAccessExpression(ti.vis)); // just to test
+                                                                                                                                             // parsing
                     columnVisibilities.add(ti.vis);
 
                     // Keep track of counts for individual vis
@@ -107,7 +109,8 @@ public class TermInfoAggregation implements Function<Collection<TermInfo>,Discov
                 ColumnVisibility columnVisibility = null;
                 try {
 
-                    columnVisibility = MarkingFunctions.Factory.createMarkingFunctions().combine(columnVisibilities);
+                    columnVisibility = AccessExpressionUtil.toColumnVisibility(MarkingFunctions.Factory.createMarkingFunctions().combine(
+                                    columnVisibilities.stream().map(AccessExpressionUtil::toAccessExpression).collect(java.util.stream.Collectors.toSet())));
 
                 } catch (Exception e) {
                     log.warn("Invalid columnvisibility after combining!", e);
@@ -119,7 +122,8 @@ public class TermInfoAggregation implements Function<Collection<TermInfo>,Discov
                     countsByVis.put(new Text(entry.getKey()), new VLongWritable(entry.getValue()));
                 }
 
-                return new DiscoveredThing(term, field, type, date, new String(columnVisibility.flatten()), count, countsByVis);
+                return new DiscoveredThing(term, field, type, date,
+                                MarkingFunctions.normalize(AccessExpressionUtil.toAccessExpression(columnVisibility)).getExpression(), count, countsByVis);
             }
         }
     }

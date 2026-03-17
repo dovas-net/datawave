@@ -19,6 +19,7 @@ import org.slf4j.LoggerFactory;
 import com.google.common.base.Strings;
 import com.google.common.collect.Multimap;
 
+import datawave.core.common.util.AccessExpressionUtil;
 import datawave.ingest.data.RawRecordContainer;
 import datawave.ingest.data.Type;
 import datawave.ingest.data.TypeRegistry;
@@ -30,6 +31,7 @@ import datawave.ingest.mapreduce.job.BulkIngestKey;
 import datawave.ingest.mapreduce.job.writer.ContextWriter;
 import datawave.ingest.metadata.RawRecordMetadata;
 import datawave.marking.MarkingFunctions;
+import datawave.marking.Markings;
 import datawave.util.StringUtils;
 import datawave.util.TextUtil;
 
@@ -255,28 +257,28 @@ public class AtomDataTypeHandler<KEYIN,KEYOUT,VALUEOUT> implements ExtendedDataT
      * @return the visibility
      */
 
+    @SuppressWarnings("unchecked")
     protected String getColumnQualifier(RawRecordContainer event, NormalizedContentInterface value) {
-        ColumnVisibility visibility = event.getVisibility();
-        if (value.getMarkings() != null && !value.getMarkings().isEmpty()) {
+        Markings<?> markings = value.getMarkings();
+        if (markings != null && !markings.isEmpty()) {
             try {
-                visibility = markingFunctions.translateToColumnVisibility(value.getMarkings());
+                return markingFunctions.toAccessExpression(markings).getExpression();
             } catch (MarkingFunctions.Exception e) {
                 throw new RuntimeException("Cannot convert record-level markings into a column visibility", e);
-
             }
         }
-        return flatten(visibility);
+        return flatten(event.getVisibility());
     }
 
     /**
-     * Create a flattened visibility, using the cache if possible
+     * Normalize a ColumnVisibility expression via AccessExpression.
      *
      * @param vis
      *            the column visibility
-     * @return the flattened visibility
+     * @return the normalized visibility string
      */
     protected String flatten(ColumnVisibility vis) {
-        return new String(markingFunctions.flatten(vis));
+        return MarkingFunctions.normalize(AccessExpressionUtil.toAccessExpression(vis)).getExpression();
     }
 
 }

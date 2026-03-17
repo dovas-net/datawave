@@ -5,7 +5,6 @@ import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 
 import javax.xml.bind.annotation.XmlAccessOrder;
 import javax.xml.bind.annotation.XmlAccessType;
@@ -14,8 +13,6 @@ import javax.xml.bind.annotation.XmlAccessorType;
 import javax.xml.bind.annotation.XmlElement;
 import javax.xml.bind.annotation.XmlElementWrapper;
 import javax.xml.bind.annotation.XmlTransient;
-
-import com.google.common.collect.Maps;
 
 import datawave.webservice.query.data.ObjectSizeOf;
 import io.protostuff.Input;
@@ -28,9 +25,6 @@ import io.protostuff.Schema;
 public class SimpleEvent extends EventBase<SimpleEvent,SimpleField> implements Serializable, Message<SimpleEvent>, ObjectSizeOf {
 
     private static final long serialVersionUID = -1963967131747306439L;
-
-    @XmlElementWrapper(name = "Markings")
-    private Map<String,String> markings;
 
     @XmlElement(name = "Metadata")
     private Metadata metadata = null;
@@ -102,9 +96,7 @@ public class SimpleEvent extends EventBase<SimpleEvent,SimpleField> implements S
                         output.writeObject(2, field, SimpleField.getSchema(), true);
                 }
             }
-            if (message.markings != null) {
-                output.writeObject(3, message.markings, MapSchema.SCHEMA, false);
-            }
+            // markings field 3 no longer written; markings are now on the parent EventBase
         }
 
         public void mergeFrom(Input input, SimpleEvent message) throws IOException {
@@ -121,9 +113,9 @@ public class SimpleEvent extends EventBase<SimpleEvent,SimpleField> implements S
                         message.fields.add(f);
                         break;
                     case 3:
-                        if (message.markings == null)
-                            message.markings = Maps.newHashMap();
-                        input.mergeObject(message.markings, MapSchema.SCHEMA);
+                        // legacy markings map — consume but discard
+                        HashMap<String,String> legacyMarkings = new HashMap<>();
+                        input.mergeObject(legacyMarkings, MapSchema.SCHEMA);
                     default:
                         input.handleUnknownField(number, this);
                         break;

@@ -20,6 +20,7 @@ import com.google.common.collect.Multimap;
 import com.google.common.collect.Multimaps;
 import com.google.common.collect.Sets;
 
+import datawave.core.common.util.AccessExpressionUtil;
 import datawave.data.type.OneToManyNormalizerType;
 import datawave.data.type.Type;
 import datawave.ingest.data.config.ingest.CompositeIngest;
@@ -225,7 +226,7 @@ public class ValueToAttributes implements Function<Entry<Key,String>,Iterable<En
     }
 
     public Attribute<?> joinAttributes(String compositeName, Collection<Attribute<?>> in, boolean isOverloadedComposite, String separator) throws Exception {
-        Collection<ColumnVisibility> columnVisibilities = Sets.newHashSet();
+        Collection<org.apache.accumulo.access.AccessExpression> accessExpressions = Sets.newHashSet();
         List<String> dataList = new ArrayList<>();
         long timestamp = 0;
         boolean toKeep = false;
@@ -260,7 +261,7 @@ public class ValueToAttributes implements Function<Entry<Key,String>,Iterable<En
                                     dataList.add(base + value);
                             }
                             timestamp = Math.max(timestamp, attrs.getTimestamp());
-                            columnVisibilities.add(attrs.getColumnVisibility());
+                            accessExpressions.add(AccessExpressionUtil.toAccessExpression(attrs.getColumnVisibility()));
                         }
                     }
                 }
@@ -284,13 +285,13 @@ public class ValueToAttributes implements Function<Entry<Key,String>,Iterable<En
                     }
                 }
                 timestamp = Math.max(timestamp, attr.getTimestamp());
-                columnVisibilities.add(attr.getColumnVisibility());
+                accessExpressions.add(AccessExpressionUtil.toAccessExpression(attr.getColumnVisibility()));
             }
         }
         if (log.isDebugEnabled()) {
             log.debug("dataList is " + dataList);
         }
-        ColumnVisibility combinedColumnVisibility = this.markingFunctions.combine(columnVisibilities);
+        ColumnVisibility combinedColumnVisibility = AccessExpressionUtil.toColumnVisibility(this.markingFunctions.combine(accessExpressions));
         metadata = new Key(metadata.getRow(), metadata.getColumnFamily(), new Text(), combinedColumnVisibility, timestamp);
         if (dataList.size() == 1) {
             return this.attrFactory.create(compositeName, dataList.get(0), metadata, toKeep, true);

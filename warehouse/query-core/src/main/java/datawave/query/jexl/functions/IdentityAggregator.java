@@ -11,7 +11,6 @@ import org.apache.accumulo.core.data.Value;
 import org.apache.accumulo.core.iterators.SortedKeyValueIterator;
 import org.apache.hadoop.io.Text;
 
-import datawave.marking.ColumnVisibilityCache;
 import datawave.query.attributes.Attribute;
 import datawave.query.attributes.AttributeFactory;
 import datawave.query.attributes.Document;
@@ -119,7 +118,7 @@ public class IdentityAggregator extends SeekingAggregator implements FieldIndexA
             nextKey = (itr.hasTop() ? itr.getTopKey() : null);
         }
 
-        Key docKey = new Key(row, new Text(pointer.toArray()), new Text(), ColumnVisibilityCache.get(key.getColumnVisibilityData()), key.getTimestamp());
+        Key docKey = new Key(row, new Text(pointer.toArray()), new Text(), key.getColumnVisibilityParsed(), key.getTimestamp());
         Attribute<?> attr = new DocumentKey(docKey, false);
         doc.put(Document.DOCKEY_FIELD_NAME, attr);
 

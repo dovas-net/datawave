@@ -2,16 +2,15 @@ package datawave.webservice.response.objects;
 
 import static java.nio.charset.StandardCharsets.UTF_8;
 
-import java.util.HashMap;
-import java.util.Map;
-
 import javax.xml.bind.annotation.XmlAccessType;
 import javax.xml.bind.annotation.XmlAccessorType;
 import javax.xml.bind.annotation.XmlElement;
 
 import org.apache.commons.codec.binary.Base64;
 
+import datawave.marking.AccessExpressionMarkings;
 import datawave.marking.MarkingFunctions;
+import datawave.marking.Markings;
 import datawave.webservice.query.util.TypedValue;
 
 @XmlAccessorType(XmlAccessType.NONE)
@@ -87,18 +86,16 @@ public class DefaultKey extends KeyBase {
     }
 
     @Override
-    public void setMarkings(Map<String,String> markings) {
-        HashMap<String,String> markingMap = new HashMap<>();
-        if (markings != null) {
-            markingMap.putAll(markings);
+    public void setMarkings(Markings<?> markings) {
+        this.markings = markings;
+        if (markings instanceof AccessExpressionMarkings) {
+            AccessExpressionMarkings aem = (AccessExpressionMarkings) markings;
+            this.columnVisibility = new TypedValue(aem.getAccessExpression() != null ? aem.getAccessExpression().getExpression() : "");
         }
-        this.markings = markingMap;
-
-        setColumnVisibility(markingMap.getOrDefault(MarkingFunctions.Default.COLUMN_VISIBILITY, ""));
     }
 
     @Override
-    public Map<String,String> getMarkings() {
+    public Markings<?> getMarkings() {
         return this.markings;
     }
 
@@ -116,11 +113,8 @@ public class DefaultKey extends KeyBase {
 
     public void setColumnVisibility(String colVis) {
         this.columnVisibility = (colVis == null) ? new TypedValue("") : new TypedValue(colVis);
-        if (markings == null) {
-            markings = new HashMap<>();
-        }
-        markings.put(MarkingFunctions.Default.COLUMN_VISIBILITY, this.columnVisibility.getValue().toString());
-
+        String expr = this.columnVisibility.getValue().toString();
+        this.markings = AccessExpressionMarkings.builder().accessExpression(MarkingFunctions.Default.ACCESS.newExpression(expr)).build();
     }
 
     public void setTimestamp(long timestamp) {

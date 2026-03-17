@@ -3,7 +3,6 @@ package datawave.ingest.mapreduce.handler.edge.define;
 import java.io.IOException;
 import java.util.Calendar;
 import java.util.List;
-import java.util.Map;
 
 import org.apache.accumulo.core.data.Value;
 import org.apache.accumulo.core.security.ColumnVisibility;
@@ -21,6 +20,7 @@ import datawave.ingest.data.config.ingest.IngestHelperInterface;
 import datawave.ingest.mapreduce.handler.edge.define.VertexValue.ValueType;
 import datawave.marking.MarkingFunctions;
 import datawave.marking.MarkingFunctions.Exception;
+import datawave.marking.Markings;
 import datawave.util.time.DateHelper;
 
 /**
@@ -55,7 +55,7 @@ public class EdgeDataBundle {
 
     private long eventDate = 0;
     private IngestHelperInterface helper;
-    private Map<String,String> markings = null;
+    private Markings<?> markings = null;
     private ColumnVisibility maskedVisibility = null;
     private boolean forceMaskedVisibility = false; // if this is a masked event, but the
     // the fields defined aren't masked, use the unmasked visibility
@@ -141,7 +141,7 @@ public class EdgeDataBundle {
     }
 
     @SuppressWarnings("unchecked")
-    private void initMarkings(Map<String,String> m1, Map<String,String> m2) {
+    private void initMarkings(Markings<?> m1, Markings<?> m2) {
         if (m1 != null) {
             if (m2 != null) {
                 try {
@@ -385,11 +385,11 @@ public class EdgeDataBundle {
         this.sink = sink;
     }
 
-    public Map<String,String> getMarkings() {
+    public Markings<?> getMarkings() {
         return this.markings;
     }
 
-    public void setMarkings(Map<String,String> markings) {
+    public void setMarkings(Markings<?> markings) {
         this.markings = markings;
     }
 

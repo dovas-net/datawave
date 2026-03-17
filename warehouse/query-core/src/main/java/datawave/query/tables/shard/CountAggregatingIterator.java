@@ -13,6 +13,7 @@ import java.util.concurrent.Executors;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.atomic.AtomicLong;
+import java.util.stream.Collectors;
 
 import org.apache.accumulo.core.data.Key;
 import org.apache.accumulo.core.data.Value;
@@ -25,6 +26,8 @@ import com.esotericsoftware.kryo.Kryo;
 import com.esotericsoftware.kryo.io.Input;
 import com.google.common.collect.Maps;
 
+import datawave.core.common.util.AccessExpressionUtil;
+import datawave.core.iterators.ResultCountingIterator;
 import datawave.marking.MarkingFunctions;
 import datawave.webservice.query.result.event.DefaultEvent;
 
@@ -121,7 +124,7 @@ public class CountAggregatingIterator extends TransformIterator {
     private static class CountEntryAggregator {
 
         private final AtomicLong count = new AtomicLong(0L);
-        private final Set<ColumnVisibility> cvs = new HashSet<>();
+        private final Set<ColumnVisibility> columnVisibilities = new HashSet<>();
 
         private final Transformer transformer;
         private final MarkingFunctions markingFunctions;
@@ -136,13 +139,13 @@ public class CountAggregatingIterator extends TransformIterator {
         }
 
         public void addColumnVisibility(ColumnVisibility cv) {
-            this.cvs.add(cv);
+            this.columnVisibilities.add(cv);
         }
 
         @SuppressWarnings("unchecked")
         public Object getAggregatedEvent() {
-            if (cvs.isEmpty() && count.get() == 0L) {
-                cvs.add(new ColumnVisibility(""));
+            if (columnVisibilities.isEmpty() && count.get() == 0L) {
+                columnVisibilities.add(new ColumnVisibility(""));
             }
 
             ColumnVisibility cv = getCombinedColumnVisibility();
@@ -151,7 +154,8 @@ public class CountAggregatingIterator extends TransformIterator {
 
         private ColumnVisibility getCombinedColumnVisibility() {
             try {
-                return markingFunctions.combine(cvs);
+                return AccessExpressionUtil.toColumnVisibility(markingFunctions
+                                .combine(columnVisibilities.stream().map(AccessExpressionUtil::toAccessExpression).collect(Collectors.toSet())));
             } catch (Exception e) {
                 log.error("Could not combine columnVisibilities for the count", e);
                 return null;

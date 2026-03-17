@@ -1,5 +1,7 @@
 package datawave.ingest.mapreduce.handler.error;
 
+import static java.nio.charset.StandardCharsets.UTF_8;
+
 import java.io.IOException;
 import java.io.PrintStream;
 import java.util.ArrayList;
@@ -156,7 +158,7 @@ public class ErrorShardedDataTypeHandler<KEYIN,KEYOUT,VALUEOUT> extends Abstract
         setShardDictionaryIndexTableName(tableName == null ? null : new Text(tableName));
 
         try {
-            defaultVisibility = flatten(markingFunctions.translateToColumnVisibility(markingsHelper.getDefaultMarkings()));
+            defaultVisibility = markingFunctions.toAccessExpression(markingsHelper.getDefaultMarkings()).getExpression().getBytes(UTF_8);
         } catch (Exception e) {
             throw new IllegalArgumentException("Failed to parse security marking configuration", e);
         }
@@ -342,12 +344,13 @@ public class ErrorShardedDataTypeHandler<KEYIN,KEYOUT,VALUEOUT> extends Abstract
      *            the value
      * @return the visibility
      */
+    @SuppressWarnings("unchecked")
     @Override
     public byte[] getVisibility(RawRecordContainer event, NormalizedContentInterface value) {
         byte[] visibility;
         if (value != null && value.getMarkings() != null && !value.getMarkings().isEmpty()) {
             try {
-                visibility = flatten(markingFunctions.translateToColumnVisibility(value.getMarkings()));
+                visibility = markingFunctions.toAccessExpression(value.getMarkings()).getExpression().getBytes(UTF_8);
             } catch (MarkingFunctions.Exception e) {
                 log.error("Failed to create visibility from markings, using default", e);
                 visibility = defaultVisibility;

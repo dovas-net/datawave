@@ -15,8 +15,9 @@ import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.ConcurrentSkipListSet;
 
+import org.apache.accumulo.access.Access;
+import org.apache.accumulo.access.AccessExpression;
 import org.apache.accumulo.core.security.ColumnVisibility;
-import org.apache.commons.lang.StringUtils;
 import org.apache.commons.lang.builder.EqualsBuilder;
 import org.apache.commons.lang.builder.ToStringBuilder;
 import org.apache.hadoop.conf.Configurable;
@@ -36,7 +37,8 @@ import datawave.ingest.data.TypeRegistry;
 import datawave.ingest.data.config.ConfigurationHelper;
 import datawave.ingest.data.config.ingest.IgnorableErrorHelperInterface;
 import datawave.ingest.protobuf.RawRecordContainer.Data;
-import datawave.marking.MarkingFunctions;
+import datawave.marking.AccessExpressionMarkings;
+import datawave.marking.Markings;
 import datawave.util.CompositeTimestamp;
 
 public class RawRecordContainerImpl implements Writable, Configurable, RawRecordContainer {
@@ -80,57 +82,61 @@ public class RawRecordContainerImpl implements Writable, Configurable, RawRecord
     private Object auxData = null;
     private Map<String,String> auxMap = null;
 
+    private static final Access ACCESS = Access.builder().build();
+
     // RawRecordContainer support
-    Map<String,String> securityMarkings = null;
+    Markings<?> securityMarkings = null;
 
     public RawRecordContainerImpl() {
         uidBuilder = UID.builder();
     }
 
     @Override
-    public Map<String,String> getSecurityMarkings() {
+    public Markings<?> getSecurityMarkings() {
         return this.securityMarkings;
     }
 
     @Override
-    public void setSecurityMarkings(Map<String,String> securityMarkings) {
-        this.securityMarkings = (securityMarkings == null ? null : new HashMap<>(securityMarkings));
+    public void setSecurityMarkings(Markings<?> securityMarkings) {
+        this.securityMarkings = securityMarkings;
         syncSecurityMarkingsToFields();
     }
 
     @Override
     public void addSecurityMarking(String domain, String marking) {
-        if (null == securityMarkings) {
-            securityMarkings = new HashMap<>();
-        }
-        securityMarkings.put(domain, marking);
+        // Legacy map-based operation — treat marking as an access expression string
+        this.securityMarkings = AccessExpressionMarkings.builder().accessExpression(ACCESS.newExpression(marking)).build();
         syncSecurityMarkingsToFields();
     }
 
     @Override
     public boolean hasSecurityMarking(String domain, String marking) {
-        return null != securityMarkings && securityMarkings.containsKey(domain) && StringUtils.equals(securityMarkings.get(domain), marking);
+        if (securityMarkings == null) {
+            return false;
+        }
+        Object m = securityMarkings.getMarkings();
+        if (m instanceof AccessExpression) {
+            return ((AccessExpression) m).getExpression().equals(marking);
+        }
+        return false;
     }
 
     protected void syncSecurityMarkingsToFields() {
         if (securityMarkings != null) {
-            setVisibility(securityMarkings.get(MarkingFunctions.Default.COLUMN_VISIBILITY));
+            Object m = securityMarkings.getMarkings();
+            if (m instanceof AccessExpression) {
+                setVisibilityNoSync(((AccessExpression) m).getExpression());
+            }
         } else {
-            setVisibility((String) null);
+            setVisibilityNoSync(null);
         }
     }
 
     protected void syncFieldsToSecurityMarkings() {
         if (visibility != null) {
-            if (securityMarkings == null) {
-                securityMarkings = new HashMap<>();
-            }
-            securityMarkings.put(MarkingFunctions.Default.COLUMN_VISIBILITY, new String(visibility.getExpression()));
-
-        } else if (securityMarkings != null) {
-            securityMarkings.remove(MarkingFunctions.Default.COLUMN_VISIBILITY);
-        }
-        if (securityMarkings != null && securityMarkings.isEmpty()) {
+            String expr = new String(visibility.getExpression());
+            securityMarkings = AccessExpressionMarkings.builder().accessExpression(ACCESS.newExpression(expr)).build();
+        } else {
             securityMarkings = null;
         }
     }

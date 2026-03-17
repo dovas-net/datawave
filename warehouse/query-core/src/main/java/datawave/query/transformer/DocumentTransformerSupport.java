@@ -24,11 +24,14 @@ import org.apache.log4j.Logger;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Sets;
 
+import datawave.core.common.util.AccessExpressionUtil;
 import datawave.core.query.exception.EmptyObjectException;
 import datawave.core.query.logic.BaseQueryLogic;
 import datawave.core.query.logic.WritesQueryMetrics;
 import datawave.core.query.logic.WritesResultCardinalities;
+import datawave.marking.AccessExpressionMarkings;
 import datawave.marking.MarkingFunctions;
+import datawave.marking.Markings;
 import datawave.microservice.query.Query;
 import datawave.microservice.query.QueryImpl.Parameter;
 import datawave.microservice.querymetric.BaseQueryMetric;
@@ -68,7 +71,7 @@ public abstract class DocumentTransformerSupport<I,O> extends EventQueryTransfor
     protected Boolean reducedResponse;
 
     private static final Logger log = Logger.getLogger(DocumentTransformerSupport.class);
-    private static final Map<String,String> EMPTY_MARKINGS = new HashMap<>();
+    private static final Markings<?> EMPTY_MARKINGS = AccessExpressionMarkings.builder().build();
 
     private long sourceCount = 0;
     private long nextCount = 0;
@@ -463,9 +466,8 @@ public abstract class DocumentTransformerSupport<I,O> extends EventQueryTransfor
             // Use the markings on the Field if we're returning the markings to the client
             if (!this.reducedResponse) {
                 try {
-                    Map<String,String> markings = markingFunctions.translateFromColumnVisibility(attr.getColumnVisibility());
+                    Markings<?> markings = markingFunctions.fromAccessExpression(AccessExpressionUtil.toAccessExpression(attr.getColumnVisibility()));
                     FieldBase<?> field = this.makeField(fieldName, markings, attr.getColumnVisibility(), attr.getTimestamp(), attr.getData());
-                    MarkingFunctions.Util.populate(field, markings);
                     myFields.add(field);
                 } catch (Exception ex) {
                     log.error("unable to process markings:" + ex);
@@ -495,8 +497,7 @@ public abstract class DocumentTransformerSupport<I,O> extends EventQueryTransfor
      *            mapping of markings
      * @return a field
      */
-    protected FieldBase<?> createField(final String fieldName, final long ts, final Attribute<?> attribute, Map<String,String> markings,
-                    String columnVisibility) {
+    protected FieldBase<?> createField(final String fieldName, final long ts, final Attribute<?> attribute, Markings<?> markings, String columnVisibility) {
         if (markings == null || markings.isEmpty()) {
             log.warn("Null or empty markings for " + fieldName + ":" + attribute);
         }
@@ -504,16 +505,14 @@ public abstract class DocumentTransformerSupport<I,O> extends EventQueryTransfor
         return createField(fieldName, (Long) ts, attribute, markings, columnVisibility);
     }
 
-    protected FieldBase<?> createField(final String fieldName, final Long ts, final Attribute<?> attribute, Map<String,String> markings,
-                    String columnVisibility) {
+    protected FieldBase<?> createField(final String fieldName, final Long ts, final Attribute<?> attribute, Markings<?> markings, String columnVisibility) {
         if (this.transformValuePrefixFields.contains(fieldName)) {
             return convertHitTermField(fieldName, ts, attribute, markings, columnVisibility);
         }
         return this.makeField(fieldName, markings, columnVisibility, ts, attribute.getData());
     }
 
-    private FieldBase<?> convertHitTermField(final String fieldName, final Long ts, Attribute<?> attribute, Map<String,String> markings,
-                    String columnVisibility) {
+    private FieldBase<?> convertHitTermField(final String fieldName, final Long ts, Attribute<?> attribute, Markings<?> markings, String columnVisibility) {
         return this.makeField(fieldName, markings, columnVisibility, ts, convertMappedAttribute(attribute).getData());
     }
 

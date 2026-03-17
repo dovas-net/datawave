@@ -2,14 +2,15 @@ package datawave.query.attributes;
 
 import java.io.Serializable;
 import java.util.Collection;
+import java.util.stream.Collectors;
 
+import org.apache.accumulo.access.AccessExpression;
 import org.apache.accumulo.core.data.Key;
 import org.apache.accumulo.core.security.ColumnVisibility;
 import org.apache.commons.lang.mutable.MutableLong;
 import org.apache.log4j.Logger;
 
-import com.google.common.collect.Sets;
-
+import datawave.core.common.util.AccessExpressionUtil;
 import datawave.marking.MarkingFunctions;
 import datawave.marking.MarkingFunctions.Exception;
 
@@ -78,11 +79,9 @@ public abstract class AttributeBag<T extends Comparable<T>> extends Attribute<T>
     }
 
     protected ColumnVisibility combineAndSetColumnVisibilities(Collection<Attribute<? extends Comparable<?>>> attributes) throws Exception {
-        Collection<ColumnVisibility> columnVisibilities = Sets.newHashSet();
-        for (Attribute<?> attr : attributes) {
-            columnVisibilities.add(attr.getColumnVisibility());
-        }
-        return MarkingFunctions.Factory.createMarkingFunctions().combine(columnVisibilities);
+        Collection<AccessExpression> accessExpressions = attributes.stream().map(attr -> AccessExpressionUtil.toAccessExpression(attr.getColumnVisibility()))
+                        .collect(Collectors.toSet());
+        return AccessExpressionUtil.toColumnVisibility(MarkingFunctions.Factory.createMarkingFunctions().combine(accessExpressions));
     }
 
     private long updateTimestamps() {

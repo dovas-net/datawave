@@ -65,7 +65,7 @@ import com.hazelcast.spring.cache.HazelcastCacheManager;
 
 import datawave.core.common.connection.AccumuloConnectionFactory;
 import datawave.ingest.protobuf.Uid;
-import datawave.marking.MarkingFunctions;
+import datawave.marking.ColumnVisibilitySecurityMarking;
 import datawave.microservice.authorization.preauth.ProxiedEntityX509Filter;
 import datawave.microservice.authorization.user.DatawaveUserDetails;
 import datawave.microservice.querymetric.config.QueryMetricClientProperties;
@@ -151,7 +151,7 @@ public class QueryMetricTestBase {
 
     static {
         metricMarkings = new HashMap<>();
-        metricMarkings.put(MarkingFunctions.Default.COLUMN_VISIBILITY, "A&C");
+        metricMarkings.put(ColumnVisibilitySecurityMarking.VISIBILITY_MARKING, "A&C");
     }
 
     @AfterAll

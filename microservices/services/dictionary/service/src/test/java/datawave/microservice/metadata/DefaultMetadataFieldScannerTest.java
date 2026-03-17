@@ -279,7 +279,7 @@ public class DefaultMetadataFieldScannerTest {
 
         Map<String,String> markings = new HashMap<>();
         markings.put("columnVisibility", "PRIVATE}");
-        description.setMarkings(markings);
+        description.setMarkingsMap(markings);
 
         return description;
     }

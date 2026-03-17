@@ -1,5 +1,7 @@
 package datawave.iterators;
 
+import static java.nio.charset.StandardCharsets.UTF_8;
+
 import java.io.IOException;
 import java.util.Arrays;
 import java.util.Collection;
@@ -10,7 +12,10 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.TreeMap;
+import java.util.stream.Collectors;
 
+import org.apache.accumulo.access.Access;
+import org.apache.accumulo.access.AccessExpression;
 import org.apache.accumulo.core.data.ByteSequence;
 import org.apache.accumulo.core.data.Key;
 import org.apache.accumulo.core.data.Range;
@@ -584,7 +589,10 @@ public class FrequencyMetadataAggregator extends WrappingIterator implements Opt
     private ColumnVisibility combineAllVisibilities() {
         Set<ColumnVisibility> visibilities = visibilityToDateFrequencies.keySet();
         try {
-            return markingFunctions.combine(visibilities);
+            Access access = Access.builder().build();
+            AccessExpression combined = markingFunctions
+                            .combine(visibilities.stream().map(cv -> access.newExpression(new String(cv.getExpression(), UTF_8))).collect(Collectors.toSet()));
+            return new ColumnVisibility(combined.getExpression());
         } catch (MarkingFunctions.Exception e) {
             log.error("Failed to combine visibilities " + visibilities);
             throw new IllegalArgumentException("Failed to combine visibilities " + visibilities, e);

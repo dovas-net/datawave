@@ -26,7 +26,6 @@ import com.google.common.collect.TreeMultimap;
 
 import datawave.ingest.table.aggregator.BitSetCombiner;
 import datawave.ingest.table.aggregator.util.TruncatedIndexKeyParser;
-import datawave.marking.ColumnVisibilityCache;
 
 /**
  * Utility that converts a standard shard index to a truncated index
@@ -86,7 +85,7 @@ public class TruncatedIndexIngest extends AbstractIndexIngest {
             for (Map.Entry<Key,Value> entry : combined.entries()) {
                 Key k = entry.getKey();
                 Mutation m = new Mutation(k.getRow());
-                ColumnVisibility cv = ColumnVisibilityCache.get(k.getColumnVisibilityData());
+                ColumnVisibility cv = k.getColumnVisibilityParsed();
                 m.put(k.getColumnFamily().toString(), k.getColumnQualifier().toString(), cv, k.getTimestamp(), entry.getValue());
                 bw.addMutation(m);
             }

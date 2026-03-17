@@ -8,12 +8,14 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
+import org.apache.accumulo.access.AccessExpression;
 import org.apache.accumulo.core.data.Key;
 import org.apache.accumulo.core.security.ColumnVisibility;
 import org.slf4j.Logger;
 
 import com.google.common.base.Preconditions;
 
+import datawave.core.common.util.AccessExpressionUtil;
 import datawave.data.type.NumberType;
 import datawave.marking.MarkingFunctions;
 import datawave.query.attributes.Document;
@@ -31,25 +33,25 @@ public class GroupingUtils {
     private static final Logger log = getLogger(GroupingUtils.class);
 
     /**
-     * Returns a column visibility that results from the combination of all given visibilities using the given {@link MarkingFunctions}.
+     * Returns a column visibility that results from the combination of all given access expressions using the given {@link MarkingFunctions}.
      *
-     * @param visibilities
-     *            the visibilities to combine
+     * @param expressions
+     *            the access expressions to combine
      * @param markingFunctions
-     *            the marking functions to combine the visibilities with
+     *            the marking functions to combine the expressions with
      * @param failOnError
-     *            if true and the visibilities cannot be combined, an {@link IllegalArgumentException} will be thrown. If false and the visibilities cannot be
+     *            if true and the expressions cannot be combined, an {@link IllegalArgumentException} will be thrown. If false and the expressions cannot be
      *            combined, it will be logged and a new, blank {@link ColumnVisibility} will be returned.
      * @return the combined column visibility
      */
-    public static ColumnVisibility combineVisibilities(Collection<ColumnVisibility> visibilities, MarkingFunctions markingFunctions, boolean failOnError) {
+    public static ColumnVisibility combineVisibilities(Collection<AccessExpression> expressions, MarkingFunctions markingFunctions, boolean failOnError) {
         try {
-            return markingFunctions.combine(visibilities);
+            return AccessExpressionUtil.toColumnVisibility(markingFunctions.combine(expressions));
         } catch (MarkingFunctions.Exception e) {
             if (failOnError) {
-                throw new IllegalArgumentException("Unable to combine visibilities: " + visibilities, e);
+                throw new IllegalArgumentException("Unable to combine access expressions: " + expressions, e);
             } else {
-                log.warn("Unable to combine visibilities from {}", visibilities);
+                log.warn("Unable to combine access expressions from {}", expressions);
             }
         }
         return new ColumnVisibility();
@@ -97,12 +99,12 @@ public class GroupingUtils {
         Document document = new Document(key, true);
 
         // Set the visibility for the document to the combined visibility of each previous document in which this grouping was seen in.
-        document.setColumnVisibility(combineVisibilities(group.getDocumentVisibilities(), markingFunctions, true));
+        document.setColumnVisibility(combineVisibilities(group.getDocumentExpressions(), markingFunctions, true));
 
         // Add each of the grouping attributes to the document.
         for (GroupingAttribute<?> attribute : group.getGrouping()) {
             // Update the visibility to the combined visibilities of each visibility seen for this attribute in a grouping.
-            attribute.setColumnVisibility(combineVisibilities(group.getVisibilitiesForAttribute(attribute), markingFunctions, false));
+            attribute.setColumnVisibility(combineVisibilities(group.getAccessExpressionsForAttribute(attribute), markingFunctions, false));
             document.put(attribute.getMetadata().getRow().toString(), attribute);
         }
 
@@ -171,7 +173,7 @@ public class GroupingUtils {
         NumberType type = new NumberType();
         type.setDelegate(aggregator.getAggregation());
         TypeAttribute<BigDecimal> sumAttribute = new TypeAttribute<>(type, new Key(field + "_sum"), true);
-        sumAttribute.setColumnVisibility(combineVisibilities(aggregator.getColumnVisibilities(), markingFunctions, false));
+        sumAttribute.setColumnVisibility(combineVisibilities(aggregator.getAccessExpressions(), markingFunctions, false));
         document.put(field + DocumentGrouper.FIELD_SUM_SUFFIX, sumAttribute);
     }
 
@@ -191,9 +193,9 @@ public class GroupingUtils {
         NumberType type = new NumberType();
         type.setDelegate(BigDecimal.valueOf(aggregator.getAggregation()));
         TypeAttribute<BigDecimal> sumAttribute = new TypeAttribute<>(type, new Key(field + "_count"), true);
-        Set<ColumnVisibility> columnVisibilities = aggregator.getColumnVisibilities();
-        if (!columnVisibilities.isEmpty()) {
-            sumAttribute.setColumnVisibility(combineVisibilities(aggregator.getColumnVisibilities(), markingFunctions, false));
+        Set<AccessExpression> accessExpressions = aggregator.getAccessExpressions();
+        if (!accessExpressions.isEmpty()) {
+            sumAttribute.setColumnVisibility(combineVisibilities(aggregator.getAccessExpressions(), markingFunctions, false));
         }
         document.put(field + DocumentGrouper.FIELD_COUNT_SUFFIX, sumAttribute);
     }
@@ -242,7 +244,7 @@ public class GroupingUtils {
         NumberType type = new NumberType();
         type.setDelegate(aggregator.getAggregation());
         TypeAttribute<BigDecimal> attribute = new TypeAttribute<>(type, new Key(field + "_average"), true);
-        attribute.setColumnVisibility(combineVisibilities(aggregator.getColumnVisibilities(), markingFunctions, false));
+        attribute.setColumnVisibility(combineVisibilities(aggregator.getAccessExpressions(), markingFunctions, false));
         document.put(field + DocumentGrouper.FIELD_AVERAGE_SUFFIX, attribute);
     }
 
@@ -259,7 +261,7 @@ public class GroupingUtils {
      *            the marking functions to use when combining column visibilities
      */
     private static void addAverageNumeratorAndDivisor(Document document, String field, AverageAggregator aggregator, MarkingFunctions markingFunctions) {
-        ColumnVisibility visibility = combineVisibilities(aggregator.getColumnVisibilities(), markingFunctions, false);
+        ColumnVisibility visibility = combineVisibilities(aggregator.getAccessExpressions(), markingFunctions, false);
 
         // Add an attribute for the average's numerator. This is required to properly combine additional aggregations in future groupings.
         NumberType numeratorType = new NumberType();

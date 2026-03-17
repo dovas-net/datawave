@@ -27,7 +27,6 @@ import com.google.protobuf.InvalidProtocolBufferException;
 
 import datawave.ingest.protobuf.Uid;
 import datawave.ingest.table.aggregator.KeepCountOnlyNoUidAggregator;
-import datawave.marking.ColumnVisibilityCache;
 import datawave.query.index.day.AbstractIndexIngest;
 
 /**
@@ -80,7 +79,7 @@ public class NoUidIndexIngest extends AbstractIndexIngest {
             for (Map.Entry<Key,Value> entry : combined.entries()) {
                 Key key = entry.getKey();
                 Mutation m = new Mutation(key.getRow());
-                ColumnVisibility cv = ColumnVisibilityCache.get(key.getColumnVisibilityData());
+                ColumnVisibility cv = key.getColumnVisibilityParsed();
                 m.put(key.getColumnFamily(), key.getColumnQualifier(), cv, key.getTimestamp(), entry.getValue());
                 bw.addMutation(m);
             }

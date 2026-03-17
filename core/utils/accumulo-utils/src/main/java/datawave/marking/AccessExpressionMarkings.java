@@ -15,4 +15,9 @@ public class AccessExpressionMarkings implements Markings<AccessExpression> {
     public AccessExpression getMarkings() {
         return getAccessExpression();
     }
+
+    @Override
+    public boolean isEmpty() {
+        return accessExpression == null || accessExpression.getExpression().isEmpty();
+    }
 }

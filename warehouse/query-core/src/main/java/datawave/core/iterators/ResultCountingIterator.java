@@ -31,6 +31,7 @@ import com.google.common.cache.Cache;
 import com.google.common.cache.CacheBuilder;
 import com.google.common.collect.Sets;
 
+import datawave.core.common.util.AccessExpressionUtil;
 import datawave.marking.MarkingFunctions;
 
 /**
@@ -209,7 +210,8 @@ public class ResultCountingIterator extends WrappingIterator {
         ColumnVisibility cv = null;
 
         try {
-            cv = MarkingFunctions.Factory.createMarkingFunctions().combine(columnVisibilities);
+            cv = AccessExpressionUtil.toColumnVisibility(MarkingFunctions.Factory.createMarkingFunctions()
+                            .combine(columnVisibilities.stream().map(AccessExpressionUtil::toAccessExpression).collect(java.util.stream.Collectors.toSet())));
         } catch (MarkingFunctions.Exception e) {
             log.error("Could not create combined columnVisibility for the count", e);
             return null;
