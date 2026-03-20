@@ -2,11 +2,11 @@ package datawave.query.transformer;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Set;
 import java.util.stream.Collectors;
 
+import org.apache.accumulo.access.AccessExpression;
 import org.apache.accumulo.core.data.Key;
 import org.apache.accumulo.core.data.Value;
 import org.apache.accumulo.core.security.Authorizations;
@@ -201,15 +201,12 @@ public class TagCloudTransformer extends BaseQueryLogicTransformer<Entry<Key,Val
     }
 
     @SuppressWarnings("unchecked")
-    private void convertAndSetMarkings(TagCloudBase base, Map<String,String> visibility) {
-        if (visibility != null && !visibility.isEmpty()) {
-            String expr = visibility.getOrDefault("visibility", "");
-            if (!expr.isEmpty()) {
-                try {
-                    base.setMarkings(markingFunctions.fromAccessExpression(MarkingFunctions.Default.ACCESS.newExpression(expr)));
-                } catch (MarkingFunctions.Exception e) {
-                    log.warn("Could not convert tag cloud visibility to markings: {}", expr, e);
-                }
+    private void convertAndSetMarkings(TagCloudBase base, AccessExpression visibility) {
+        if (visibility != null && !visibility.getExpression().isEmpty()) {
+            try {
+                base.setMarkings(markingFunctions.fromAccessExpression(visibility));
+            } catch (MarkingFunctions.Exception e) {
+                log.warn("Could not convert tag cloud visibility to markings: {}", visibility.getExpression(), e);
             }
         }
     }

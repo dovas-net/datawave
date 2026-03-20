@@ -2,11 +2,11 @@ package datawave.marking;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
+import java.util.List;
+
 import org.apache.accumulo.access.Access;
 import org.apache.accumulo.access.AccessExpression;
 import org.junit.jupiter.api.Test;
-
-import com.google.common.collect.Sets;
 
 public class MarkingFunctionsDefaultCombineTest {
     public static final Access ACCESS = Access.builder().build();
@@ -18,7 +18,7 @@ public class MarkingFunctionsDefaultCombineTest {
         AccessExpression oneAnna = ACCESS.newExpression("A&B");
         AccessExpression twoAnna = ACCESS.newExpression("A&C");
 
-        AccessExpression combined = markingFunctions.combine(Sets.newHashSet(oneAnna, twoAnna));
+        AccessExpression combined = markingFunctions.combine(List.of(oneAnna, twoAnna));
         assertEquals(ACCESS.newExpression("A&B&C"), combined);
     }
 
@@ -29,7 +29,7 @@ public class MarkingFunctionsDefaultCombineTest {
         AccessExpression oneOr = ACCESS.newExpression("A|B");
         AccessExpression twoOr = ACCESS.newExpression("A|C");
 
-        AccessExpression combined = markingFunctions.combine(Sets.newHashSet(oneOr, twoOr));
+        AccessExpression combined = markingFunctions.combine(List.of(oneOr, twoOr));
         assertEquals(ACCESS.newExpression("(A|B)&(A|C)"), combined);
     }
 

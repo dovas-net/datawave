@@ -16,7 +16,8 @@ import datawave.query.table.parser.EventKeyValueFactory.EventKeyValue;
 
 public class TermFrequencyKeyValueFactory {
 
-    public static TermFrequencyKeyValue parse(Key key, Value value, Authorizations auths, MarkingFunctions<?> markingFunctions) throws MarkingFunctions.Exception {
+    public static TermFrequencyKeyValue parse(Key key, Value value, Authorizations auths, MarkingFunctions<?> markingFunctions)
+                    throws MarkingFunctions.Exception {
         if (null == key) {
             throw new IllegalArgumentException("Cannot pass null key to TermFrequencyKeyValueFactory");
         }

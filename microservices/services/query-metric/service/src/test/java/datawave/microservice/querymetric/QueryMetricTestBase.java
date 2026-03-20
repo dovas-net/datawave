@@ -19,9 +19,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
-import datawave.marking.AccessExpressionMarkings;
-import datawave.marking.MarkingFunctions;
-import datawave.marking.Markings;
 import org.apache.accumulo.access.AccessExpression;
 import org.apache.accumulo.core.client.AccumuloClient;
 import org.apache.accumulo.core.client.BatchScanner;
@@ -69,7 +66,10 @@ import com.hazelcast.spring.cache.HazelcastCacheManager;
 
 import datawave.core.common.connection.AccumuloConnectionFactory;
 import datawave.ingest.protobuf.Uid;
+import datawave.marking.AccessExpressionMarkings;
 import datawave.marking.ColumnVisibilitySecurityMarking;
+import datawave.marking.MarkingFunctions;
+import datawave.marking.Markings;
 import datawave.microservice.authorization.preauth.ProxiedEntityX509Filter;
 import datawave.microservice.authorization.user.DatawaveUserDetails;
 import datawave.microservice.querymetric.config.QueryMetricClientProperties;

@@ -24,10 +24,9 @@ import datawave.webservice.query.cachedresults.CacheableQueryRow;
 import datawave.webservice.query.data.ObjectSizeOf;
 import datawave.webservice.query.util.TypedValue;
 
-@SuppressWarnings("unchecked")
 public class CacheableQueryRowImpl extends CacheableQueryRow implements ObjectSizeOf {
 
-    private static Logger log = LoggerFactory.getLogger(CacheableQueryRowImpl.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(CacheableQueryRowImpl.class);
     private static final Markings<?> EMPTY_MARKINGS = AccessExpressionMarkings.builder().accessExpression(MarkingFunctions.Default.ACCESS.newExpression(""))
                     .build();
 
@@ -68,20 +67,17 @@ public class CacheableQueryRowImpl extends CacheableQueryRow implements ObjectSi
                         this.markings = markings;
                     }
                 } catch (MarkingFunctions.Exception e) {
-                    log.error("Invalid markings {} skipping column {} = {}", markings, columnName, columnTypedValue, e);
+                    LOGGER.error("Invalid markings {} skipping column {} = {}", markings, columnName, columnTypedValue, e);
                     return;
                 }
             } else {
                 try {
-                    Set<AccessExpression> expressions = new HashSet<>();
-                    expressions.add(markingFunctions.toAccessExpression(this.markings));
-                    expressions.add(markingFunctions.toAccessExpression(markings));
-                    AccessExpression combined = markingFunctions.combine(expressions);
-
+                    AccessExpression combined = markingFunctions
+                                    .combine(List.of(markingFunctions.toAccessExpression(this.markings), markingFunctions.toAccessExpression(markings)));
                     // use combined marking as new markings
                     this.markings = markingFunctions.fromAccessExpression(combined);
                 } catch (MarkingFunctions.Exception e) {
-                    log.error("Invalid markings {} skipping column {} = {}", markings, columnName, columnTypedValue, e);
+                    LOGGER.error("Invalid markings {} skipping column {} = {}", markings, columnName, columnTypedValue, e);
                     return;
                 }
             }
@@ -139,7 +135,7 @@ public class CacheableQueryRowImpl extends CacheableQueryRow implements ObjectSi
 
             if (!currMarkings.equals(markings)) {
                 try {
-                    Set<AccessExpression> expressions = new HashSet<>();
+                    List<AccessExpression> expressions = new ArrayList<>();
                     expressions.add(markingFunctions.toAccessExpression(currMarkings));
                     expressions.add(markingFunctions.toAccessExpression(markings));
                     AccessExpression combined = markingFunctions.combine(expressions);
@@ -293,7 +289,7 @@ public class CacheableQueryRowImpl extends CacheableQueryRow implements ObjectSi
             markingFunctions.toAccessExpression(markings);
             this.markings = markings;
         } catch (MarkingFunctions.Exception e) {
-            log.error("Invalid markings {}", markings, e);
+            LOGGER.error("Invalid markings {}", markings, e);
         }
     }
 
@@ -322,7 +318,7 @@ public class CacheableQueryRowImpl extends CacheableQueryRow implements ObjectSi
                 try {
                     mStr = markingFunctions.toAccessExpression(m).getExpression();
                 } catch (MarkingFunctions.Exception e) {
-                    log.error("could not serialize markings {}", m, e);
+                    LOGGER.error("could not serialize markings {}", m, e);
                 }
             }
             if (v == null) {

@@ -2,11 +2,12 @@ package datawave.core.common.util;
 
 import static java.nio.charset.StandardCharsets.UTF_8;
 
-import datawave.marking.AccessExpressionMarkings;
-import datawave.marking.Markings;
 import org.apache.accumulo.access.Access;
 import org.apache.accumulo.access.AccessExpression;
 import org.apache.accumulo.core.security.ColumnVisibility;
+
+import datawave.marking.AccessExpressionMarkings;
+import datawave.marking.Markings;
 
 /**
  * Utility for bridging between Accumulo's {@link ColumnVisibility} (from accumulo-core) and {@link AccessExpression} (from accumulo-access).

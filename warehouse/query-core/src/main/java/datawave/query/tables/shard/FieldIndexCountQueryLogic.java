@@ -14,6 +14,7 @@ import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Set;
 import java.util.TreeSet;
+import java.util.stream.Collectors;
 
 import org.apache.accumulo.core.client.AccumuloClient;
 import org.apache.accumulo.core.client.BatchScanner;
@@ -477,12 +478,12 @@ public class FieldIndexCountQueryLogic extends ShardQueryLogic {
 
     public static class Tuple {
 
-        private final MarkingFunctions tupleMarkingFunctions;
+        private final MarkingFunctions<?> tupleMarkingFunctions;
         private long count = 0L;
         private long maxTimestamp = 0L;
         Set<Text> uniqueVisibilities = new HashSet<>();
 
-        public Tuple(MarkingFunctions mf) {
+        public Tuple(MarkingFunctions<?> mf) {
             tupleMarkingFunctions = mf;
         }
 
@@ -508,8 +509,8 @@ public class FieldIndexCountQueryLogic extends ShardQueryLogic {
                 for (Text t : this.uniqueVisibilities) {
                     columnVisibilities.add(new ColumnVisibility(t));
                 }
-                return AccessExpressionUtil.toColumnVisibility(tupleMarkingFunctions.combine(
-                                columnVisibilities.stream().map(AccessExpressionUtil::toAccessExpression).collect(java.util.stream.Collectors.toSet())));
+                return AccessExpressionUtil.toColumnVisibility(tupleMarkingFunctions
+                                .combine(columnVisibilities.stream().map(AccessExpressionUtil::toAccessExpression).collect(Collectors.toList())));
 
             } catch (MarkingFunctions.Exception e) {
                 logger.error("Could not create combined column visibility for the count", e);

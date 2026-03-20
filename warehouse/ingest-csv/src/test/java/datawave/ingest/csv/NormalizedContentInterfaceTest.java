@@ -1,8 +1,6 @@
 package datawave.ingest.csv;
 
 import java.io.IOException;
-import java.util.HashMap;
-import java.util.Map;
 import java.util.Objects;
 
 import org.apache.hadoop.conf.Configuration;

@@ -19,8 +19,6 @@ import java.util.UUID;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.locks.ReentrantReadWriteLock;
 
-import datawave.core.common.util.AccessExpressionUtil;
-import datawave.marking.Markings;
 import org.apache.accumulo.access.AccessExpression;
 import org.apache.accumulo.core.client.AccumuloClient;
 import org.apache.accumulo.core.client.AccumuloException;
@@ -51,6 +49,7 @@ import com.google.common.collect.Maps;
 import com.google.common.collect.Multimap;
 
 import datawave.core.common.connection.AccumuloConnectionFactory;
+import datawave.core.common.util.AccessExpressionUtil;
 import datawave.core.query.util.QueryUtil;
 import datawave.data.hash.UID;
 import datawave.data.hash.UIDBuilder;
@@ -66,6 +65,7 @@ import datawave.ingest.mapreduce.job.BulkIngestKey;
 import datawave.ingest.protobuf.Uid;
 import datawave.ingest.table.config.TableConfigHelper;
 import datawave.marking.MarkingFunctions;
+import datawave.marking.Markings;
 import datawave.microservice.authorization.user.DatawaveUserDetails;
 import datawave.microservice.query.Query;
 import datawave.microservice.query.QueryImpl;

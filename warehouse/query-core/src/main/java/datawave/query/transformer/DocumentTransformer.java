@@ -36,7 +36,7 @@ import datawave.webservice.query.result.event.ResponseObjectFactory;
 public class DocumentTransformer extends DocumentTransformerSupport<Entry<Key,Value>,EventBase>
                 implements WritesQueryMetrics, WritesResultCardinalities, Flushable<EventBase> {
 
-    private static final Logger log = Logger.getLogger(DocumentTransformerSupport.class);
+    private static final Logger log = Logger.getLogger(DocumentTransformer.class);
 
     /**
      * By default, assume each cell still has the visibility attached to it
@@ -163,7 +163,7 @@ public class DocumentTransformer extends DocumentTransformerSupport<Entry<Key,Va
         return output;
     }
 
-    protected EventBase buildResponse(Document document, Key documentKey, ColumnVisibility eventCV, String colf, String row, MarkingFunctions mf)
+    protected EventBase buildResponse(Document document, Key documentKey, ColumnVisibility eventCV, String colf, String row, MarkingFunctions<?> mf)
                     throws MarkingFunctions.Exception {
 
         Markings<?> markings = mf.fromAccessExpression(AccessExpressionUtil.toAccessExpression(eventCV));

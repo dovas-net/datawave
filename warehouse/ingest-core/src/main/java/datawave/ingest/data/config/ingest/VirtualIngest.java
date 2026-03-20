@@ -13,7 +13,6 @@ import java.util.Set;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-import datawave.marking.AccessExpressionMarkings;
 import org.apache.commons.lang.StringUtils;
 import org.apache.commons.lang.builder.HashCodeBuilder;
 import org.apache.commons.lang3.builder.EqualsBuilder;
@@ -28,6 +27,7 @@ import datawave.ingest.data.Type;
 import datawave.ingest.data.config.GroupedNormalizedContentInterface;
 import datawave.ingest.data.config.NormalizedContentInterface;
 import datawave.ingest.data.config.NormalizedFieldAndValue;
+import datawave.marking.AccessExpressionMarkings;
 import datawave.marking.MarkingFunctions;
 import datawave.marking.Markings;
 
@@ -358,9 +358,10 @@ public interface VirtualIngest {
                         if (markings1 instanceof AccessExpressionMarkings && markings2 instanceof AccessExpressionMarkings) {
                             AccessExpressionMarkings aem1 = (AccessExpressionMarkings) markings1;
                             AccessExpressionMarkings aem2 = (AccessExpressionMarkings) markings2;
-                            return markingFunctions.fromAccessExpression(markingFunctions.combine(Set.of(aem1.getMarkings(), aem2.getMarkings())));
+                            return markingFunctions.fromAccessExpression(markingFunctions.combine(List.of(aem1.getMarkings(), aem2.getMarkings())));
                         } else {
-                            throw new RuntimeException(String.format("Unknown markings class %s or %s", markings1.getClass().getName(), markings1.getClass().getName()));
+                            throw new RuntimeException(
+                                            String.format("Unknown markings class %s or %s", markings1.getClass().getName(), markings1.getClass().getName()));
                         }
                     } catch (MarkingFunctions.Exception e) {
                         throw new RuntimeException("Unable to combine markings.", e);

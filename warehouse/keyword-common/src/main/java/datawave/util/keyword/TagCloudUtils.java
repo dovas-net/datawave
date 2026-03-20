@@ -5,19 +5,21 @@ import java.util.Comparator;
 import java.util.Map;
 import java.util.Set;
 
+import org.apache.accumulo.access.AccessExpression;
+
 /**
  * Interface for pluggable utilities for generating tag clouds, includes mechanisms to partition keywords into separate tag clouds, combine or merge visibility
  * strings, and calculate scores, source collections and frequencies of individual keywords based on observed results
  */
 public interface TagCloudUtils {
     /**
-     * Aggregate visibilities by concatenating them together with an AND ('&amp;'), and then flatten them using the Accumulo column visibility class.
+     * Aggregate visibilities by concatenating them together with an AND ('&amp;'), and then normalizing the resulting expression.
      *
      * @param visibilities
      *            a set of valid visibility strings.
-     * @return a single visibility
+     * @return a combined {@link AccessExpression}, or {@code null} if there are no visibilities
      */
-    Map<String,String> generateCombinedVisibility(Set<String> visibilities);
+    AccessExpression generateCombinedVisibility(Set<String> visibilities);
 
     /**
      * Aggregate metadata from multiple sources, combining multi-valued entries into a flattened string

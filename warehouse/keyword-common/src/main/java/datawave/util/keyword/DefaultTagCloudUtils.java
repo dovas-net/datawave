@@ -2,7 +2,6 @@ package datawave.util.keyword;
 
 import java.io.Serializable;
 import java.util.Collection;
-import java.util.Collections;
 import java.util.Comparator;
 import java.util.HashMap;
 import java.util.Map;
@@ -10,8 +9,10 @@ import java.util.Map.Entry;
 import java.util.Set;
 import java.util.stream.Collectors;
 
-import org.apache.accumulo.core.security.ColumnVisibility;
+import org.apache.accumulo.access.AccessExpression;
 import org.apache.commons.lang3.StringUtils;
+
+import datawave.marking.MarkingFunctions;
 
 /**
  * Default implementations for pluggable utilities for generating tag clouds, includes mechanisms to partition keywords into separate tag clouds, combine or
@@ -22,17 +23,12 @@ public class DefaultTagCloudUtils implements TagCloudUtils, Serializable {
     private static final String MULTI_VALUE_SEPARATOR = ",";
 
     @Override
-    public Map<String,String> generateCombinedVisibility(Set<String> visibilities) {
-        final StringBuilder b = new StringBuilder();
-        visibilities.forEach(x -> b.append("(").append(x).append(")&"));
-        if (b.length() > 0) {
-            b.setLength(b.length() - 1);
-            ColumnVisibility cv = new ColumnVisibility(b.toString());
-            ColumnVisibility flat = new ColumnVisibility(cv.flatten());
-            return Map.of("visibility", flat.toString());
-        } else {
-            return Collections.emptyMap();
+    public AccessExpression generateCombinedVisibility(Set<String> visibilities) {
+        if (visibilities == null || visibilities.isEmpty()) {
+            return null;
         }
+        Set<AccessExpression> expressions = visibilities.stream().map(MarkingFunctions.Default.ACCESS::newExpression).collect(Collectors.toSet());
+        return new MarkingFunctions.Default().combine(expressions);
     }
 
     @Override

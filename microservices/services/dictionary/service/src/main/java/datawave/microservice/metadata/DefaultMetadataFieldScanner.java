@@ -275,7 +275,8 @@ public class DefaultMetadataFieldScanner {
         private void setDescriptions() throws MarkingFunctions.Exception {
             DefaultDescription description = responseObjectFactory.getDescription();
             description.setDescription(currValue.toString());
-            description.setMarkings(markingFunctions.fromAccessExpression(MarkingFunctions.Default.ACCESS.newExpression(currKey.getColumnVisibility().toString())));
+            description.setMarkings(
+                            markingFunctions.fromAccessExpression(MarkingFunctions.Default.ACCESS.newExpression(currKey.getColumnVisibility().toString())));
             currField.getDescriptions().add(description);
         }
 

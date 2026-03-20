@@ -2,6 +2,8 @@ package datawave.marking;
 
 import java.util.Arrays;
 import java.util.Collection;
+import java.util.HashSet;
+import java.util.Set;
 import java.util.stream.Collectors;
 
 import org.apache.accumulo.access.Access;
@@ -71,12 +73,24 @@ public interface MarkingFunctions<T extends Markings<?>> {
 
     class Default implements MarkingFunctions<AccessExpressionMarkings> {
         public static final Access ACCESS = Access.builder().build();
+        public static final AccessExpression EMPTY_MARKINGS = ACCESS.newExpression("");
 
         @Override
         public AccessExpression combine(Collection<AccessExpression> expressions) {
             // filter out any empty expressions and concatenate with '&'
             // @formatter:off
-            ParsedAccessExpression expression = ACCESS.newParsedExpression(expressions
+
+            Set<AccessExpression> uniqueExpressions = new HashSet<>(expressions);
+
+            if (uniqueExpressions.isEmpty()) {
+                return EMPTY_MARKINGS;
+            }
+
+            if (uniqueExpressions.size() == 1) {
+                return uniqueExpressions.stream().findFirst().get();
+            }
+
+            ParsedAccessExpression expression = ACCESS.newParsedExpression(uniqueExpressions
                                                 .stream()
                                                 .map(AccessExpression::getExpression)
                                                 .filter(str -> !str.isEmpty())

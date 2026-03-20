@@ -3,10 +3,12 @@ package datawave.query.predicate;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 
+import org.apache.accumulo.access.AccessExpression;
 import org.apache.accumulo.core.data.ByteSequence;
 import org.apache.accumulo.core.data.Key;
 import org.apache.accumulo.core.security.ColumnVisibility;
@@ -18,7 +20,6 @@ import com.google.common.collect.ArrayListMultimap;
 import com.google.common.collect.Maps;
 import com.google.common.collect.Multimap;
 import com.google.common.collect.Multimaps;
-import com.google.common.collect.Sets;
 
 import datawave.core.common.util.AccessExpressionUtil;
 import datawave.data.type.OneToManyNormalizerType;
@@ -68,8 +69,8 @@ public class ValueToAttributes implements Function<Entry<Key,String>,Iterable<En
      * @param fromIndex
      *            flag denoting if this class is operating on values from the field index
      */
-    public ValueToAttributes(CompositeMetadata compositeMetadata, TypeMetadata typeMetadata, EventDataQueryFilter attrFilter, MarkingFunctions<?> markingFunctions,
-                    boolean fromIndex) {
+    public ValueToAttributes(CompositeMetadata compositeMetadata, TypeMetadata typeMetadata, EventDataQueryFilter attrFilter,
+                    MarkingFunctions<?> markingFunctions, boolean fromIndex) {
         // in Java 25 we can create the attribute factory first
         this(new AttributeFactory(typeMetadata), compositeMetadata, attrFilter, markingFunctions, fromIndex);
     }
@@ -226,7 +227,7 @@ public class ValueToAttributes implements Function<Entry<Key,String>,Iterable<En
     }
 
     public Attribute<?> joinAttributes(String compositeName, Collection<Attribute<?>> in, boolean isOverloadedComposite, String separator) throws Exception {
-        Collection<org.apache.accumulo.access.AccessExpression> accessExpressions = Sets.newHashSet();
+        Collection<AccessExpression> accessExpressions = new HashSet<>();
         List<String> dataList = new ArrayList<>();
         long timestamp = 0;
         boolean toKeep = false;

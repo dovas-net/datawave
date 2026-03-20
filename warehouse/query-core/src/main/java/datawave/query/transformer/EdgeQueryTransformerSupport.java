@@ -2,6 +2,7 @@ package datawave.query.transformer;
 
 import java.nio.ByteBuffer;
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -12,7 +13,6 @@ import org.apache.accumulo.core.security.Authorizations;
 import org.apache.commons.lang.StringUtils;
 import org.apache.commons.lang.builder.HashCodeBuilder;
 
-import com.google.common.collect.Sets;
 import com.google.protobuf.InvalidProtocolBufferException;
 
 import datawave.core.query.cachedresults.CacheableLogic;
@@ -34,7 +34,8 @@ public abstract class EdgeQueryTransformerSupport<I,O> extends BaseQueryLogicTra
     protected ResponseObjectFactory responseObjectFactory;
     protected EdgeModelFields fields;
 
-    public EdgeQueryTransformerSupport(Query settings, MarkingFunctions<?> markingFunctions, ResponseObjectFactory responseObjectFactory, EdgeModelFields fields) {
+    public EdgeQueryTransformerSupport(Query settings, MarkingFunctions<?> markingFunctions, ResponseObjectFactory responseObjectFactory,
+                    EdgeModelFields fields) {
         super(markingFunctions);
         this.responseObjectFactory = responseObjectFactory;
         auths = new Authorizations(settings.getQueryAuthorizations().split(","));
@@ -100,7 +101,7 @@ public abstract class EdgeQueryTransformerSupport<I,O> extends BaseQueryLogicTra
         try {
             EdgeQueryResponseBase response = responseObjectFactory.getEdgeQueryResponse();
 
-            Set<AccessExpression> uniqueExpressions = Sets.newHashSet();
+            Set<AccessExpression> uniqueExpressions = new HashSet<>();
             for (Object result : resultList) {
                 EdgeBase edge = (EdgeBase) result;
                 Markings<?> markings = edge.getMarkings();
