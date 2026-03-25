@@ -16,6 +16,7 @@ import com.google.common.collect.ArrayListMultimap;
 import com.google.common.collect.HashMultimap;
 import com.google.common.collect.Multimap;
 
+import datawave.core.common.util.AccessExpressionUtil;
 import datawave.data.hash.UID;
 import datawave.ingest.config.IngestConfiguration;
 import datawave.ingest.config.IngestConfigurationFactory;
@@ -126,7 +127,7 @@ public class CSVRecordReader extends CSVReaderBase implements EventFixer {
     protected void decorateEvent() {
         if (securityMarkingExpression != null) {
             try {
-                AccessExpression ae = MarkingFunctions.normalize(MarkingFunctions.Default.ACCESS.newExpression(securityMarkingExpression));
+                AccessExpression ae = AccessExpressionUtil.normalize(MarkingFunctions.Default.ACCESS.newExpression(securityMarkingExpression));
                 event.setSecurityMarkings(AccessExpressionMarkings.builder().accessExpression(ae).build());
             } catch (Exception e) {
                 log.error("Could not set security markings for the event", e);

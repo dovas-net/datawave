@@ -14,7 +14,6 @@ import datawave.core.query.cachedresults.CacheableLogic;
 import datawave.core.query.logic.BaseQueryLogic;
 import datawave.core.query.logic.BaseQueryLogicTransformer;
 import datawave.marking.MarkingFunctions;
-import datawave.marking.MarkingFunctions.Exception;
 import datawave.marking.Markings;
 import datawave.microservice.query.Query;
 import datawave.query.model.QueryModel;
@@ -47,12 +46,8 @@ public class DiscoveryTransformer extends BaseQueryLogicTransformer<DiscoveredTh
         Preconditions.checkNotNull(thing, "Received a null object to transform!");
 
         EventBase event = this.responseObjectFactory.getEvent();
-        Markings<?> markings;
-        try {
-            markings = this.markingFunctions.fromAccessExpression(AccessExpressionUtil.toAccessExpression(new ColumnVisibility(thing.getColumnVisibility())));
-        } catch (Exception e) {
-            throw new RuntimeException("could not parse to markings: " + thing.getColumnVisibility());
-        }
+        Markings<?> markings = AccessExpressionUtil
+                        .fromAccessExpression(AccessExpressionUtil.toAccessExpression(new ColumnVisibility(thing.getColumnVisibility())));
         event.setMarkings(markings);
 
         List<FieldBase> fields = new ArrayList<>();
@@ -68,13 +63,9 @@ public class DiscoveryTransformer extends BaseQueryLogicTransformer<DiscoveredTh
         // If requested return counts separated by colvis, all counts by colvis could be > total record count
         if (thing.getCountsByColumnVisibility() != null && !thing.getCountsByColumnVisibility().isEmpty()) {
             for (Map.Entry<Writable,Writable> entry : thing.getCountsByColumnVisibility().entrySet()) {
-                try {
-                    Markings<?> eMarkings = this.markingFunctions
-                                    .fromAccessExpression(AccessExpressionUtil.toAccessExpression(new ColumnVisibility(entry.getKey().toString())));
-                    fields.add(this.makeField("RECORD COUNT", eMarkings, entry.getKey().toString(), 0L, entry.getValue().toString()));
-                } catch (Exception e) {
-                    throw new RuntimeException("could not parse to markings: " + thing.getColumnVisibility());
-                }
+                Markings<?> eMarkings = AccessExpressionUtil
+                                .fromAccessExpression(AccessExpressionUtil.toAccessExpression(new ColumnVisibility(entry.getKey().toString())));
+                fields.add(this.makeField("RECORD COUNT", eMarkings, entry.getKey().toString(), 0L, entry.getValue().toString()));
 
             }
         } else {

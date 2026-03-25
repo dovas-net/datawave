@@ -13,6 +13,7 @@ import org.apache.accumulo.core.security.Authorizations;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import datawave.core.common.util.AccessExpressionUtil;
 import datawave.core.query.logic.BaseQueryLogicTransformer;
 import datawave.marking.MarkingFunctions;
 import datawave.microservice.query.Query;
@@ -203,11 +204,7 @@ public class TagCloudTransformer extends BaseQueryLogicTransformer<Entry<Key,Val
     @SuppressWarnings("unchecked")
     private void convertAndSetMarkings(TagCloudBase base, AccessExpression visibility) {
         if (visibility != null && !visibility.getExpression().isEmpty()) {
-            try {
-                base.setMarkings(markingFunctions.fromAccessExpression(visibility));
-            } catch (MarkingFunctions.Exception e) {
-                log.warn("Could not convert tag cloud visibility to markings: {}", visibility.getExpression(), e);
-            }
+            base.setMarkings(AccessExpressionUtil.fromAccessExpression(visibility));
         }
     }
 

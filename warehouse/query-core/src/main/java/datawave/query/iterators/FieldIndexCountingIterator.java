@@ -11,6 +11,7 @@ import java.util.Map;
 import java.util.Set;
 import java.util.TimeZone;
 import java.util.TreeSet;
+import java.util.stream.Collectors;
 
 import org.apache.accumulo.core.client.IteratorSetting;
 import org.apache.accumulo.core.data.ArrayByteSequence;
@@ -588,8 +589,9 @@ public class FieldIndexCountingIterator extends WrappingIterator implements Sort
         }
         ColumnVisibility cv;
         try {
-            cv = AccessExpressionUtil.toColumnVisibility(MarkingFunctions.Factory.createMarkingFunctions()
-                            .combine(columnVisibilities.stream().map(AccessExpressionUtil::toAccessExpression).collect(java.util.stream.Collectors.toSet())));
+            cv = AccessExpressionUtil.toColumnVisibility(AccessExpressionUtil.combine(MarkingFunctions.Factory.createMarkingFunctions(),
+                            columnVisibilities.stream().map(c -> AccessExpressionUtil.fromAccessExpression(AccessExpressionUtil.toAccessExpression(c)))
+                                            .collect(Collectors.toSet())));
         } catch (MarkingFunctions.Exception e) {
             log.error("Could not combine visibilities: " + visibilitySet + "  " + e);
             return null;

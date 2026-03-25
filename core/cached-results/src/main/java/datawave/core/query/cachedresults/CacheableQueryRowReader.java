@@ -9,10 +9,10 @@ import java.util.Map;
 import java.util.Set;
 import java.util.TreeSet;
 
-import org.apache.accumulo.access.AccessExpression;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import datawave.core.common.util.AccessExpressionUtil;
 import datawave.marking.MarkingFunctions;
 import datawave.marking.Markings;
 import datawave.webservice.query.cachedresults.CacheableQueryRow;
@@ -90,12 +90,7 @@ public class CacheableQueryRowReader {
             if (columnToIndexMap.get("_markings_") != null) {
                 String mStr = cachedRowSet.getString(columnToIndexMap.get("_markings_"));
                 if (mStr != null && !mStr.isEmpty()) {
-                    try {
-                        AccessExpression ae = MarkingFunctions.Default.ACCESS.newExpression(mStr);
-                        cqfc.setMarkings(markingFunctions.fromAccessExpression(ae));
-                    } catch (MarkingFunctions.Exception e) {
-                        log.error("could not deserialize markings {}", mStr, e);
-                    }
+                    cqfc.setMarkings(AccessExpressionUtil.fromAccessExpression(MarkingFunctions.Default.ACCESS.newExpression(mStr)));
                 }
             }
             if (columnToIndexMap.get("_column_markings_") != null) {
@@ -107,19 +102,14 @@ public class CacheableQueryRowReader {
                     String columnName = entry.getKey();
                     String combinedString = entry.getValue();
                     int x = combinedString.lastIndexOf(':');
-                    try {
-                        if (x >= 0) {
-                            String markingStr = combinedString.substring(0, x);
-                            AccessExpression ae = MarkingFunctions.Default.ACCESS.newExpression(markingStr);
-                            columnMarkingsMap.put(columnName, markingFunctions.fromAccessExpression(ae));
-                            columnVisibilityMap.put(columnName, combinedString.substring(x + 1));
-                        } else {
-                            AccessExpression ae = MarkingFunctions.Default.ACCESS.newExpression(combinedString);
-                            columnMarkingsMap.put(columnName, markingFunctions.fromAccessExpression(ae));
-                            columnVisibilityMap.put(columnName, "");
-                        }
-                    } catch (MarkingFunctions.Exception e) {
-                        log.error("could not deserialize column markings for {}: {}", columnName, combinedString, e);
+                    if (x >= 0) {
+                        String markingStr = combinedString.substring(0, x);
+                        columnMarkingsMap.put(columnName, AccessExpressionUtil.fromAccessExpression(MarkingFunctions.Default.ACCESS.newExpression(markingStr)));
+                        columnVisibilityMap.put(columnName, combinedString.substring(x + 1));
+                    } else {
+                        columnMarkingsMap.put(columnName,
+                                        AccessExpressionUtil.fromAccessExpression(MarkingFunctions.Default.ACCESS.newExpression(combinedString)));
+                        columnVisibilityMap.put(columnName, "");
                     }
                 }
                 cqfc.setColumnMarkingsMap(columnMarkingsMap);

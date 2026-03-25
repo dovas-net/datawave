@@ -261,11 +261,7 @@ public class AtomDataTypeHandler<KEYIN,KEYOUT,VALUEOUT> implements ExtendedDataT
     protected String getColumnQualifier(RawRecordContainer event, NormalizedContentInterface value) {
         Markings<?> markings = value.getMarkings();
         if (markings != null && !markings.isEmpty()) {
-            try {
-                return markingFunctions.toAccessExpression(markings).getExpression();
-            } catch (MarkingFunctions.Exception e) {
-                throw new RuntimeException("Cannot convert record-level markings into a column visibility", e);
-            }
+            return AccessExpressionUtil.toAccessExpression(markings).getExpression();
         }
         return flatten(event.getVisibility());
     }
@@ -278,7 +274,7 @@ public class AtomDataTypeHandler<KEYIN,KEYOUT,VALUEOUT> implements ExtendedDataT
      * @return the normalized visibility string
      */
     protected String flatten(ColumnVisibility vis) {
-        return MarkingFunctions.normalize(AccessExpressionUtil.toAccessExpression(vis)).getExpression();
+        return AccessExpressionUtil.normalize(AccessExpressionUtil.toAccessExpression(vis)).getExpression();
     }
 
 }

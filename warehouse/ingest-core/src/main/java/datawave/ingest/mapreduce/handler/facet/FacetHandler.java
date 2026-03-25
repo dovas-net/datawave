@@ -195,7 +195,7 @@ public class FacetHandler<KEYIN,KEYOUT,VALUEOUT> implements ExtendedDataTypeHand
     }
 
     protected byte[] flatten(ColumnVisibility vis) {
-        return MarkingFunctions.normalize(AccessExpressionUtil.toAccessExpression(vis)).getExpression().getBytes(UTF_8);
+        return AccessExpressionUtil.normalize(AccessExpressionUtil.toAccessExpression(vis)).getExpression().getBytes(UTF_8);
     }
 
     @Override

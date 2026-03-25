@@ -12,7 +12,9 @@ import java.util.stream.Collectors;
 import org.apache.accumulo.access.AccessExpression;
 import org.apache.commons.lang3.StringUtils;
 
+import datawave.core.common.util.AccessExpressionUtil;
 import datawave.marking.MarkingFunctions;
+import datawave.marking.Markings;
 
 /**
  * Default implementations for pluggable utilities for generating tag clouds, includes mechanisms to partition keywords into separate tag clouds, combine or
@@ -27,8 +29,13 @@ public class DefaultTagCloudUtils implements TagCloudUtils, Serializable {
         if (visibilities == null || visibilities.isEmpty()) {
             return null;
         }
-        Set<AccessExpression> expressions = visibilities.stream().map(MarkingFunctions.Default.ACCESS::newExpression).collect(Collectors.toSet());
-        return new MarkingFunctions.Default().combine(expressions);
+        Set<Markings<?>> markings = visibilities.stream().map(v -> AccessExpressionUtil.fromAccessExpression(MarkingFunctions.Default.ACCESS.newExpression(v)))
+                        .collect(Collectors.toSet());
+        try {
+            return AccessExpressionUtil.toAccessExpression(AccessExpressionUtil.combine(new MarkingFunctions.Default(), markings));
+        } catch (MarkingFunctions.Exception e) {
+            throw new IllegalArgumentException("Failed to combine visibilities", e);
+        }
     }
 
     @Override

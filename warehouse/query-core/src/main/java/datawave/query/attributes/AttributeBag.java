@@ -81,7 +81,8 @@ public abstract class AttributeBag<T extends Comparable<T>> extends Attribute<T>
     protected ColumnVisibility combineAndSetColumnVisibilities(Collection<Attribute<? extends Comparable<?>>> attributes) throws Exception {
         Collection<AccessExpression> accessExpressions = attributes.stream().map(attr -> AccessExpressionUtil.toAccessExpression(attr.getColumnVisibility()))
                         .collect(Collectors.toSet());
-        return AccessExpressionUtil.toColumnVisibility(MarkingFunctions.Factory.createMarkingFunctions().combine(accessExpressions));
+        return AccessExpressionUtil.toColumnVisibility(AccessExpressionUtil.combine(MarkingFunctions.Factory.createMarkingFunctions(),
+                        accessExpressions.stream().map(AccessExpressionUtil::fromAccessExpression).collect(Collectors.toList())));
     }
 
     private long updateTimestamps() {

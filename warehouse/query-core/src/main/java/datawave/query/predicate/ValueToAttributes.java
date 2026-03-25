@@ -7,6 +7,7 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
+import java.util.stream.Collectors;
 
 import org.apache.accumulo.access.AccessExpression;
 import org.apache.accumulo.core.data.ByteSequence;
@@ -292,7 +293,8 @@ public class ValueToAttributes implements Function<Entry<Key,String>,Iterable<En
         if (log.isDebugEnabled()) {
             log.debug("dataList is " + dataList);
         }
-        ColumnVisibility combinedColumnVisibility = AccessExpressionUtil.toColumnVisibility(this.markingFunctions.combine(accessExpressions));
+        ColumnVisibility combinedColumnVisibility = AccessExpressionUtil.toColumnVisibility(AccessExpressionUtil.combine(this.markingFunctions,
+                        accessExpressions.stream().map(AccessExpressionUtil::fromAccessExpression).collect(Collectors.toList())));
         metadata = new Key(metadata.getRow(), metadata.getColumnFamily(), new Text(), combinedColumnVisibility, timestamp);
         if (dataList.size() == 1) {
             return this.attrFactory.create(compositeName, dataList.get(0), metadata, toKeep, true);

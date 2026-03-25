@@ -466,7 +466,7 @@ public abstract class DocumentTransformerSupport<I,O> extends EventQueryTransfor
             // Use the markings on the Field if we're returning the markings to the client
             if (!this.reducedResponse) {
                 try {
-                    Markings<?> markings = markingFunctions.fromAccessExpression(AccessExpressionUtil.toAccessExpression(attr.getColumnVisibility()));
+                    Markings<?> markings = AccessExpressionUtil.fromAccessExpression(AccessExpressionUtil.toAccessExpression(attr.getColumnVisibility()));
                     FieldBase<?> field = this.makeField(fieldName, markings, attr.getColumnVisibility(), attr.getTimestamp(), attr.getData());
                     myFields.add(field);
                 } catch (Exception ex) {

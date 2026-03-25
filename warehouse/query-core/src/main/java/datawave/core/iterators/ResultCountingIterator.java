@@ -7,6 +7,7 @@ import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.TimeUnit;
+import java.util.stream.Collectors;
 
 import org.apache.accumulo.core.client.BatchScanner;
 import org.apache.accumulo.core.data.ByteSequence;
@@ -210,8 +211,9 @@ public class ResultCountingIterator extends WrappingIterator {
         ColumnVisibility cv = null;
 
         try {
-            cv = AccessExpressionUtil.toColumnVisibility(MarkingFunctions.Factory.createMarkingFunctions()
-                            .combine(columnVisibilities.stream().map(AccessExpressionUtil::toAccessExpression).collect(java.util.stream.Collectors.toSet())));
+            cv = AccessExpressionUtil.toColumnVisibility(AccessExpressionUtil.combine(MarkingFunctions.Factory.createMarkingFunctions(),
+                            columnVisibilities.stream().map(c -> AccessExpressionUtil.fromAccessExpression(AccessExpressionUtil.toAccessExpression(c)))
+                                            .collect(Collectors.toSet())));
         } catch (MarkingFunctions.Exception e) {
             log.error("Could not create combined columnVisibility for the count", e);
             return null;

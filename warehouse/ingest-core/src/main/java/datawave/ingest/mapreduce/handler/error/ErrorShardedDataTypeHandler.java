@@ -24,6 +24,7 @@ import org.slf4j.LoggerFactory;
 import com.google.common.collect.HashMultimap;
 import com.google.common.collect.Multimap;
 
+import datawave.core.common.util.AccessExpressionUtil;
 import datawave.data.hash.UID;
 import datawave.ingest.config.IngestConfiguration;
 import datawave.ingest.config.IngestConfigurationFactory;
@@ -43,7 +44,6 @@ import datawave.ingest.mapreduce.handler.shard.AbstractColumnBasedHandler;
 import datawave.ingest.mapreduce.handler.shard.ShardedDataTypeHandler;
 import datawave.ingest.mapreduce.job.BulkIngestKey;
 import datawave.ingest.mapreduce.job.writer.ContextWriter;
-import datawave.marking.MarkingFunctions;
 
 /**
  * Handler that take events with processing errors or fatal errors and dumps them into a processing error table. This table will be used for subsequent
@@ -158,7 +158,7 @@ public class ErrorShardedDataTypeHandler<KEYIN,KEYOUT,VALUEOUT> extends Abstract
         setShardDictionaryIndexTableName(tableName == null ? null : new Text(tableName));
 
         try {
-            defaultVisibility = markingFunctions.toAccessExpression(markingsHelper.getDefaultMarkings()).getExpression().getBytes(UTF_8);
+            defaultVisibility = AccessExpressionUtil.toAccessExpression(markingsHelper.getDefaultMarkings()).getExpression().getBytes(UTF_8);
         } catch (Exception e) {
             throw new IllegalArgumentException("Failed to parse security marking configuration", e);
         }
@@ -349,12 +349,7 @@ public class ErrorShardedDataTypeHandler<KEYIN,KEYOUT,VALUEOUT> extends Abstract
     public byte[] getVisibility(RawRecordContainer event, NormalizedContentInterface value) {
         byte[] visibility;
         if (value != null && value.getMarkings() != null && !value.getMarkings().isEmpty()) {
-            try {
-                visibility = markingFunctions.toAccessExpression(value.getMarkings()).getExpression().getBytes(UTF_8);
-            } catch (MarkingFunctions.Exception e) {
-                log.error("Failed to create visibility from markings, using default", e);
-                visibility = defaultVisibility;
-            }
+            visibility = AccessExpressionUtil.toAccessExpression(value.getMarkings()).getExpression().getBytes(UTF_8);
         } else if (event.getVisibility() != null) {
             visibility = flatten(event.getVisibility());
         } else {

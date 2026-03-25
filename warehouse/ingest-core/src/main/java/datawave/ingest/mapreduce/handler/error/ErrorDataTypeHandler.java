@@ -135,11 +135,7 @@ public class ErrorDataTypeHandler<KEYIN,KEYOUT,VALUEOUT> implements ExtendedData
 
         this.conf = context.getConfiguration();
 
-        try {
-            defaultVisibility = markingFunctions.toAccessExpression(markingsHelper.getDefaultMarkings()).getExpression().getBytes(UTF_8);
-        } catch (MarkingFunctions.Exception e) {
-            throw new IllegalArgumentException("Failed to convert default markings to an AccessExpression.", e);
-        }
+        defaultVisibility = AccessExpressionUtil.toAccessExpression(markingsHelper.getDefaultMarkings()).getExpression().getBytes(UTF_8);
 
         // Initialize a UID builder based on the configuration
         uidBuilder = UID.builder(conf);
@@ -322,12 +318,7 @@ public class ErrorDataTypeHandler<KEYIN,KEYOUT,VALUEOUT> implements ExtendedData
     protected byte[] getVisibility(RawRecordContainer event, NormalizedContentInterface value) {
         byte[] visibility;
         if (value != null && value.getMarkings() != null && !value.getMarkings().isEmpty()) {
-            try {
-                visibility = markingFunctions.toAccessExpression(value.getMarkings()).getExpression().getBytes(UTF_8);
-            } catch (MarkingFunctions.Exception e) {
-                log.error("Failed to create visibility from markings, using default", e);
-                visibility = defaultVisibility;
-            }
+            visibility = AccessExpressionUtil.toAccessExpression(value.getMarkings()).getExpression().getBytes(UTF_8);
         } else if (event.getVisibility() != null) {
             visibility = flatten(event.getVisibility());
         } else {
@@ -344,7 +335,7 @@ public class ErrorDataTypeHandler<KEYIN,KEYOUT,VALUEOUT> implements ExtendedData
      * @return the normalized visibility bytes
      */
     protected byte[] flatten(ColumnVisibility vis) {
-        return MarkingFunctions.normalize(AccessExpressionUtil.toAccessExpression(vis)).getExpression().getBytes(UTF_8);
+        return AccessExpressionUtil.normalize(AccessExpressionUtil.toAccessExpression(vis)).getExpression().getBytes(UTF_8);
     }
 
     @Override

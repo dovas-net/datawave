@@ -8,7 +8,6 @@ import java.util.HashSet;
 import java.util.Map.Entry;
 import java.util.Set;
 
-import org.apache.accumulo.access.AccessExpression;
 import org.apache.accumulo.core.data.Key;
 import org.apache.accumulo.core.data.Value;
 import org.apache.accumulo.core.security.ColumnVisibility;
@@ -54,13 +53,8 @@ public class EventQueryTransformer extends EventQueryTransformerSupport<Entry<Ke
         }
         EventBase event = this.responseObjectFactory.getEvent();
 
-        Markings<?> markings = null;
-        try {
-            markings = this.markingFunctions.fromAccessExpression(AccessExpressionUtil.toAccessExpression(new ColumnVisibility(key.getColumnVisibility())));
-        } catch (Exception e) {
-            log.error("could not translate " + key.getColumnVisibility() + " to markings, skipping entry");
-            return null;
-        }
+        Markings<?> markings = AccessExpressionUtil
+                        .fromAccessExpression(AccessExpressionUtil.toAccessExpression(new ColumnVisibility(key.getColumnVisibility())));
         if (null == markings || markings.isEmpty()) {
             // can't process this one because we did not have valid security markings
             log.error("Transformer visibility interpreter was null, skipping entry");
@@ -88,9 +82,9 @@ public class EventQueryTransformer extends EventQueryTransformerSupport<Entry<Ke
         String origFieldName = null;
         String fieldName = null;
 
-        // Hold unique AccessExpressions and merge them at the end
+        // Hold unique Markings and merge them at the end
         // for the overall event visibility.
-        Set<AccessExpression> expressionsToMerge = new HashSet<>();
+        Set<Markings<?>> markingsToMerge = new HashSet<>();
 
         for (Entry<String,Collection<FieldValue>> e : eventFields.asMap().entrySet()) {
             origFieldName = e.getKey();
@@ -101,28 +95,22 @@ public class EventQueryTransformer extends EventQueryTransformerSupport<Entry<Ke
             }
 
             for (FieldValue fv : e.getValue()) {
-                AccessExpression fvExpression = AccessExpressionUtil.toAccessExpression(fv.getVisibility());
-                expressionsToMerge.add(fvExpression);
-                try {
-                    Markings<?> fieldMarkings = this.markingFunctions.fromAccessExpression(fvExpression);
-                    String value = new String(fv.getValue(), StandardCharsets.UTF_8);
-                    // if this is a content field name, then replace the value with the uid
-                    if (getContentFieldNames().contains(fieldName)) {
-                        value = baseUid;
-                    }
-                    values.add(this.makeField(fieldName, fieldMarkings, fvExpression.getExpression(), entry.getKey().getTimestamp(), value));
-                } catch (Exception e1) {
-                    throw new RuntimeException("could not make markings from: " + fvExpression);
+                Markings<?> fieldMarkings = AccessExpressionUtil.fromAccessExpression(AccessExpressionUtil.toAccessExpression(fv.getVisibility()));
+                markingsToMerge.add(fieldMarkings);
+                String value = new String(fv.getValue(), StandardCharsets.UTF_8);
+                // if this is a content field name, then replace the value with the uid
+                if (getContentFieldNames().contains(fieldName)) {
+                    value = baseUid;
                 }
+                values.add(this.makeField(fieldName, fieldMarkings, AccessExpressionUtil.toAccessExpression(fieldMarkings).getExpression(),
+                                entry.getKey().getTimestamp(), value));
             }
         }
 
-        AccessExpression combinedExpression = null;
         try {
-            combinedExpression = this.markingFunctions.combine(expressionsToMerge);
-            event.setMarkings(this.markingFunctions.fromAccessExpression(combinedExpression));
+            event.setMarkings(AccessExpressionUtil.combine(this.markingFunctions, markingsToMerge));
         } catch (Exception e1) {
-            throw new RuntimeException("could not make markings from: " + combinedExpression);
+            throw new RuntimeException("could not combine markings");
         }
         event.setFields(new ArrayList<>(values));
 

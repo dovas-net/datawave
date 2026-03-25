@@ -22,6 +22,7 @@ import org.slf4j.LoggerFactory;
 
 import com.google.common.collect.Maps;
 
+import datawave.core.common.util.AccessExpressionUtil;
 import datawave.data.ColumnFamilyConstants;
 import datawave.marking.MarkingFunctions;
 import datawave.microservice.Connection;
@@ -276,7 +277,7 @@ public class DefaultMetadataFieldScanner {
             DefaultDescription description = responseObjectFactory.getDescription();
             description.setDescription(currValue.toString());
             description.setMarkings(
-                            markingFunctions.fromAccessExpression(MarkingFunctions.Default.ACCESS.newExpression(currKey.getColumnVisibility().toString())));
+                            AccessExpressionUtil.fromAccessExpression(MarkingFunctions.Default.ACCESS.newExpression(currKey.getColumnVisibility().toString())));
             currField.getDescriptions().add(description);
         }
 

@@ -15,6 +15,7 @@ import java.util.Iterator;
 import java.util.Map;
 import java.util.Set;
 import java.util.SortedSet;
+import java.util.stream.Collectors;
 
 import org.apache.accumulo.core.data.Range;
 import org.apache.accumulo.core.security.ColumnVisibility;
@@ -470,8 +471,8 @@ public class DatawaveInterpreter extends Interpreter {
         }
 
         try {
-            cv = AccessExpressionUtil.toColumnVisibility(MarkingFunctionsFactory.createMarkingFunctions()
-                            .combine(cvs.stream().map(AccessExpressionUtil::toAccessExpression).collect(java.util.stream.Collectors.toSet())));
+            cv = AccessExpressionUtil.toColumnVisibility(AccessExpressionUtil.combine(MarkingFunctionsFactory.createMarkingFunctions(), cvs.stream()
+                            .map(c -> AccessExpressionUtil.fromAccessExpression(AccessExpressionUtil.toAccessExpression(c))).collect(Collectors.toSet())));
         } catch (MarkingFunctions.Exception e) {
             log.error("Failed to combine column visibilities while generating HIT_TERM for phrase function for field [" + field + "]");
             log.error("msg: ", e);

@@ -5,7 +5,6 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import java.util.List;
 
 import org.apache.accumulo.access.Access;
-import org.apache.accumulo.access.AccessExpression;
 import org.junit.jupiter.api.Test;
 
 public class MarkingFunctionsDefaultCombineTest {
@@ -15,22 +14,22 @@ public class MarkingFunctionsDefaultCombineTest {
     public void testCombineAnds() throws MarkingFunctions.Exception {
         MarkingFunctions<AccessExpressionMarkings> markingFunctions = new MarkingFunctions.Default();
 
-        AccessExpression oneAnna = ACCESS.newExpression("A&B");
-        AccessExpression twoAnna = ACCESS.newExpression("A&C");
+        AccessExpressionMarkings oneAnna = AccessExpressionMarkings.builder().accessExpression(ACCESS.newExpression("A&B")).build();
+        AccessExpressionMarkings twoAnna = AccessExpressionMarkings.builder().accessExpression(ACCESS.newExpression("A&C")).build();
 
-        AccessExpression combined = markingFunctions.combine(List.of(oneAnna, twoAnna));
-        assertEquals(ACCESS.newExpression("A&B&C"), combined);
+        AccessExpressionMarkings combined = markingFunctions.combine(List.of(oneAnna, twoAnna));
+        assertEquals(AccessExpressionMarkings.builder().accessExpression(ACCESS.newExpression("A&B&C")).build(), combined);
     }
 
     @Test
     public void testCombineOrs() throws MarkingFunctions.Exception {
         MarkingFunctions<AccessExpressionMarkings> markingFunctions = new MarkingFunctions.Default();
 
-        AccessExpression oneOr = ACCESS.newExpression("A|B");
-        AccessExpression twoOr = ACCESS.newExpression("A|C");
+        AccessExpressionMarkings oneOr = AccessExpressionMarkings.builder().accessExpression(ACCESS.newExpression("A|B")).build();
+        AccessExpressionMarkings twoOr = AccessExpressionMarkings.builder().accessExpression(ACCESS.newExpression("A|C")).build();
 
-        AccessExpression combined = markingFunctions.combine(List.of(oneOr, twoOr));
-        assertEquals(ACCESS.newExpression("(A|B)&(A|C)"), combined);
+        AccessExpressionMarkings combined = markingFunctions.combine(List.of(oneOr, twoOr));
+        assertEquals(AccessExpressionMarkings.builder().accessExpression(ACCESS.newExpression("(A|B)&(A|C)")).build(), combined);
     }
 
     @Test
@@ -41,7 +40,7 @@ public class MarkingFunctionsDefaultCombineTest {
         AccessExpressionMarkings cv2 = AccessExpressionMarkings.builder().accessExpression(ACCESS.newExpression("A&C")).build();
         AccessExpressionMarkings expected = AccessExpressionMarkings.builder().accessExpression(ACCESS.newExpression("A&B&C")).build();
 
-        assertEquals(expected, markingFunctions.combine(cv1, cv2));
+        assertEquals(expected, markingFunctions.combine(List.of(cv1, cv2)));
     }
 
     @Test
@@ -52,6 +51,6 @@ public class MarkingFunctionsDefaultCombineTest {
         AccessExpressionMarkings cv2 = AccessExpressionMarkings.builder().accessExpression(ACCESS.newExpression("A|C")).build();
         AccessExpressionMarkings expected = AccessExpressionMarkings.builder().accessExpression(ACCESS.newExpression("(A|B)&(A|C)")).build();
 
-        assertEquals(expected, markingFunctions.combine(cv1, cv2));
+        assertEquals(expected, markingFunctions.combine(List.of(cv1, cv2)));
     }
 }

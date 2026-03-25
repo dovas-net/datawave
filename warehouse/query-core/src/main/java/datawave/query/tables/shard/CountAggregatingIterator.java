@@ -154,8 +154,8 @@ public class CountAggregatingIterator extends TransformIterator {
 
         private ColumnVisibility getCombinedColumnVisibility() {
             try {
-                return AccessExpressionUtil.toColumnVisibility(markingFunctions
-                                .combine(columnVisibilities.stream().map(AccessExpressionUtil::toAccessExpression).collect(Collectors.toSet())));
+                return AccessExpressionUtil.toColumnVisibility(AccessExpressionUtil.combine(markingFunctions, columnVisibilities.stream()
+                                .map(c -> AccessExpressionUtil.fromAccessExpression(AccessExpressionUtil.toAccessExpression(c))).collect(Collectors.toSet())));
             } catch (Exception e) {
                 log.error("Could not combine columnVisibilities for the count", e);
                 return null;

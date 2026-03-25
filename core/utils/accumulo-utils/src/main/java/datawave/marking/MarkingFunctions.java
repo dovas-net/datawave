@@ -1,6 +1,5 @@
 package datawave.marking;
 
-import java.util.Arrays;
 import java.util.Collection;
 import java.util.HashSet;
 import java.util.Set;
@@ -23,30 +22,7 @@ import org.springframework.context.support.ClassPathXmlApplicationContext;
 
 public interface MarkingFunctions<T extends Markings<?>> {
 
-    AccessExpression combine(Collection<AccessExpression> expressions) throws MarkingFunctions.Exception;
-
-    T combine(T... markings) throws MarkingFunctions.Exception;
-
-    AccessExpression toAccessExpression(Markings<?> markings) throws MarkingFunctions.Exception;
-
-    T fromAccessExpression(AccessExpression expression) throws MarkingFunctions.Exception;
-
-    /**
-     * Normalize an {@link AccessExpression} by deduplicating and sorting terms. This is the replacement for the old {@code ColumnVisibility.flatten()}
-     * behavior.
-     *
-     * @param expression
-     *            the expression to normalize
-     * @return a normalized {@link AccessExpression}
-     */
-    static AccessExpression normalize(AccessExpression expression) {
-        String expr = expression.getExpression();
-        if (expr.isEmpty()) {
-            return expression;
-        }
-        ParsedAccessExpression parsed = Default.ACCESS.newParsedExpression(expr);
-        return Default.ACCESS.newExpression(ParseExamples.normalize(parsed).expression);
-    }
+    T combine(Collection<T> markings) throws MarkingFunctions.Exception;
 
     class Exception extends java.lang.Exception {
 
@@ -73,23 +49,25 @@ public interface MarkingFunctions<T extends Markings<?>> {
 
     class Default implements MarkingFunctions<AccessExpressionMarkings> {
         public static final Access ACCESS = Access.builder().build();
-        public static final AccessExpression EMPTY_MARKINGS = ACCESS.newExpression("");
+        public static final AccessExpressionMarkings EMPTY_MARKINGS = AccessExpressionMarkings.builder().accessExpression(ACCESS.newExpression("")).build();
 
         @Override
-        public AccessExpression combine(Collection<AccessExpression> expressions) {
-            // filter out any empty expressions and concatenate with '&'
-            // @formatter:off
+        public AccessExpressionMarkings combine(Collection<AccessExpressionMarkings> markings) {
 
-            Set<AccessExpression> uniqueExpressions = new HashSet<>(expressions);
+            Set<AccessExpressionMarkings> uniqueMarkings = new HashSet<>(markings);
 
-            if (uniqueExpressions.isEmpty()) {
+            if (uniqueMarkings.isEmpty()) {
                 return EMPTY_MARKINGS;
             }
 
-            if (uniqueExpressions.size() == 1) {
-                return uniqueExpressions.stream().findFirst().get();
+            if (uniqueMarkings.size() == 1) {
+                return uniqueMarkings.stream().findFirst().get();
             }
 
+            Set<AccessExpression> uniqueExpressions = markings.stream().map(AccessExpressionMarkings::getMarkings).collect(Collectors.toSet());
+
+            // filter out any empty expressions and concatenate with '&'
+            // @formatter:off
             ParsedAccessExpression expression = ACCESS.newParsedExpression(uniqueExpressions
                                                 .stream()
                                                 .map(AccessExpression::getExpression)
@@ -101,25 +79,8 @@ public interface MarkingFunctions<T extends Markings<?>> {
 
             // normalize the Parsed Expression and then return a copy without the parse tree
             // FIXME: Using a beta of the accumulo-access API so temporarily using the normalize function from the example code
-            return ACCESS.newExpression(ParseExamples.normalize(expression).expression);
+            return AccessExpressionMarkings.builder().accessExpression(ACCESS.newExpression(ParseExamples.normalize(expression).expression)).build();
         }
-
-        @Override
-        public final AccessExpressionMarkings combine(AccessExpressionMarkings... markings) {
-            return AccessExpressionMarkings.builder().accessExpression(combine(Arrays.stream(markings).map(Markings::getMarkings).collect(Collectors.toSet())))
-                            .build();
-        }
-
-        @Override
-        public AccessExpression toAccessExpression(Markings<?> markings) {
-            return (AccessExpression) markings.getMarkings();
-        }
-
-        @Override
-        public AccessExpressionMarkings fromAccessExpression(AccessExpression expression) {
-            return AccessExpressionMarkings.builder().accessExpression(expression).build();
-        }
-
     }
 
     /**

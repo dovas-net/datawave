@@ -20,7 +20,6 @@ import datawave.core.query.logic.BaseQueryLogic;
 import datawave.core.query.logic.BaseQueryLogicTransformer;
 import datawave.ingest.protobuf.Uid;
 import datawave.marking.MarkingFunctions;
-import datawave.marking.MarkingFunctions.Exception;
 import datawave.marking.Markings;
 import datawave.microservice.query.Query;
 import datawave.query.model.QueryModel;
@@ -68,12 +67,7 @@ public class ShardIndexQueryTransformer extends BaseQueryLogicTransformer<Entry<
 
         EventBase event = responseObjectFactory.getEvent();
         ColumnVisibility columnVisibility = new ColumnVisibility(entry.getKey().getColumnVisibility());
-        Markings<?> markings;
-        try {
-            markings = this.markingFunctions.fromAccessExpression(AccessExpressionUtil.toAccessExpression(columnVisibility));
-        } catch (Exception e1) {
-            throw new RuntimeException("could not make markings from: " + columnVisibility);
-        }
+        Markings<?> markings = AccessExpressionUtil.fromAccessExpression(AccessExpressionUtil.toAccessExpression(columnVisibility));
         event.setMarkings(markings);
 
         List<FieldBase> fields = new ArrayList<>();

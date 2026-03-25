@@ -12,6 +12,7 @@ import java.util.Set;
 import java.util.TimeZone;
 import java.util.TreeMap;
 import java.util.TreeSet;
+import java.util.stream.Collectors;
 
 import org.apache.accumulo.core.client.IteratorSetting;
 import org.apache.accumulo.core.data.ArrayByteSequence;
@@ -566,8 +567,9 @@ public class FieldIndexCountingIteratorPerVisibility extends WrappingIterator im
             ColumnVisibility cv = null;
             try {
                 // Calculate the columnVisibility for this key from the combiner.
-                cv = AccessExpressionUtil.toColumnVisibility(MarkingFunctions.Factory.createMarkingFunctions().combine(
-                                columnVisibilities.stream().map(AccessExpressionUtil::toAccessExpression).collect(java.util.stream.Collectors.toSet())));
+                cv = AccessExpressionUtil.toColumnVisibility(AccessExpressionUtil.combine(MarkingFunctions.Factory.createMarkingFunctions(),
+                                columnVisibilities.stream().map(c -> AccessExpressionUtil.fromAccessExpression(AccessExpressionUtil.toAccessExpression(c)))
+                                                .collect(Collectors.toSet())));
             } catch (Exception e) {
                 log.error("Could not create combined columnVisibility for the count", e);
                 return null;

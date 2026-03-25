@@ -41,7 +41,7 @@ public class EventKeyValueFactory {
 
     protected static void parseColumnVisibility(EventKeyValue event, Key key, Authorizations auths, MarkingFunctions<?> markingFunctions)
                     throws MarkingFunctions.Exception {
-        event.setMarkings(markingFunctions.fromAccessExpression(AccessExpressionUtil.toAccessExpression(new ColumnVisibility(key.getColumnVisibility()))));
+        event.setMarkings(AccessExpressionUtil.fromAccessExpression(AccessExpressionUtil.toAccessExpression(new ColumnVisibility(key.getColumnVisibility()))));
     }
 
     public static class EventKeyValue {

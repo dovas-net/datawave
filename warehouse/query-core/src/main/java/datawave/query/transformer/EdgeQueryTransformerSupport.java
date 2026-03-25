@@ -7,7 +7,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
-import org.apache.accumulo.access.AccessExpression;
 import org.apache.accumulo.core.data.Value;
 import org.apache.accumulo.core.security.Authorizations;
 import org.apache.commons.lang.StringUtils;
@@ -15,6 +14,7 @@ import org.apache.commons.lang.builder.HashCodeBuilder;
 
 import com.google.protobuf.InvalidProtocolBufferException;
 
+import datawave.core.common.util.AccessExpressionUtil;
 import datawave.core.query.cachedresults.CacheableLogic;
 import datawave.core.query.logic.BaseQueryLogicTransformer;
 import datawave.edge.model.EdgeModelFields;
@@ -101,16 +101,14 @@ public abstract class EdgeQueryTransformerSupport<I,O> extends BaseQueryLogicTra
         try {
             EdgeQueryResponseBase response = responseObjectFactory.getEdgeQueryResponse();
 
-            Set<AccessExpression> uniqueExpressions = new HashSet<>();
+            Set<Markings<?>> uniqueMarkings = new HashSet<>();
             for (Object result : resultList) {
                 EdgeBase edge = (EdgeBase) result;
-                Markings<?> markings = edge.getMarkings();
-                uniqueExpressions.add(this.markingFunctions.toAccessExpression(markings));
+                uniqueMarkings.add(edge.getMarkings());
                 response.addEdge(edge);
             }
 
-            AccessExpression combinedExpression = this.markingFunctions.combine(uniqueExpressions);
-            response.setMarkings(this.markingFunctions.fromAccessExpression(combinedExpression));
+            response.setMarkings(AccessExpressionUtil.combine(this.markingFunctions, uniqueMarkings));
             return response;
         } catch (Exception ex) {
             throw new RuntimeException("could not handle markings in resultList ", ex);

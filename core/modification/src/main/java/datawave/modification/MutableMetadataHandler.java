@@ -323,7 +323,7 @@ public class MutableMetadataHandler extends ModificationServiceConfiguration {
         if (vis.isEmpty()) {
             return null;
         }
-        return markingFunctions.fromAccessExpression(MarkingFunctions.Default.ACCESS.newExpression(vis));
+        return AccessExpressionUtil.fromAccessExpression(MarkingFunctions.Default.ACCESS.newExpression(vis));
     }
 
     public void process(AccumuloClient client, ModificationRequestBase request, Map<String,Set<String>> mutableFieldList, Set<Authorizations> userAuths,
@@ -659,7 +659,7 @@ public class MutableMetadataHandler extends ModificationServiceConfiguration {
             if (null == markings || markings.isEmpty())
                 throw new IllegalArgumentException("No security information specified. Security markings must be supplied");
 
-            viz = AccessExpressionUtil.toColumnVisibility(markingFunctions.toAccessExpression(markings));
+            viz = AccessExpressionUtil.toColumnVisibility(AccessExpressionUtil.toAccessExpression(markings));
         }
 
         insert(writer, shardId, datatype, eventUid, viz, fieldName, fieldValue, ts, isIndexOnlyField, isIndexed, isReverseIndexed, dataTypes, false,
@@ -863,14 +863,14 @@ public class MutableMetadataHandler extends ModificationServiceConfiguration {
 
                 if (null != oldColumnVisibility) {
                     // need to compare the normalized values for equivalence. It's possible for the visibility to be in a different order
-                    String oldColViz = MarkingFunctions.normalize(AccessExpressionUtil.toAccessExpression(oldColumnVisibility)).getExpression();
-                    String thisVis = MarkingFunctions.normalize(AccessExpressionUtil.toAccessExpression(thisViz)).getExpression();
+                    String oldColViz = AccessExpressionUtil.normalize(AccessExpressionUtil.toAccessExpression(oldColumnVisibility)).getExpression();
+                    String thisVis = AccessExpressionUtil.normalize(AccessExpressionUtil.toAccessExpression(thisViz)).getExpression();
                     if (!oldColViz.equals(thisVis)) {
                         log.trace("Skipping key that does not match with column visibility: {}", e.getKey());
                         continue;
                     }
                 } else {
-                    Markings<?> markings = markingFunctions
+                    Markings<?> markings = AccessExpressionUtil
                                     .fromAccessExpression(AccessExpressionUtil.toAccessExpression(e.getKey().getColumnVisibilityParsed()));
                     if (null != oldFieldMarkings && !oldFieldMarkings.equals(markings)) {
                         log.trace("Skipping key that does not match with markings: {}", e.getKey());

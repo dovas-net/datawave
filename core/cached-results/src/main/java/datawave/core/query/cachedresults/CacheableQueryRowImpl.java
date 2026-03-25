@@ -9,13 +9,13 @@ import java.util.Map;
 import java.util.Set;
 import java.util.TreeSet;
 
-import org.apache.accumulo.access.AccessExpression;
 import org.apache.commons.lang.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import com.google.common.collect.Sets;
 
+import datawave.core.common.util.AccessExpressionUtil;
 import datawave.data.type.Type;
 import datawave.marking.AccessExpressionMarkings;
 import datawave.marking.MarkingFunctions;
@@ -60,22 +60,15 @@ public class CacheableQueryRowImpl extends CacheableQueryRow implements ObjectSi
         if (!this.markings.equals(markings)) {
             if (this.markings.isEmpty()) {
                 // validate the markings
-                try {
-                    markingFunctions.toAccessExpression(markings);
-                    if (this.markings.isEmpty()) {
-                        // markings were empty, so use the one passed in.
-                        this.markings = markings;
-                    }
-                } catch (MarkingFunctions.Exception e) {
-                    LOGGER.error("Invalid markings {} skipping column {} = {}", markings, columnName, columnTypedValue, e);
-                    return;
+                AccessExpressionUtil.toAccessExpression(markings);
+                if (this.markings.isEmpty()) {
+                    // markings were empty, so use the one passed in.
+                    this.markings = markings;
                 }
             } else {
                 try {
-                    AccessExpression combined = markingFunctions
-                                    .combine(List.of(markingFunctions.toAccessExpression(this.markings), markingFunctions.toAccessExpression(markings)));
                     // use combined marking as new markings
-                    this.markings = markingFunctions.fromAccessExpression(combined);
+                    this.markings = AccessExpressionUtil.combine(markingFunctions, List.of(this.markings, markings));
                 } catch (MarkingFunctions.Exception e) {
                     LOGGER.error("Invalid markings {} skipping column {} = {}", markings, columnName, columnTypedValue, e);
                     return;
@@ -135,11 +128,7 @@ public class CacheableQueryRowImpl extends CacheableQueryRow implements ObjectSi
 
             if (!currMarkings.equals(markings)) {
                 try {
-                    List<AccessExpression> expressions = new ArrayList<>();
-                    expressions.add(markingFunctions.toAccessExpression(currMarkings));
-                    expressions.add(markingFunctions.toAccessExpression(markings));
-                    AccessExpression combined = markingFunctions.combine(expressions);
-                    Markings<?> combinedMarkings = markingFunctions.fromAccessExpression(combined);
+                    Markings<?> combinedMarkings = AccessExpressionUtil.combine(markingFunctions, List.of(currMarkings, markings));
 
                     // use combined marking as new markings
                     columnMarkingsMap.put(columnName, combinedMarkings);
@@ -285,12 +274,8 @@ public class CacheableQueryRowImpl extends CacheableQueryRow implements ObjectSi
 
     public void setMarkings(Markings<?> markings) {
         // validate the markings
-        try {
-            markingFunctions.toAccessExpression(markings);
-            this.markings = markings;
-        } catch (MarkingFunctions.Exception e) {
-            LOGGER.error("Invalid markings {}", markings, e);
-        }
+        AccessExpressionUtil.toAccessExpression(markings);
+        this.markings = markings;
     }
 
     public void setColumnMarkingsMap(Map<String,Markings<?>> columnMarkingsMap) {
@@ -315,11 +300,7 @@ public class CacheableQueryRowImpl extends CacheableQueryRow implements ObjectSi
             String v = columnColumnVisibilityMap.get(field);
             String mStr = "";
             if (m != null && !m.isEmpty()) {
-                try {
-                    mStr = markingFunctions.toAccessExpression(m).getExpression();
-                } catch (MarkingFunctions.Exception e) {
-                    LOGGER.error("could not serialize markings {}", m, e);
-                }
+                mStr = AccessExpressionUtil.toAccessExpression(m).getExpression();
             }
             if (v == null) {
                 combinedMap.put(field, mStr);

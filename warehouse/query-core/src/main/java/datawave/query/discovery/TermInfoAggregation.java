@@ -5,6 +5,7 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Set;
+import java.util.stream.Collectors;
 
 import org.apache.accumulo.core.security.ColumnVisibility;
 import org.apache.hadoop.io.MapWritable;
@@ -74,8 +75,8 @@ public class TermInfoAggregation implements Function<Collection<TermInfo>,Discov
                 chosenCount = showReferenceCountInsteadOfTermCount ? referenceCount : termCount;
 
                 try {
-                    MarkingFunctions.Factory.createMarkingFunctions().fromAccessExpression(AccessExpressionUtil.toAccessExpression(ti.vis)); // just to test
-                                                                                                                                             // parsing
+                    AccessExpressionUtil.fromAccessExpression(AccessExpressionUtil.toAccessExpression(ti.vis)); // just to test
+                                                                                                                // parsing
                     columnVisibilities.add(ti.vis);
 
                     // Keep track of counts for individual vis
@@ -109,8 +110,10 @@ public class TermInfoAggregation implements Function<Collection<TermInfo>,Discov
                 ColumnVisibility columnVisibility = null;
                 try {
 
-                    columnVisibility = AccessExpressionUtil.toColumnVisibility(MarkingFunctions.Factory.createMarkingFunctions().combine(
-                                    columnVisibilities.stream().map(AccessExpressionUtil::toAccessExpression).collect(java.util.stream.Collectors.toSet())));
+                    columnVisibility = AccessExpressionUtil.toColumnVisibility(AccessExpressionUtil.combine(MarkingFunctions.Factory.createMarkingFunctions(),
+                                    columnVisibilities.stream()
+                                                    .map(cv -> AccessExpressionUtil.fromAccessExpression(AccessExpressionUtil.toAccessExpression(cv)))
+                                                    .collect(Collectors.toSet())));
 
                 } catch (Exception e) {
                     log.warn("Invalid columnvisibility after combining!", e);
@@ -123,7 +126,7 @@ public class TermInfoAggregation implements Function<Collection<TermInfo>,Discov
                 }
 
                 return new DiscoveredThing(term, field, type, date,
-                                MarkingFunctions.normalize(AccessExpressionUtil.toAccessExpression(columnVisibility)).getExpression(), count, countsByVis);
+                                AccessExpressionUtil.normalize(AccessExpressionUtil.toAccessExpression(columnVisibility)).getExpression(), count, countsByVis);
             }
         }
     }

@@ -171,7 +171,7 @@ public class ContentQueryLogicTest {
         Value viewValue = new Value(Base64.encodeBytes("my happy message".getBytes()));
         Map.Entry<Key,Value> entry = new AbstractMap.SimpleImmutableEntry<>(dataKey, viewValue);
 
-        markingFunctions.fromAccessExpression(new ColumnVisibility("A"), auths);
+        markingFunctions.translateFromColumnVisibilityForAuths(new ColumnVisibility("A"), auths);
 
         // test with decode view
         logic.initialize(mockClient, settings, Set.of(auths));

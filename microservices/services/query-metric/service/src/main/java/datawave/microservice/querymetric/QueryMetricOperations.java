@@ -479,7 +479,7 @@ public class QueryMetricOperations {
 
     private boolean canViewMetric(DatawaveUserDetails currentUser, BaseQueryMetric metric) throws Exception {
         boolean userCanViewMetric = true;
-        ColumnVisibility columnVisibility = AccessExpressionUtil.toColumnVisibility(markingFunctions.toAccessExpression(metric.getMarkings()));
+        ColumnVisibility columnVisibility = AccessExpressionUtil.toColumnVisibility(AccessExpressionUtil.toAccessExpression(metric.getMarkings()));
         for (DatawaveUser user : currentUser.getProxiedUsers()) {
             Authorizations authorizations = new Authorizations(user.getAuths().toArray(new String[0]));
             VisibilityEvaluator visibilityEvaluator = new VisibilityEvaluator(authorizations);

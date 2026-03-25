@@ -1334,15 +1334,11 @@ public class ProtobufEdgeDataTypeHandler<KEYIN,KEYOUT,VALUEOUT> implements Exten
      */
     @SuppressWarnings("unchecked")
     protected Text getVisibility(Markings<?> markings, RawRecordContainer event) {
-        try {
-            if (null == markings || markings.isEmpty()) {
-                return new Text(flatten(event.getVisibility()));
-            } else {
-                AccessExpression ae = MarkingFunctions.normalize(markingFunctions.toAccessExpression(markings));
-                return new Text(ae.getExpression().getBytes(UTF_8));
-            }
-        } catch (MarkingFunctions.Exception e) {
-            throw new RuntimeException("Cannot convert markings into column visibility", e);
+        if (null == markings || markings.isEmpty()) {
+            return new Text(flatten(event.getVisibility()));
+        } else {
+            AccessExpression ae = AccessExpressionUtil.normalize(AccessExpressionUtil.toAccessExpression(markings));
+            return new Text(ae.getExpression().getBytes(UTF_8));
         }
     }
 
@@ -1370,7 +1366,7 @@ public class ProtobufEdgeDataTypeHandler<KEYIN,KEYOUT,VALUEOUT> implements Exten
      * @return the flattened visibility
      */
     protected byte[] flatten(ColumnVisibility vis) {
-        return MarkingFunctions.normalize(AccessExpressionUtil.toAccessExpression(vis)).getExpression().getBytes(UTF_8);
+        return AccessExpressionUtil.normalize(AccessExpressionUtil.toAccessExpression(vis)).getExpression().getBytes(UTF_8);
     }
 
     @Override

@@ -9,6 +9,7 @@ import org.apache.accumulo.core.security.ColumnVisibility;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import datawave.core.common.util.AccessExpressionUtil;
 import datawave.edge.util.EdgeKey;
 import datawave.edge.util.EdgeValue.EdgeValueBuilder;
 import datawave.edge.util.EdgeValueHelper;
@@ -157,7 +158,7 @@ public class EdgeDataBundle {
                     if (markings1 instanceof AccessExpressionMarkings && markings2 instanceof AccessExpressionMarkings) {
                         AccessExpressionMarkings aem1 = (AccessExpressionMarkings) markings1;
                         AccessExpressionMarkings aem2 = (AccessExpressionMarkings) markings2;
-                        this.markings = markingFunctions.fromAccessExpression(markingFunctions.combine(List.of(aem1.getMarkings(), aem2.getMarkings())));
+                        this.markings = AccessExpressionUtil.combine(markingFunctions, List.of(aem1, aem2));
                     } else {
                         throw new RuntimeException(
                                         String.format("Unknown markings class %s or %s", markings1.getClass().getName(), markings1.getClass().getName()));

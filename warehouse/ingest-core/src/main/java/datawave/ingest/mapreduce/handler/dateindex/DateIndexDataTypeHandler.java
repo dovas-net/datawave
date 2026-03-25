@@ -40,7 +40,6 @@ import datawave.ingest.mapreduce.handler.shard.ShardIdFactory;
 import datawave.ingest.mapreduce.job.BulkIngestKey;
 import datawave.ingest.metadata.RawRecordMetadata;
 import datawave.ingest.table.aggregator.DateIndexDateAggregator;
-import datawave.marking.MarkingFunctions;
 
 /**
  * <p>
@@ -367,7 +366,7 @@ public class DateIndexDataTypeHandler<KEYIN> implements DataTypeHandler<KEYIN>, 
      * @return the flattened visibility
      */
     protected byte[] flatten(ColumnVisibility vis) {
-        return MarkingFunctions.normalize(AccessExpressionUtil.toAccessExpression(vis)).getExpression().getBytes(UTF_8);
+        return AccessExpressionUtil.normalize(AccessExpressionUtil.toAccessExpression(vis)).getExpression().getBytes(UTF_8);
     }
 
     public Text getDateIndexTableName() {

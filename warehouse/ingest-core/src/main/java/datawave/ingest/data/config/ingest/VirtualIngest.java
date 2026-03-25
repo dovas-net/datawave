@@ -22,6 +22,7 @@ import com.google.common.collect.HashMultimap;
 import com.google.common.collect.Iterables;
 import com.google.common.collect.Multimap;
 
+import datawave.core.common.util.AccessExpressionUtil;
 import datawave.data.type.NoOpType;
 import datawave.ingest.data.Type;
 import datawave.ingest.data.config.GroupedNormalizedContentInterface;
@@ -358,7 +359,7 @@ public interface VirtualIngest {
                         if (markings1 instanceof AccessExpressionMarkings && markings2 instanceof AccessExpressionMarkings) {
                             AccessExpressionMarkings aem1 = (AccessExpressionMarkings) markings1;
                             AccessExpressionMarkings aem2 = (AccessExpressionMarkings) markings2;
-                            return markingFunctions.fromAccessExpression(markingFunctions.combine(List.of(aem1.getMarkings(), aem2.getMarkings())));
+                            return AccessExpressionUtil.combine(markingFunctions, List.of(aem1, aem2));
                         } else {
                             throw new RuntimeException(
                                             String.format("Unknown markings class %s or %s", markings1.getClass().getName(), markings1.getClass().getName()));

@@ -8,6 +8,7 @@ import java.util.Map.Entry;
 import java.util.Set;
 import java.util.SortedMap;
 import java.util.TreeMap;
+import java.util.stream.Collectors;
 
 import org.apache.accumulo.core.data.ByteSequence;
 import org.apache.accumulo.core.data.Key;
@@ -257,8 +258,10 @@ public class GlobalIndexDateSummaryIterator implements SortedKeyValueIterator<Ke
                     Set<ColumnVisibility> columnVisibilities = this.columnVisibilitiesMap.get(datatype);
 
                     // Note that the access controls found in the combined ColumnVisibility will be pulled out appropriately here
-                    ColumnVisibility cv = AccessExpressionUtil.toColumnVisibility(MarkingFunctions.Factory.createMarkingFunctions().combine(
-                                    columnVisibilities.stream().map(AccessExpressionUtil::toAccessExpression).collect(java.util.stream.Collectors.toSet())));
+                    ColumnVisibility cv = AccessExpressionUtil.toColumnVisibility(AccessExpressionUtil.combine(
+                                    MarkingFunctions.Factory.createMarkingFunctions(),
+                                    columnVisibilities.stream().map(c -> AccessExpressionUtil.fromAccessExpression(AccessExpressionUtil.toAccessExpression(c)))
+                                                    .collect(Collectors.toSet())));
 
                     // Create a new Key compatible with the shardIndex key format
                     Key k = new Key(this.fieldValue, this.fieldName, this.date + '\0' + datatype, new String(cv.getExpression()));

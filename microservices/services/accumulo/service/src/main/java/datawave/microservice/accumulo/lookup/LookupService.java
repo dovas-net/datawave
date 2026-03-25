@@ -34,6 +34,7 @@ import org.springframework.util.MultiValueMap;
 import com.google.common.base.Preconditions;
 
 import datawave.accumulo.util.security.UserAuthFunctions;
+import datawave.core.common.util.AccessExpressionUtil;
 import datawave.marking.MarkingFunctions;
 import datawave.marking.Markings;
 import datawave.marking.SecurityMarking;
@@ -218,7 +219,7 @@ public class LookupService {
                     continue;
                 }
 
-                final Markings<?> markings = markingFunctions
+                final Markings<?> markings = AccessExpressionUtil
                                 .fromAccessExpression(MarkingFunctions.Default.ACCESS.newExpression(k.getColumnVisibility().toString()));
 
                 final KeyBase responseKey = responseObjectFactory.createKey();

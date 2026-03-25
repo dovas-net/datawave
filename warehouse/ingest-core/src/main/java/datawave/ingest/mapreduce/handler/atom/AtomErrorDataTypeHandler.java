@@ -17,6 +17,7 @@ import org.apache.hadoop.mapreduce.TaskInputOutputContext;
 import com.google.common.collect.HashMultimap;
 import com.google.common.collect.Multimap;
 
+import datawave.core.common.util.AccessExpressionUtil;
 import datawave.data.hash.UID;
 import datawave.ingest.config.IngestConfigurationFactory;
 import datawave.ingest.data.RawDataErrorNames;
@@ -77,11 +78,7 @@ public class AtomErrorDataTypeHandler<KEYIN,KEYOUT,VALUEOUT> extends AtomDataTyp
         }
 
         mHelper = IngestConfigurationFactory.getIngestConfiguration().getMarkingsHelper(conf, record.getDataType());
-        try {
-            defaultVisibility = markingFunctions.toAccessExpression(mHelper.getDefaultMarkings());
-        } catch (MarkingFunctions.Exception e) {
-            throw new IllegalArgumentException("Failed to parse security marking configuration", e);
-        }
+        defaultVisibility = AccessExpressionUtil.toAccessExpression(mHelper.getDefaultMarkings());
 
         // write out the event into a value before we muck with it
         DataOutputBuffer buffer = new DataOutputBuffer();
@@ -183,11 +180,7 @@ public class AtomErrorDataTypeHandler<KEYIN,KEYOUT,VALUEOUT> extends AtomDataTyp
     protected String getVisibilityColumnString(RawRecordContainer event, NormalizedContentInterface value) {
         Markings<?> markings = value.getMarkings();
         if (markings != null && !markings.isEmpty()) {
-            try {
-                return markingFunctions.toAccessExpression(markings).getExpression();
-            } catch (MarkingFunctions.Exception e) {
-                throw new RuntimeException("Cannot convert record-level markings into a column visibility", e);
-            }
+            return AccessExpressionUtil.toAccessExpression(markings).getExpression();
         }
         ColumnVisibility vis = event.getVisibility();
         if (vis != null) {

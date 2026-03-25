@@ -13,7 +13,6 @@ import datawave.core.common.util.AccessExpressionUtil;
 import datawave.core.query.cachedresults.CacheableLogic;
 import datawave.core.query.logic.BaseQueryLogicTransformer;
 import datawave.marking.MarkingFunctions;
-import datawave.marking.MarkingFunctions.Exception;
 import datawave.marking.Markings;
 import datawave.microservice.query.Query;
 import datawave.query.Constants;
@@ -48,12 +47,7 @@ public class ShardQueryCountTableTransformer extends BaseQueryLogicTransformer<E
         Long count = untypedEntry.getKey();
         ColumnVisibility vis = untypedEntry.getValue();
 
-        Markings<?> markings;
-        try {
-            markings = markingFunctions.fromAccessExpression(AccessExpressionUtil.toAccessExpression(vis));
-        } catch (Exception e1) {
-            throw new IllegalArgumentException("Unable to translate markings", e1);
-        }
+        Markings<?> markings = AccessExpressionUtil.fromAccessExpression(AccessExpressionUtil.toAccessExpression(vis));
 
         EventBase e = this.responseObjectFactory.getEvent();
         e.setMarkings(markings);

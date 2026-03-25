@@ -41,6 +41,7 @@ import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.stereotype.Service;
 
+import datawave.core.common.util.AccessExpressionUtil;
 import datawave.marking.MarkingFunctions;
 import datawave.marking.Markings;
 import datawave.webservice.query.util.OptionallyEncodedString;
@@ -570,7 +571,7 @@ public class AdminService {
                     vis.setValid(false);
                     visibilityList.add(vis);
                     try {
-                        Markings<?> markings = markingFunctions.fromAccessExpression(MarkingFunctions.Default.ACCESS.newExpression(v));
+                        Markings<?> markings = AccessExpressionUtil.fromAccessExpression(MarkingFunctions.Default.ACCESS.newExpression(v));
                         vis.setVisibility(v);
                         vis.setValid(true);
                         vis.setMarkings(markings);

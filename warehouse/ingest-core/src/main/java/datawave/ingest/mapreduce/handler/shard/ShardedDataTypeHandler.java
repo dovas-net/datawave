@@ -1135,11 +1135,7 @@ public abstract class ShardedDataTypeHandler<KEYIN> extends StatsDEnabledDataTyp
     public byte[] getVisibility(RawRecordContainer event, NormalizedContentInterface value) {
         Markings<?> markings = value.getMarkings();
         if (markings != null && !markings.isEmpty()) {
-            try {
-                return markingFunctions.toAccessExpression(markings).getExpression().getBytes(UTF_8);
-            } catch (MarkingFunctions.Exception e) {
-                throw new RuntimeException("Cannot convert record-level markings into a column visibility", e);
-            }
+            return AccessExpressionUtil.toAccessExpression(markings).getExpression().getBytes(UTF_8);
         }
         return flatten(event.getVisibility());
     }
@@ -1152,7 +1148,7 @@ public abstract class ShardedDataTypeHandler<KEYIN> extends StatsDEnabledDataTyp
      * @return the normalized visibility bytes
      */
     protected byte[] flatten(ColumnVisibility vis) {
-        return MarkingFunctions.normalize(AccessExpressionUtil.toAccessExpression(vis)).getExpression().getBytes(UTF_8);
+        return AccessExpressionUtil.normalize(AccessExpressionUtil.toAccessExpression(vis)).getExpression().getBytes(UTF_8);
     }
 
     /**

@@ -7,6 +7,7 @@ import java.util.Collection;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.stream.Collectors;
 
 import org.apache.accumulo.access.AccessExpression;
 import org.apache.accumulo.core.data.Key;
@@ -46,7 +47,8 @@ public class GroupingUtils {
      */
     public static ColumnVisibility combineVisibilities(Collection<AccessExpression> expressions, MarkingFunctions<?> markingFunctions, boolean failOnError) {
         try {
-            return AccessExpressionUtil.toColumnVisibility(markingFunctions.combine(expressions));
+            return AccessExpressionUtil.toColumnVisibility(AccessExpressionUtil.combine(markingFunctions,
+                            expressions.stream().map(AccessExpressionUtil::fromAccessExpression).collect(Collectors.toList())));
         } catch (MarkingFunctions.Exception e) {
             if (failOnError) {
                 throw new IllegalArgumentException("Unable to combine access expressions: " + expressions, e);

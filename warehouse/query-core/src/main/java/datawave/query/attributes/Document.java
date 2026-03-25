@@ -87,11 +87,7 @@ public class Document extends AttributeBag<Document> implements Serializable {
     }
 
     public Markings<?> getMarkings() {
-        try {
-            MarkingFunctions<?> markingFunctions = MarkingFunctions.Factory.createMarkingFunctions();
-            return markingFunctions.fromAccessExpression(AccessExpressionUtil.toAccessExpression(getColumnVisibility()));
-        } catch (MarkingFunctions.Exception e) {}
-        return null;
+        return AccessExpressionUtil.fromAccessExpression(AccessExpressionUtil.toAccessExpression(getColumnVisibility()));
     }
 
     public Document() {

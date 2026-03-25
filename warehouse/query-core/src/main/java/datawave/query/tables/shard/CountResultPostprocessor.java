@@ -5,6 +5,7 @@ import static datawave.query.transformer.ShardQueryCountTableTransformer.COUNT_C
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;
+import java.util.stream.Collectors;
 
 import org.apache.accumulo.core.security.ColumnVisibility;
 import org.apache.log4j.Logger;
@@ -71,8 +72,10 @@ public class CountResultPostprocessor implements ResultPostprocessor {
             if (success) {
                 ColumnVisibility columnVisibility = null;
                 try {
-                    columnVisibility = AccessExpressionUtil.toColumnVisibility(markingFunctions.combine(
-                                    columnVisibilities.stream().map(AccessExpressionUtil::toAccessExpression).collect(java.util.stream.Collectors.toSet())));
+                    columnVisibility = AccessExpressionUtil.toColumnVisibility(AccessExpressionUtil.combine(markingFunctions,
+                                    columnVisibilities.stream()
+                                                    .map(cv -> AccessExpressionUtil.fromAccessExpression(AccessExpressionUtil.toAccessExpression(cv)))
+                                                    .collect(Collectors.toSet())));
                 } catch (Exception e) {
                     log.error("Could not create combined columnVisibilities for the count", e);
                 }
