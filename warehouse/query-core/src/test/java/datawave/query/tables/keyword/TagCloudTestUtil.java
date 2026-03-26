@@ -11,12 +11,13 @@ import datawave.marking.Markings;
 import datawave.query.tables.keyword.transform.KeywordResultsTransformer;
 import datawave.webservice.result.keyword.DefaultTagCloud;
 import datawave.webservice.result.keyword.DefaultTagCloudEntry;
+import org.apache.accumulo.access.examples.ParseExamples;
 
 /**
  * Utility for producing TagClouds and supporting objects for tests
  */
 public class TagCloudTestUtil {
-    private static final Access ACCESS = Access.builder().build();
+    private static final Access ACCESS = ParseExamples.ACCESS;
     private static final Markings<?> ALL_MARKINGS = AccessExpressionMarkings.builder().accessExpression(ACCESS.newExpression("ALL")).build();
 
     public static final String SOPRANO_SOURCE = "20130101_0/test/-1kfeoq.-80b5fs.r0262j";

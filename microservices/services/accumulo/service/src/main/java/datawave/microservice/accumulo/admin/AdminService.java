@@ -1,6 +1,7 @@
 package datawave.microservice.accumulo.admin;
 
 import static java.nio.charset.StandardCharsets.UTF_8;
+import static org.apache.accumulo.access.examples.ParseExamples.ACCESS;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -571,7 +572,7 @@ public class AdminService {
                     vis.setValid(false);
                     visibilityList.add(vis);
                     try {
-                        Markings<?> markings = AccessExpressionUtil.fromAccessExpression(MarkingFunctions.Default.ACCESS.newExpression(v));
+                        Markings<?> markings = AccessExpressionUtil.toAccessExpressionMarkings(ACCESS.newExpression(v));
                         vis.setVisibility(v);
                         vis.setValid(true);
                         vis.setMarkings(markings);

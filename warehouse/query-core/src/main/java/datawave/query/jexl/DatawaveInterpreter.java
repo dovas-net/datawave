@@ -472,7 +472,7 @@ public class DatawaveInterpreter extends Interpreter {
 
         try {
             cv = AccessExpressionUtil.toColumnVisibility(AccessExpressionUtil.combine(MarkingFunctionsFactory.createMarkingFunctions(), cvs.stream()
-                            .map(c -> AccessExpressionUtil.fromAccessExpression(AccessExpressionUtil.toAccessExpression(c))).collect(Collectors.toSet())));
+                            .map(c -> AccessExpressionUtil.toAccessExpressionMarkings(AccessExpressionUtil.toAccessExpression(c))).collect(Collectors.toSet())));
         } catch (MarkingFunctions.Exception e) {
             log.error("Failed to combine column visibilities while generating HIT_TERM for phrase function for field [" + field + "]");
             log.error("msg: ", e);

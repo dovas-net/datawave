@@ -9,6 +9,7 @@ import java.util.Map;
 import java.util.Set;
 import java.util.TreeSet;
 
+import org.apache.accumulo.access.impl.AccessExpressionImpl;
 import org.apache.commons.lang.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -27,8 +28,7 @@ import datawave.webservice.query.util.TypedValue;
 public class CacheableQueryRowImpl extends CacheableQueryRow implements ObjectSizeOf {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(CacheableQueryRowImpl.class);
-    private static final Markings<?> EMPTY_MARKINGS = AccessExpressionMarkings.builder().accessExpression(MarkingFunctions.Default.ACCESS.newExpression(""))
-                    .build();
+    private static final Markings<?> EMPTY_MARKINGS = AccessExpressionMarkings.builder().accessExpression(AccessExpressionImpl.EMPTY).build();
 
     private String user = null;
     private String queryId = null;

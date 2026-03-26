@@ -74,7 +74,7 @@ public class CountResultPostprocessor implements ResultPostprocessor {
                 try {
                     columnVisibility = AccessExpressionUtil.toColumnVisibility(AccessExpressionUtil.combine(markingFunctions,
                                     columnVisibilities.stream()
-                                                    .map(cv -> AccessExpressionUtil.fromAccessExpression(AccessExpressionUtil.toAccessExpression(cv)))
+                                                    .map(cv -> AccessExpressionUtil.toAccessExpressionMarkings(AccessExpressionUtil.toAccessExpression(cv)))
                                                     .collect(Collectors.toSet())));
                 } catch (Exception e) {
                     log.error("Could not create combined columnVisibilities for the count", e);

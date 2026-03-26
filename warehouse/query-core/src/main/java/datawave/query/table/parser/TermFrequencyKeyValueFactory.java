@@ -56,9 +56,8 @@ public class TermFrequencyKeyValueFactory {
         return t;
     }
 
-    protected static void parseColumnVisibility(TermFrequencyKeyValue tfkv, Key key, Authorizations auths, MarkingFunctions<?> markingFunctions)
-                    throws MarkingFunctions.Exception {
-        tfkv.setMarkings(AccessExpressionUtil.fromAccessExpression(AccessExpressionUtil.toAccessExpression(key.getColumnVisibilityParsed())));
+    protected static void parseColumnVisibility(TermFrequencyKeyValue tfkv, Key key, Authorizations auths, MarkingFunctions<?> markingFunctions) {
+        tfkv.setMarkings(AccessExpressionUtil.toAccessExpressionMarkings(AccessExpressionUtil.toAccessExpression(key.getColumnVisibilityParsed())));
     }
 
     public static class TermFrequencyKeyValue extends EventKeyValue {

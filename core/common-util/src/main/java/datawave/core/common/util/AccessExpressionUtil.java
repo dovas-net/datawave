@@ -8,6 +8,7 @@ import org.apache.accumulo.access.Access;
 import org.apache.accumulo.access.AccessExpression;
 import org.apache.accumulo.access.ParsedAccessExpression;
 import org.apache.accumulo.access.examples.ParseExamples;
+import org.apache.accumulo.access.impl.AccessExpressionImpl;
 import org.apache.accumulo.core.security.ColumnVisibility;
 
 import datawave.marking.AccessExpressionMarkings;
@@ -22,9 +23,9 @@ import datawave.marking.Markings;
  */
 public final class AccessExpressionUtil {
 
-    private static final Access ACCESS = Access.builder().build();
+    private static final Access ACCESS = ParseExamples.ACCESS;
 
-    private static final AccessExpression EMPTY_EXPRESSION = ACCESS.newExpression("");
+    private static final AccessExpression EMPTY_EXPRESSION = AccessExpressionImpl.EMPTY;
 
     private AccessExpressionUtil() {}
 
@@ -61,7 +62,7 @@ public final class AccessExpressionUtil {
      *            The AccessExpression to embed in the wrapper class
      * @return the wrapped access expression
      */
-    public static AccessExpressionMarkings fromAccessExpression(AccessExpression expression) {
+    public static AccessExpressionMarkings toAccessExpressionMarkings(AccessExpression expression) {
         return AccessExpressionMarkings.builder().accessExpression(expression).build();
     }
 
@@ -125,8 +126,8 @@ public final class AccessExpressionUtil {
         if (expr.isEmpty()) {
             return expression;
         }
-        ParsedAccessExpression parsed = MarkingFunctions.Default.ACCESS.newParsedExpression(expr);
-        return MarkingFunctions.Default.ACCESS.newExpression(ParseExamples.normalize(parsed).expression);
+        ParsedAccessExpression parsed = ACCESS.newParsedExpression(expr);
+        return ACCESS.newExpression(ParseExamples.normalize(parsed).expression);
     }
 
     /**

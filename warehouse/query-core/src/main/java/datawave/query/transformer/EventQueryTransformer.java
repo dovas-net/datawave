@@ -54,7 +54,7 @@ public class EventQueryTransformer extends EventQueryTransformerSupport<Entry<Ke
         EventBase event = this.responseObjectFactory.getEvent();
 
         Markings<?> markings = AccessExpressionUtil
-                        .fromAccessExpression(AccessExpressionUtil.toAccessExpression(new ColumnVisibility(key.getColumnVisibility())));
+                        .toAccessExpressionMarkings(AccessExpressionUtil.toAccessExpression(new ColumnVisibility(key.getColumnVisibility())));
         if (null == markings || markings.isEmpty()) {
             // can't process this one because we did not have valid security markings
             log.error("Transformer visibility interpreter was null, skipping entry");
@@ -95,7 +95,7 @@ public class EventQueryTransformer extends EventQueryTransformerSupport<Entry<Ke
             }
 
             for (FieldValue fv : e.getValue()) {
-                Markings<?> fieldMarkings = AccessExpressionUtil.fromAccessExpression(AccessExpressionUtil.toAccessExpression(fv.getVisibility()));
+                Markings<?> fieldMarkings = AccessExpressionUtil.toAccessExpressionMarkings(AccessExpressionUtil.toAccessExpression(fv.getVisibility()));
                 markingsToMerge.add(fieldMarkings);
                 String value = new String(fv.getValue(), StandardCharsets.UTF_8);
                 // if this is a content field name, then replace the value with the uid

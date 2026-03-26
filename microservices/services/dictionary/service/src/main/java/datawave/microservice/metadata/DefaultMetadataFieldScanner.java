@@ -34,6 +34,8 @@ import datawave.webservice.dictionary.data.DefaultDictionaryField;
 import datawave.webservice.dictionary.data.DefaultFields;
 import datawave.webservice.metadata.DefaultMetadataField;
 
+import static org.apache.accumulo.access.examples.ParseExamples.ACCESS;
+
 public class DefaultMetadataFieldScanner {
 
     private static final Logger log = LoggerFactory.getLogger(DefaultMetadataFieldScanner.class);
@@ -273,11 +275,11 @@ public class DefaultMetadataFieldScanner {
         }
 
         // Extract the description from the current value and add it to the current {@link DefaultMetadataField}.
-        private void setDescriptions() throws MarkingFunctions.Exception {
+        private void setDescriptions() {
             DefaultDescription description = responseObjectFactory.getDescription();
             description.setDescription(currValue.toString());
             description.setMarkings(
-                            AccessExpressionUtil.fromAccessExpression(MarkingFunctions.Default.ACCESS.newExpression(currKey.getColumnVisibility().toString())));
+                            AccessExpressionUtil.toAccessExpressionMarkings(ACCESS.newExpression(currKey.getColumnVisibility().toString())));
             currField.getDescriptions().add(description);
         }
 

@@ -12,6 +12,7 @@ import java.util.Map;
 
 import org.apache.accumulo.access.Access;
 import org.apache.accumulo.access.AccessExpression;
+import org.apache.accumulo.access.examples.ParseExamples;
 import org.apache.accumulo.core.security.ColumnVisibility;
 import org.apache.hadoop.io.Writable;
 
@@ -30,7 +31,7 @@ import datawave.util.CompositeTimestamp;
  */
 public class SimpleRawRecord implements RawRecordContainer, Writable {
 
-    private static final Access ACCESS = Access.builder().build();
+    private static final Access ACCESS = ParseExamples.ACCESS;
     private UIDBuilder<UID> uidBuilder = HashUID.builder();
 
     private Markings<?> securityMarkings = null;

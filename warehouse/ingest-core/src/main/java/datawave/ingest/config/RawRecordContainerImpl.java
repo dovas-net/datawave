@@ -17,6 +17,7 @@ import java.util.concurrent.ConcurrentSkipListSet;
 
 import org.apache.accumulo.access.Access;
 import org.apache.accumulo.access.AccessExpression;
+import org.apache.accumulo.access.examples.ParseExamples;
 import org.apache.accumulo.core.security.ColumnVisibility;
 import org.apache.commons.lang.builder.EqualsBuilder;
 import org.apache.commons.lang.builder.ToStringBuilder;
@@ -82,7 +83,7 @@ public class RawRecordContainerImpl implements Writable, Configurable, RawRecord
     private Object auxData = null;
     private Map<String,String> auxMap = null;
 
-    private static final Access ACCESS = Access.builder().build();
+    private static final Access ACCESS = ParseExamples.ACCESS;
 
     // RawRecordContainer support
     Markings<?> securityMarkings = null;

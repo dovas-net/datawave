@@ -42,7 +42,7 @@ public class EdgeQueryTransformer extends EdgeQueryTransformerSupport<Entry<Key,
         boolean statsEdge = edgeKey.isStatsKey();
         try {
             Markings<?> markings = AccessExpressionUtil
-                            .fromAccessExpression(AccessExpressionUtil.toAccessExpression(new ColumnVisibility(edgeKey.getColvis())));
+                            .toAccessExpressionMarkings(AccessExpressionUtil.toAccessExpression(new ColumnVisibility(edgeKey.getColvis())));
             edge.setMarkings(markings);
             edge.setEdgeType(edgeKey.getType());
             edge.setEdgeRelationship(edgeKey.getRelationship());

@@ -31,6 +31,8 @@ import datawave.webservice.dictionary.data.FieldsBase;
 import datawave.webservice.metadata.MetadataFieldBase;
 import datawave.webservice.result.VoidResponse;
 
+import static org.apache.accumulo.access.examples.ParseExamples.ACCESS;
+
 public class DataDictionaryControllerLogic<DESC extends DescriptionBase<DESC>,DICT extends DataDictionaryBase<DICT,META>,META extends MetadataFieldBase<META,DESC>,FIELD extends DictionaryFieldBase<FIELD,DESC>,FIELDS extends FieldsBase<FIELDS,FIELD,DESC>> {
     private final DataDictionaryProperties dataDictionaryConfiguration;
     private final DataDictionary<META,DESC,FIELD> dataDictionary;
@@ -170,7 +172,7 @@ public class DataDictionaryControllerLogic<DESC extends DescriptionBase<DESC>,DI
     public VoidResponse setDescriptionPost(String fieldName, String datatype, String description, String modelName, String modelTable, String columnVisibility,
                     DatawaveUserDetails currentUser) throws Exception {
         DESC desc = this.responseObjectFactory.getDescription();
-        Markings<?> markings = AccessExpressionMarkings.builder().accessExpression(MarkingFunctions.Default.ACCESS.newExpression(columnVisibility)).build();
+        Markings<?> markings = AccessExpressionMarkings.builder().accessExpression(ACCESS.newExpression(columnVisibility)).build();
         desc.setMarkings(markings);
         desc.setDescription(description);
 
@@ -283,7 +285,7 @@ public class DataDictionaryControllerLogic<DESC extends DescriptionBase<DESC>,DI
      */
     public VoidResponse deleteDescription(String fieldName, String datatype, String modelName, String modelTable, String columnVisibility,
                     DatawaveUserDetails currentUser) throws Exception {
-        Markings<?> markings = AccessExpressionMarkings.builder().accessExpression(MarkingFunctions.Default.ACCESS.newExpression(columnVisibility)).build();
+        Markings<?> markings = AccessExpressionMarkings.builder().accessExpression(ACCESS.newExpression(columnVisibility)).build();
         DESC desc = this.responseObjectFactory.getDescription();
         desc.setDescription("");
         desc.setMarkings(markings);

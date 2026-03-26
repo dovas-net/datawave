@@ -76,6 +76,8 @@ import datawave.webservice.result.BaseQueryResponse;
 import datawave.webservice.result.EventQueryResponseBase;
 import datawave.webservice.result.GenericResponse;
 
+import static org.apache.accumulo.access.examples.ParseExamples.ACCESS;
+
 /**
  * Class that handles requests for modification requests (INSERT, UPDATE, DELETE) for metadata in the shard schema. <br>
  * <br>
@@ -315,7 +317,7 @@ public class MutableMetadataHandler extends ModificationServiceConfiguration {
     /**
      * Convert legacy Map&lt;String,String&gt; field markings (from DefaultModificationRequest) to Markings&lt;?&gt;.
      */
-    private Markings<?> convertFieldMarkings(Map<String,String> rawMarkings) throws MarkingFunctions.Exception {
+    private Markings<?> convertFieldMarkings(Map<String,String> rawMarkings) {
         if (rawMarkings == null || rawMarkings.isEmpty()) {
             return null;
         }
@@ -323,7 +325,7 @@ public class MutableMetadataHandler extends ModificationServiceConfiguration {
         if (vis.isEmpty()) {
             return null;
         }
-        return AccessExpressionUtil.fromAccessExpression(MarkingFunctions.Default.ACCESS.newExpression(vis));
+        return AccessExpressionUtil.toAccessExpressionMarkings(ACCESS.newExpression(vis));
     }
 
     public void process(AccumuloClient client, ModificationRequestBase request, Map<String,Set<String>> mutableFieldList, Set<Authorizations> userAuths,
@@ -871,7 +873,7 @@ public class MutableMetadataHandler extends ModificationServiceConfiguration {
                     }
                 } else {
                     Markings<?> markings = AccessExpressionUtil
-                                    .fromAccessExpression(AccessExpressionUtil.toAccessExpression(e.getKey().getColumnVisibilityParsed()));
+                                    .toAccessExpressionMarkings(AccessExpressionUtil.toAccessExpression(e.getKey().getColumnVisibilityParsed()));
                     if (null != oldFieldMarkings && !oldFieldMarkings.equals(markings)) {
                         log.trace("Skipping key that does not match with markings: {}", e.getKey());
                         continue;

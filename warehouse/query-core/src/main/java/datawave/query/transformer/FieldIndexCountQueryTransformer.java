@@ -61,7 +61,7 @@ public class FieldIndexCountQueryTransformer extends BaseQueryLogicTransformer<E
         String key = entry.getKey();
         Tuple val = entry.getValue();
 
-        Markings<?> markings = AccessExpressionUtil.fromAccessExpression(AccessExpressionUtil.toAccessExpression(val.getColumnVisibility()));
+        Markings<?> markings = AccessExpressionUtil.toAccessExpressionMarkings(AccessExpressionUtil.toAccessExpression(val.getColumnVisibility()));
         if (null == markings || markings.isEmpty()) {
             // can't process this one because we did not have valid security markings
             log.error("Transformer visibility interpreter was null, skipping entry");

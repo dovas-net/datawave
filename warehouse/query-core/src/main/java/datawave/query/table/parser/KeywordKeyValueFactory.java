@@ -36,7 +36,7 @@ public class KeywordKeyValueFactory {
             k.setContents(value.get());
         }
 
-        EventKeyValueFactory.parseColumnVisibility(k, key, auths, markingFunctions);
+        EventKeyValueFactory.parseColumnVisibility(k, key);
 
         return k;
     }

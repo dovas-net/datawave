@@ -5,6 +5,7 @@ import java.util.Map;
 import java.util.Map.Entry;
 
 import org.apache.accumulo.access.Access;
+import org.apache.accumulo.access.examples.ParseExamples;
 import org.apache.hadoop.conf.Configuration;
 
 import datawave.ingest.data.Type;
@@ -54,7 +55,7 @@ public interface MarkingsHelper {
      */
     class NoOp implements MarkingsHelper {
 
-        private static final Access ACCESS = Access.builder().build();
+        private static final Access ACCESS = ParseExamples.ACCESS;
 
         private Map<String,Markings<?>> fieldMarkingMap = new HashMap<>();
         private Markings<?> defaultMarkings = null;

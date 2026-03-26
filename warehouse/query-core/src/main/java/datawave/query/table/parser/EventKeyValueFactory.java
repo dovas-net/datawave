@@ -34,14 +34,13 @@ public class EventKeyValueFactory {
 
         e.setTimestamp(key.getTimestamp());
 
-        parseColumnVisibility(e, key, auths, markingFunctions);
+        parseColumnVisibility(e, key);
 
         return e;
     }
 
-    protected static void parseColumnVisibility(EventKeyValue event, Key key, Authorizations auths, MarkingFunctions<?> markingFunctions)
-                    throws MarkingFunctions.Exception {
-        event.setMarkings(AccessExpressionUtil.fromAccessExpression(AccessExpressionUtil.toAccessExpression(new ColumnVisibility(key.getColumnVisibility()))));
+    protected static void parseColumnVisibility(EventKeyValue event, Key key) {
+        event.setMarkings(AccessExpressionUtil.toAccessExpressionMarkings(AccessExpressionUtil.toAccessExpression(new ColumnVisibility(key.getColumnVisibility()))));
     }
 
     public static class EventKeyValue {

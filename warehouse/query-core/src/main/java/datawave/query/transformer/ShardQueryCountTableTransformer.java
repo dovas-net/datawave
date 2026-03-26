@@ -47,7 +47,7 @@ public class ShardQueryCountTableTransformer extends BaseQueryLogicTransformer<E
         Long count = untypedEntry.getKey();
         ColumnVisibility vis = untypedEntry.getValue();
 
-        Markings<?> markings = AccessExpressionUtil.fromAccessExpression(AccessExpressionUtil.toAccessExpression(vis));
+        Markings<?> markings = AccessExpressionUtil.toAccessExpressionMarkings(AccessExpressionUtil.toAccessExpression(vis));
 
         EventBase e = this.responseObjectFactory.getEvent();
         e.setMarkings(markings);

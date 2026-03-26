@@ -128,7 +128,7 @@ public class FacetedTransformer extends DocumentTransformerSupport<Entry<Key,Val
 
                     FieldCardinalityBase fc = this.responseObjectFactory.getFieldCardinality();
                     fc.setField(v.getFieldName());
-                    fc.setMarkings(AccessExpressionUtil.fromAccessExpression(AccessExpressionUtil.toAccessExpression(attr.getColumnVisibility())));
+                    fc.setMarkings(AccessExpressionUtil.toAccessExpressionMarkings(AccessExpressionUtil.toAccessExpression(attr.getColumnVisibility())));
                     fc.setColumnVisibility(AccessExpressionUtil.normalize(AccessExpressionUtil.toAccessExpression(fc.getMarkings())).getExpression());
                     fc.setLower(v.getFloorValue());
                     fc.setUpper(v.getCeilingValue());
@@ -146,14 +146,13 @@ public class FacetedTransformer extends DocumentTransformerSupport<Entry<Key,Val
         return myFields;
     }
 
-    protected FacetsBase buildResponse(Document document, Key documentKey, ColumnVisibility eventCV, String colf, String row, MarkingFunctions<?> mf)
-                    throws MarkingFunctions.Exception {
+    protected FacetsBase buildResponse(Document document, Key documentKey, ColumnVisibility eventCV, String colf, String row, MarkingFunctions<?> mf) {
 
         FacetsBase facetedResponse = responseObjectFactory.getFacets();
 
         final Collection<FieldCardinalityBase> documentFields = buildFacets(documentKey, null, document, eventCV, mf);
 
-        facetedResponse.setMarkings(AccessExpressionUtil.fromAccessExpression(AccessExpressionUtil.toAccessExpression(eventCV)));
+        facetedResponse.setMarkings(AccessExpressionUtil.toAccessExpressionMarkings(AccessExpressionUtil.toAccessExpression(eventCV)));
         facetedResponse.setFields(new ArrayList<>(documentFields));
 
         // assign an estimate of the event size based on the document size
@@ -179,7 +178,7 @@ public class FacetedTransformer extends DocumentTransformerSupport<Entry<Key,Val
             for (FieldCardinalityBase fcb : facet.getFields()) {
                 if (StringUtils.isNotBlank(fcb.getColumnVisibility())) {
                     combinedMarkings.add(AccessExpressionUtil
-                                    .fromAccessExpression(AccessExpressionUtil.toAccessExpression(new ColumnVisibility(fcb.getColumnVisibility()))));
+                                    .toAccessExpressionMarkings(AccessExpressionUtil.toAccessExpression(new ColumnVisibility(fcb.getColumnVisibility()))));
                 }
             }
         }

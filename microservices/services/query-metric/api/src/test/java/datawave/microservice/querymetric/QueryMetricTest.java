@@ -1,6 +1,7 @@
 package datawave.microservice.querymetric;
 
 import static datawave.webservice.query.exception.DatawaveErrorCode.NO_QUERY_RESULTS_FOUND;
+import static org.apache.accumulo.access.examples.ParseExamples.ACCESS;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;
@@ -51,7 +52,7 @@ public class QueryMetricTest {
     @BeforeAll
     public static void setup() {
         queryMetric = new QueryMetric();
-        queryMetric.setMarkings(AccessExpressionMarkings.builder().accessExpression(MarkingFunctions.Default.ACCESS.newExpression("PUBLIC")).build());
+        queryMetric.setMarkings(AccessExpressionMarkings.builder().accessExpression(ACCESS.newExpression("PUBLIC")).build());
         negativeSelectors = new ArrayList<>();
         negativeSelectors.add("negativeSelector1");
         positiveSelectors = new ArrayList<>();
@@ -100,7 +101,7 @@ public class QueryMetricTest {
         queryMetric.setHost("host");
         queryMetric.setLastUpdated(d);
         queryMetric.setLifecycle(Lifecycle.INITIALIZED);
-        queryMetric.setMarkings(AccessExpressionMarkings.builder().accessExpression(MarkingFunctions.Default.ACCESS.newExpression("PUBLIC")).build());
+        queryMetric.setMarkings(AccessExpressionMarkings.builder().accessExpression(ACCESS.newExpression("PUBLIC")).build());
         queryMetric.setNegativeSelectors(negativeSelectors);
         queryMetric.setNumUpdates(0);
         queryMetric.setPageTimes(pageTimes);
@@ -230,7 +231,7 @@ public class QueryMetricTest {
         qm.setHost("host");
         qm.setLastUpdated(d);
         qm.setLifecycle(BaseQueryMetric.Lifecycle.INITIALIZED);
-        qm.setMarkings(AccessExpressionMarkings.builder().accessExpression(MarkingFunctions.Default.ACCESS.newExpression("PUBLIC")).build());
+        qm.setMarkings(AccessExpressionMarkings.builder().accessExpression(ACCESS.newExpression("PUBLIC")).build());
         qm.setNegativeSelectors(negativeSelectors);
         qm.setNumUpdates(0);
         qm.setPageTimes(pageTimes);

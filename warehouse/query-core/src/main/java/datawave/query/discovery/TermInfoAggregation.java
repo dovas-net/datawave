@@ -75,7 +75,7 @@ public class TermInfoAggregation implements Function<Collection<TermInfo>,Discov
                 chosenCount = showReferenceCountInsteadOfTermCount ? referenceCount : termCount;
 
                 try {
-                    AccessExpressionUtil.fromAccessExpression(AccessExpressionUtil.toAccessExpression(ti.vis)); // just to test
+                    AccessExpressionUtil.toAccessExpressionMarkings(AccessExpressionUtil.toAccessExpression(ti.vis)); // just to test
                                                                                                                 // parsing
                     columnVisibilities.add(ti.vis);
 
@@ -112,7 +112,7 @@ public class TermInfoAggregation implements Function<Collection<TermInfo>,Discov
 
                     columnVisibility = AccessExpressionUtil.toColumnVisibility(AccessExpressionUtil.combine(MarkingFunctions.Factory.createMarkingFunctions(),
                                     columnVisibilities.stream()
-                                                    .map(cv -> AccessExpressionUtil.fromAccessExpression(AccessExpressionUtil.toAccessExpression(cv)))
+                                                    .map(cv -> AccessExpressionUtil.toAccessExpressionMarkings(AccessExpressionUtil.toAccessExpression(cv)))
                                                     .collect(Collectors.toSet())));
 
                 } catch (Exception e) {

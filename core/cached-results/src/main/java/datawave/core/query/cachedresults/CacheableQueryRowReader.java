@@ -18,6 +18,8 @@ import datawave.marking.Markings;
 import datawave.webservice.query.cachedresults.CacheableQueryRow;
 import datawave.webservice.query.result.event.ResponseObjectFactory;
 
+import static org.apache.accumulo.access.examples.ParseExamples.ACCESS;
+
 public class CacheableQueryRowReader {
 
     private static Logger log = LoggerFactory.getLogger(CacheableQueryRowReader.class);
@@ -90,7 +92,7 @@ public class CacheableQueryRowReader {
             if (columnToIndexMap.get("_markings_") != null) {
                 String mStr = cachedRowSet.getString(columnToIndexMap.get("_markings_"));
                 if (mStr != null && !mStr.isEmpty()) {
-                    cqfc.setMarkings(AccessExpressionUtil.fromAccessExpression(MarkingFunctions.Default.ACCESS.newExpression(mStr)));
+                    cqfc.setMarkings(AccessExpressionUtil.toAccessExpressionMarkings(ACCESS.newExpression(mStr)));
                 }
             }
             if (columnToIndexMap.get("_column_markings_") != null) {
@@ -104,11 +106,11 @@ public class CacheableQueryRowReader {
                     int x = combinedString.lastIndexOf(':');
                     if (x >= 0) {
                         String markingStr = combinedString.substring(0, x);
-                        columnMarkingsMap.put(columnName, AccessExpressionUtil.fromAccessExpression(MarkingFunctions.Default.ACCESS.newExpression(markingStr)));
+                        columnMarkingsMap.put(columnName, AccessExpressionUtil.toAccessExpressionMarkings(ACCESS.newExpression(markingStr)));
                         columnVisibilityMap.put(columnName, combinedString.substring(x + 1));
                     } else {
                         columnMarkingsMap.put(columnName,
-                                        AccessExpressionUtil.fromAccessExpression(MarkingFunctions.Default.ACCESS.newExpression(combinedString)));
+                                        AccessExpressionUtil.toAccessExpressionMarkings(ACCESS.newExpression(combinedString)));
                         columnVisibilityMap.put(columnName, "");
                     }
                 }

@@ -26,6 +26,7 @@ import javax.xml.bind.annotation.adapters.XmlJavaTypeAdapter;
 
 import org.apache.accumulo.access.Access;
 import org.apache.accumulo.access.AccessExpression;
+import org.apache.accumulo.access.examples.ParseExamples;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.builder.CompareToBuilder;
 import org.apache.commons.lang3.builder.EqualsBuilder;
@@ -1167,7 +1168,7 @@ public abstract class BaseQueryMetric implements HasMarkings, Serializable {
         this.predictions = predictions;
     }
 
-    private static final Access ACCESS = Access.builder().build();
+    private static final Access ACCESS = ParseExamples.ACCESS;
 
     @Override
     public void setMarkings(Markings<?> markings) {

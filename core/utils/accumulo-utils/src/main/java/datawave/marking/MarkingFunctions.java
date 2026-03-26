@@ -9,6 +9,7 @@ import org.apache.accumulo.access.Access;
 import org.apache.accumulo.access.AccessExpression;
 import org.apache.accumulo.access.ParsedAccessExpression;
 import org.apache.accumulo.access.examples.ParseExamples;
+import org.apache.accumulo.access.impl.AccessExpressionImpl;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.context.support.ClassPathXmlApplicationContext;
@@ -48,8 +49,8 @@ public interface MarkingFunctions<T extends Markings<?>> {
     }
 
     class Default implements MarkingFunctions<AccessExpressionMarkings> {
-        public static final Access ACCESS = Access.builder().build();
-        public static final AccessExpressionMarkings EMPTY_MARKINGS = AccessExpressionMarkings.builder().accessExpression(ACCESS.newExpression("")).build();
+        private static final Access ACCESS = ParseExamples.ACCESS;
+        private static final AccessExpressionMarkings EMPTY_MARKINGS = AccessExpressionMarkings.builder().accessExpression(AccessExpressionImpl.EMPTY).build();
 
         @Override
         public AccessExpressionMarkings combine(Collection<AccessExpressionMarkings> markings) {

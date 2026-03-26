@@ -16,7 +16,7 @@ import org.apache.accumulo.access.AccessExpression;
 
 import com.google.gson.Gson;
 
-import datawave.marking.MarkingFunctions;
+import static org.apache.accumulo.access.examples.ParseExamples.ACCESS;
 
 /** A tag cloud - a collection of tags that have a keyword, score, frequency and list of sources from which they originated */
 public class TagCloud {
@@ -57,7 +57,7 @@ public class TagCloud {
         if (visibility == null || visibility.isEmpty()) {
             return null;
         }
-        return MarkingFunctions.Default.ACCESS.newExpression(visibility);
+        return ACCESS.newExpression(visibility);
     }
 
     public Collection<TagCloudEntry> getResults() {

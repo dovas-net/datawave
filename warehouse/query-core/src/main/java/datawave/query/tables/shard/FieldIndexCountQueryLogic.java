@@ -510,7 +510,7 @@ public class FieldIndexCountQueryLogic extends ShardQueryLogic {
                     columnVisibilities.add(new ColumnVisibility(t));
                 }
                 return AccessExpressionUtil.toColumnVisibility(AccessExpressionUtil.combine(tupleMarkingFunctions, columnVisibilities.stream()
-                                .map(c -> AccessExpressionUtil.fromAccessExpression(AccessExpressionUtil.toAccessExpression(c))).collect(Collectors.toList())));
+                                .map(c -> AccessExpressionUtil.toAccessExpressionMarkings(AccessExpressionUtil.toAccessExpression(c))).collect(Collectors.toList())));
 
             } catch (MarkingFunctions.Exception e) {
                 logger.error("Could not create combined column visibility for the count", e);

@@ -204,7 +204,7 @@ public class TagCloudTransformer extends BaseQueryLogicTransformer<Entry<Key,Val
     @SuppressWarnings("unchecked")
     private void convertAndSetMarkings(TagCloudBase base, AccessExpression visibility) {
         if (visibility != null && !visibility.getExpression().isEmpty()) {
-            base.setMarkings(AccessExpressionUtil.fromAccessExpression(visibility));
+            base.setMarkings(AccessExpressionUtil.toAccessExpressionMarkings(visibility));
         }
     }
 

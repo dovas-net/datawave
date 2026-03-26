@@ -15,6 +15,7 @@ import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Set;
 
+import org.apache.accumulo.access.impl.AccessExpressionImpl;
 import org.apache.accumulo.core.data.Key;
 import org.apache.accumulo.core.data.Value;
 import org.apache.accumulo.core.security.ColumnVisibility;
@@ -71,7 +72,7 @@ public abstract class DocumentTransformerSupport<I,O> extends EventQueryTransfor
     protected Boolean reducedResponse;
 
     private static final Logger log = Logger.getLogger(DocumentTransformerSupport.class);
-    private static final Markings<?> EMPTY_MARKINGS = AccessExpressionMarkings.builder().build();
+    private static final Markings<?> EMPTY_MARKINGS = AccessExpressionMarkings.builder().accessExpression(AccessExpressionImpl.EMPTY).build();
 
     private long sourceCount = 0;
     private long nextCount = 0;
@@ -466,7 +467,7 @@ public abstract class DocumentTransformerSupport<I,O> extends EventQueryTransfor
             // Use the markings on the Field if we're returning the markings to the client
             if (!this.reducedResponse) {
                 try {
-                    Markings<?> markings = AccessExpressionUtil.fromAccessExpression(AccessExpressionUtil.toAccessExpression(attr.getColumnVisibility()));
+                    Markings<?> markings = AccessExpressionUtil.toAccessExpressionMarkings(AccessExpressionUtil.toAccessExpression(attr.getColumnVisibility()));
                     FieldBase<?> field = this.makeField(fieldName, markings, attr.getColumnVisibility(), attr.getTimestamp(), attr.getData());
                     myFields.add(field);
                 } catch (Exception ex) {

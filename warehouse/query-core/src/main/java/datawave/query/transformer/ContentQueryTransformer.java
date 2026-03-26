@@ -13,7 +13,6 @@ import org.apache.log4j.Logger;
 
 import datawave.core.query.logic.BaseQueryLogicTransformer;
 import datawave.marking.MarkingFunctions;
-import datawave.marking.MarkingFunctions.Exception;
 import datawave.microservice.query.Query;
 import datawave.query.table.parser.ContentKeyValueFactory;
 import datawave.query.table.parser.ContentKeyValueFactory.ContentKeyValue;
@@ -122,11 +121,7 @@ public class ContentQueryTransformer extends BaseQueryLogicTransformer<Entry<Key
         }
 
         ContentKeyValue ckv;
-        try {
-            ckv = ContentKeyValueFactory.parse(entry.getKey(), entry.getValue(), auths, markingFunctions);
-        } catch (Exception e1) {
-            throw new IllegalArgumentException("Unable to parse visibility", e1);
-        }
+        ckv = ContentKeyValueFactory.parse(entry.getKey(), entry.getValue());
 
         EventBase e = responseObjectFactory.getEvent();
         FieldBase field = responseObjectFactory.getField();

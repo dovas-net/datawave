@@ -132,7 +132,7 @@ public class GroupingDocumentTransformer extends DocumentTransformer {
                 FieldBase<?> created = null;
                 try {
                     created = this.makeField(shortName,
-                                    AccessExpressionUtil.fromAccessExpression(
+                                    AccessExpressionUtil.toAccessExpressionMarkings(
                                                     AccessExpressionUtil.toAccessExpression(new ColumnVisibility(field.getColumnVisibility()))),
                                     field.getColumnVisibility(), 0L, field.getValueOfTypedValue());
                 } catch (Exception ex) {

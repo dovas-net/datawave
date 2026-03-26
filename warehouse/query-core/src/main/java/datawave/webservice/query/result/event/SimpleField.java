@@ -27,6 +27,8 @@ import io.protostuff.Message;
 import io.protostuff.Output;
 import io.protostuff.Schema;
 
+import static org.apache.accumulo.access.examples.ParseExamples.ACCESS;
+
 /**
  * This object is contained inside of Event objects to describe name/value pairs of data in the Event.
  */
@@ -227,7 +229,7 @@ public class SimpleField extends FieldBase<SimpleField> implements Serializable,
                     case 5:
                         String expr = input.readString();
                         if (expr != null && !expr.isEmpty()) {
-                            message.markings = AccessExpressionMarkings.builder().accessExpression(MarkingFunctions.Default.ACCESS.newExpression(expr)).build();
+                            message.markings = AccessExpressionMarkings.builder().accessExpression(ACCESS.newExpression(expr)).build();
                         }
                     default:
                         input.handleUnknownField(number, this);

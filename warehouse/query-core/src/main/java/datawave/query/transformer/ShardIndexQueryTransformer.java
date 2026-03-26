@@ -67,7 +67,7 @@ public class ShardIndexQueryTransformer extends BaseQueryLogicTransformer<Entry<
 
         EventBase event = responseObjectFactory.getEvent();
         ColumnVisibility columnVisibility = new ColumnVisibility(entry.getKey().getColumnVisibility());
-        Markings<?> markings = AccessExpressionUtil.fromAccessExpression(AccessExpressionUtil.toAccessExpression(columnVisibility));
+        Markings<?> markings = AccessExpressionUtil.toAccessExpressionMarkings(AccessExpressionUtil.toAccessExpression(columnVisibility));
         event.setMarkings(markings);
 
         List<FieldBase> fields = new ArrayList<>();

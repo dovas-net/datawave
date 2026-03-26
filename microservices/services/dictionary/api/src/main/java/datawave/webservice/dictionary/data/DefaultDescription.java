@@ -23,6 +23,8 @@ import io.protostuff.Message;
 import io.protostuff.Output;
 import io.protostuff.Schema;
 
+import static org.apache.accumulo.access.examples.ParseExamples.ACCESS;
+
 @XmlAccessorType(XmlAccessType.NONE)
 @XmlAccessorOrder(XmlAccessOrder.ALPHABETICAL)
 public class DefaultDescription extends DescriptionBase<DefaultDescription> implements Serializable, Message<DefaultDescription> {
@@ -66,7 +68,7 @@ public class DefaultDescription extends DescriptionBase<DefaultDescription> impl
     public Markings<?> getMarkings() {
         if (this.markingsMap != null && this.markingsMap.containsKey(CV_KEY)) {
             String expr = this.markingsMap.get(CV_KEY);
-            return AccessExpressionMarkings.builder().accessExpression(MarkingFunctions.Default.ACCESS.newExpression(expr)).build();
+            return AccessExpressionMarkings.builder().accessExpression(ACCESS.newExpression(expr)).build();
         }
         return null;
     }

@@ -21,7 +21,7 @@ import datawave.query.attributes.Numeric;
 public class FieldRenameTransformTest {
 
     @Test
-    public void renameIdentityMapTest() throws MarkingFunctions.Exception {
+    public void renameIdentityMapTest() {
         Key key = new Key("shard", "dataType" + Constants.NULL + "uid");
 
         Set<String> fieldMap = new HashSet<>();
@@ -44,7 +44,7 @@ public class FieldRenameTransformTest {
     }
 
     @Test
-    public void renameFieldMapTest() throws MarkingFunctions.Exception {
+    public void renameFieldMapTest() {
         Key key = new Key("shard", "dataType" + Constants.NULL + "uid");
 
         Set<String> fieldMap = new HashSet<>();
@@ -70,7 +70,7 @@ public class FieldRenameTransformTest {
     }
 
     @Test
-    public void renameFieldMapPreexistingTest() throws MarkingFunctions.Exception {
+    public void renameFieldMapPreexistingTest() {
         Key key = new Key("shard", "dataType" + Constants.NULL + "uid");
 
         Set<String> fieldMap = new HashSet<>();
@@ -96,7 +96,7 @@ public class FieldRenameTransformTest {
     }
 
     @Test
-    public void renameWithGroupingContextAndMultipleMappings() throws MarkingFunctions.Exception {
+    public void renameWithGroupingContextAndMultipleMappings() {
         Key key = new Key("shard", "dataType" + Constants.NULL + "uid");
 
         Set<String> fieldMap = new HashSet<>();

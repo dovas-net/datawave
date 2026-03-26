@@ -47,7 +47,7 @@ public class DiscoveryTransformer extends BaseQueryLogicTransformer<DiscoveredTh
 
         EventBase event = this.responseObjectFactory.getEvent();
         Markings<?> markings = AccessExpressionUtil
-                        .fromAccessExpression(AccessExpressionUtil.toAccessExpression(new ColumnVisibility(thing.getColumnVisibility())));
+                        .toAccessExpressionMarkings(AccessExpressionUtil.toAccessExpression(new ColumnVisibility(thing.getColumnVisibility())));
         event.setMarkings(markings);
 
         List<FieldBase> fields = new ArrayList<>();
@@ -64,7 +64,7 @@ public class DiscoveryTransformer extends BaseQueryLogicTransformer<DiscoveredTh
         if (thing.getCountsByColumnVisibility() != null && !thing.getCountsByColumnVisibility().isEmpty()) {
             for (Map.Entry<Writable,Writable> entry : thing.getCountsByColumnVisibility().entrySet()) {
                 Markings<?> eMarkings = AccessExpressionUtil
-                                .fromAccessExpression(AccessExpressionUtil.toAccessExpression(new ColumnVisibility(entry.getKey().toString())));
+                                .toAccessExpressionMarkings(AccessExpressionUtil.toAccessExpression(new ColumnVisibility(entry.getKey().toString())));
                 fields.add(this.makeField("RECORD COUNT", eMarkings, entry.getKey().toString(), 0L, entry.getValue().toString()));
 
             }

@@ -5,10 +5,11 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import java.util.List;
 
 import org.apache.accumulo.access.Access;
+import org.apache.accumulo.access.examples.ParseExamples;
 import org.junit.jupiter.api.Test;
 
 public class MarkingFunctionsDefaultCombineTest {
-    public static final Access ACCESS = Access.builder().build();
+    public static final Access ACCESS = ParseExamples.ACCESS;
 
     @Test
     public void testCombineAnds() throws MarkingFunctions.Exception {

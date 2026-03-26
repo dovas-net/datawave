@@ -13,6 +13,8 @@ import org.apache.accumulo.access.Access;
 import org.apache.accumulo.access.AccessExpression;
 
 import com.google.common.base.Preconditions;
+import org.apache.accumulo.access.examples.ParseExamples;
+import org.apache.accumulo.access.impl.AccessExpressionImpl;
 
 @XmlAccessorType(XmlAccessType.NONE)
 @XmlAccessorOrder(XmlAccessOrder.ALPHABETICAL)
@@ -20,7 +22,7 @@ public class ColumnVisibilitySecurityMarking implements SecurityMarking {
 
     public static final String VISIBILITY_MARKING = "columnVisibility";
 
-    private static final Access ACCESS = Access.builder().build();
+    private static final Access ACCESS = ParseExamples.ACCESS;
 
     @XmlAttribute(name = "columnVisibility")
     private String columnVisibility = null;
@@ -49,7 +51,7 @@ public class ColumnVisibilitySecurityMarking implements SecurityMarking {
     @Override
     public AccessExpression toAccessExpression() {
         if (columnVisibility == null || columnVisibility.isEmpty()) {
-            return ACCESS.newExpression("");
+            return AccessExpressionImpl.EMPTY;
         }
         return ACCESS.newExpression(columnVisibility);
     }

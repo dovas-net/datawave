@@ -1,5 +1,6 @@
 package datawave.webservice.response;
 
+import static org.apache.accumulo.access.examples.ParseExamples.ACCESS;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
@@ -39,7 +40,7 @@ public class LookupResponseTest {
         lookupResponse = new LookupResponse();
         List<Entry> entryList = new ArrayList<>();
         for (int i = 0; i < 3; i++) {
-            AccessExpressionMarkings markings = AccessExpressionMarkings.builder().accessExpression(MarkingFunctions.Default.ACCESS.newExpression("A&B&C" + i))
+            AccessExpressionMarkings markings = AccessExpressionMarkings.builder().accessExpression(ACCESS.newExpression("A&B&C" + i))
                             .build();
             KeyBase responseKey = new DefaultKey();
             responseKey.setRow("row" + i);

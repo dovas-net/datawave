@@ -163,10 +163,9 @@ public class DocumentTransformer extends DocumentTransformerSupport<Entry<Key,Va
         return output;
     }
 
-    protected EventBase buildResponse(Document document, Key documentKey, ColumnVisibility eventCV, String colf, String row, MarkingFunctions<?> mf)
-                    throws MarkingFunctions.Exception {
+    protected EventBase buildResponse(Document document, Key documentKey, ColumnVisibility eventCV, String colf, String row, MarkingFunctions<?> mf) {
 
-        Markings<?> markings = AccessExpressionUtil.fromAccessExpression(AccessExpressionUtil.toAccessExpression(eventCV));
+        Markings<?> markings = AccessExpressionUtil.toAccessExpressionMarkings(AccessExpressionUtil.toAccessExpression(eventCV));
 
         EventBase event = null;
         final Collection<FieldBase<?>> documentFields = buildDocumentFields(documentKey, null, document, eventCV, mf);

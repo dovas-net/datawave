@@ -31,6 +31,8 @@ import datawave.ingest.validation.EventValidator;
 import datawave.marking.AccessExpressionMarkings;
 import datawave.marking.MarkingFunctions;
 
+import static org.apache.accumulo.access.examples.ParseExamples.ACCESS;
+
 public class CSVRecordReader extends CSVReaderBase implements EventFixer {
 
     private static final Logger log = Logger.getLogger(CSVRecordReader.class);
@@ -127,7 +129,7 @@ public class CSVRecordReader extends CSVReaderBase implements EventFixer {
     protected void decorateEvent() {
         if (securityMarkingExpression != null) {
             try {
-                AccessExpression ae = AccessExpressionUtil.normalize(MarkingFunctions.Default.ACCESS.newExpression(securityMarkingExpression));
+                AccessExpression ae = AccessExpressionUtil.normalize(ACCESS.newExpression(securityMarkingExpression));
                 event.setSecurityMarkings(AccessExpressionMarkings.builder().accessExpression(ae).build());
             } catch (Exception e) {
                 log.error("Could not set security markings for the event", e);

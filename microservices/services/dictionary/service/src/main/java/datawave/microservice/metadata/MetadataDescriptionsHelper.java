@@ -3,10 +3,8 @@ package datawave.microservice.metadata;
 import static java.nio.charset.StandardCharsets.UTF_8;
 
 import java.util.Collections;
-import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Set;
-import java.util.concurrent.ExecutionException;
 import java.util.concurrent.TimeUnit;
 
 import org.apache.accumulo.core.client.AccumuloClient;
@@ -88,7 +86,7 @@ public class MetadataDescriptionsHelper<DESC extends DescriptionBase<DESC>> {
     }
 
     public SetMultimap<String,DESC> getFieldDescriptions(Set<String> ingestTypeFilter)
-                    throws TableNotFoundException, ExecutionException, MarkingFunctions.Exception {
+                    throws TableNotFoundException, MarkingFunctions.Exception {
         SetMultimap<MetadataEntry,DESC> descriptions = getDescriptions(ingestTypeFilter);
         SetMultimap<String,DESC> fieldDescriptions = HashMultimap.create();
 
@@ -121,7 +119,7 @@ public class MetadataDescriptionsHelper<DESC extends DescriptionBase<DESC>> {
     }
 
     public void setDescriptions(MetadataEntry entry, Set<? extends DescriptionBase> descs)
-                    throws TableNotFoundException, MutationsRejectedException, MarkingFunctions.Exception {
+                    throws TableNotFoundException, MutationsRejectedException {
         BatchWriter bw = null;
         try {
             BatchWriterConfig bwConfig = new BatchWriterConfig().setMaxMemory(10000L).setMaxLatency(100L, TimeUnit.MILLISECONDS).setMaxWriteThreads(1);
@@ -156,7 +154,7 @@ public class MetadataDescriptionsHelper<DESC extends DescriptionBase<DESC>> {
      *             if writing the update to Accumulo fails
      */
     public void removeDescription(MetadataEntry entry, DescriptionBase desc)
-                    throws TableNotFoundException, MutationsRejectedException, MarkingFunctions.Exception {
+                    throws TableNotFoundException, MutationsRejectedException {
         BatchWriter bw = null;
         try {
             BatchWriterConfig bwConfig = new BatchWriterConfig().setMaxMemory(10000L).setMaxLatency(100L, TimeUnit.MILLISECONDS).setMaxWriteThreads(1);
@@ -177,7 +175,7 @@ public class MetadataDescriptionsHelper<DESC extends DescriptionBase<DESC>> {
 
     }
 
-    protected SetMultimap<MetadataEntry,DESC> loadDescriptions() throws TableNotFoundException, MarkingFunctions.Exception {
+    protected SetMultimap<MetadataEntry,DESC> loadDescriptions() throws TableNotFoundException {
         if (log.isTraceEnabled())
             log.trace("loadDescriptions from table: " + metadataTableName);
         // unlike other entries, the desc colf entries have many auths set. We'll use the fullUserAuths in the scanner instead
@@ -202,7 +200,7 @@ public class MetadataDescriptionsHelper<DESC extends DescriptionBase<DESC>> {
 
     }
 
-    private Markings<?> getMarkings(Key k) throws MarkingFunctions.Exception {
-        return AccessExpressionUtil.fromAccessExpression(AccessExpressionUtil.toAccessExpression(k.getColumnVisibilityParsed()));
+    private Markings<?> getMarkings(Key k) {
+        return AccessExpressionUtil.toAccessExpressionMarkings(AccessExpressionUtil.toAccessExpression(k.getColumnVisibilityParsed()));
     }
 }

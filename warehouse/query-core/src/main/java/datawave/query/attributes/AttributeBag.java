@@ -82,7 +82,7 @@ public abstract class AttributeBag<T extends Comparable<T>> extends Attribute<T>
         Collection<AccessExpression> accessExpressions = attributes.stream().map(attr -> AccessExpressionUtil.toAccessExpression(attr.getColumnVisibility()))
                         .collect(Collectors.toSet());
         return AccessExpressionUtil.toColumnVisibility(AccessExpressionUtil.combine(MarkingFunctions.Factory.createMarkingFunctions(),
-                        accessExpressions.stream().map(AccessExpressionUtil::fromAccessExpression).collect(Collectors.toList())));
+                        accessExpressions.stream().map(AccessExpressionUtil::toAccessExpressionMarkings).collect(Collectors.toList())));
     }
 
     private long updateTimestamps() {

@@ -9,13 +9,14 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 
 import lombok.Builder;
 import lombok.Data;
+import org.apache.accumulo.access.examples.ParseExamples;
 
 @Data
 @Builder
 @JsonAutoDetect(getterVisibility = JsonAutoDetect.Visibility.NONE, isGetterVisibility = JsonAutoDetect.Visibility.NONE)
 public class AccessExpressionMarkings implements Markings<AccessExpression> {
 
-    private static final Access ACCESS = Access.builder().build();
+    private static final Access ACCESS = ParseExamples.ACCESS;
     public static final String COLUMN_VISIBILITY_KEY = "columnVisibility";
 
     private final AccessExpression accessExpression;
