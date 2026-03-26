@@ -3,6 +3,7 @@ package datawave.core.common.util;
 import static java.nio.charset.StandardCharsets.UTF_8;
 
 import java.util.Collection;
+import java.util.List;
 
 import org.apache.accumulo.access.Access;
 import org.apache.accumulo.access.AccessExpression;
@@ -159,5 +160,36 @@ public final class AccessExpressionUtil {
     @SuppressWarnings({"unchecked", "rawtypes"})
     public static Markings<?> combine(MarkingFunctions<?> markingFunctions, Collection<? extends Markings<?>> markings) throws MarkingFunctions.Exception {
         return ((MarkingFunctions) markingFunctions).combine(markings);
+    }
+
+    /**
+     * A helper routine to merge markings when merging fields of a NormalizedContentInterface
+     *
+     * @param markings1
+     *            markings
+     * @param markings2
+     *            different markings
+     * @return the merged markings
+     */
+    public static Markings<?> mergeMarkings(MarkingFunctions<?> markingFunctions, Markings<?> markings1, Markings<?> markings2) {
+        if (markings2 != null) {
+            if (markings1 == null) {
+                markings1 = markings2;
+            } else {
+                try {
+                    if (markings1 instanceof AccessExpressionMarkings && markings2 instanceof AccessExpressionMarkings) {
+                        AccessExpressionMarkings aem1 = (AccessExpressionMarkings) markings1;
+                        AccessExpressionMarkings aem2 = (AccessExpressionMarkings) markings2;
+                        return combine(markingFunctions, List.of(aem1, aem2));
+                    } else {
+                        throw new RuntimeException(
+                                        String.format("Unknown markings class %s or %s", markings1.getClass().getName(), markings1.getClass().getName()));
+                    }
+                } catch (MarkingFunctions.Exception e) {
+                    throw new RuntimeException("Unable to combine markings.", e);
+                }
+            }
+        }
+        return markings1;
     }
 }

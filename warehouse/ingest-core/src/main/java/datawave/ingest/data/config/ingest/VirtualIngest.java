@@ -32,6 +32,8 @@ import datawave.marking.AccessExpressionMarkings;
 import datawave.marking.MarkingFunctions;
 import datawave.marking.Markings;
 
+import static datawave.core.common.util.AccessExpressionUtil.mergeMarkings;
+
 public interface VirtualIngest {
 
     String VIRTUAL_FIELD_NAMES = VirtualFieldNormalizer.VIRTUAL_FIELD_NAMES;
@@ -342,37 +344,6 @@ public interface VirtualIngest {
         }
 
         /**
-         * A helper routine to merge markings when merging fields of a NormalizedContentInterface
-         *
-         * @param markings1
-         *            markings
-         * @param markings2
-         *            different markings
-         * @return the merged markings
-         */
-        protected Markings<?> mergeMarkings(Markings<?> markings1, Markings<?> markings2) {
-            if (markings2 != null) {
-                if (markings1 == null) {
-                    markings1 = markings2;
-                } else {
-                    try {
-                        if (markings1 instanceof AccessExpressionMarkings && markings2 instanceof AccessExpressionMarkings) {
-                            AccessExpressionMarkings aem1 = (AccessExpressionMarkings) markings1;
-                            AccessExpressionMarkings aem2 = (AccessExpressionMarkings) markings2;
-                            return AccessExpressionUtil.combine(markingFunctions, List.of(aem1, aem2));
-                        } else {
-                            throw new RuntimeException(
-                                            String.format("Unknown markings class %s or %s", markings1.getClass().getName(), markings1.getClass().getName()));
-                        }
-                    } catch (MarkingFunctions.Exception e) {
-                        throw new RuntimeException("Unable to combine markings.", e);
-                    }
-                }
-            }
-            return markings1;
-        }
-
-        /**
          * Create the normalized form of a map of fields, and add the virtual fields as configured above.
          *
          * @param fields
@@ -612,7 +583,7 @@ public interface VirtualIngest {
                                 addVirtualFields(virtualFields, eventFields, groupings, virtualFieldName.replace("*", replacement), replacement,
                                                 (grouping == null ? newGrouping : grouping), groupingPolicy, allowMissing, fields, pos + 1,
                                                 this.defaultStartSeparator, this.defaultEndSeparator, originalValue, normalizedValue,
-                                                mergeMarkings(markings, value.getMarkings()));
+                                                mergeMarkings(markingFunctions, markings, value.getMarkings()));
 
                                 // reset the values to the original length
                                 originalValue.setLength(oLen);
@@ -650,7 +621,7 @@ public interface VirtualIngest {
                         // recurse on the next virtual field segment
                         addVirtualFields(virtualFields, eventFields, groupings, virtualFieldName, replacement, (grouping == null ? newGrouping : grouping),
                                         groupingPolicy, allowMissing, fields, pos + 1, this.defaultStartSeparator, this.defaultEndSeparator, originalValue,
-                                        normalizedValue, mergeMarkings(markings, value.getMarkings()));
+                                        normalizedValue, mergeMarkings(markingFunctions, markings, value.getMarkings()));
 
                         // reset the values to the original length
                         originalValue.setLength(oLen);

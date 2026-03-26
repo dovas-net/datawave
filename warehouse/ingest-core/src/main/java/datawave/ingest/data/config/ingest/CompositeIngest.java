@@ -34,6 +34,8 @@ import datawave.marking.AccessExpressionMarkings;
 import datawave.marking.MarkingFunctions;
 import datawave.marking.Markings;
 
+import static datawave.core.common.util.AccessExpressionUtil.mergeMarkings;
+
 /**
  * Similar to VirtualIngest virtual fields, but composite fields are not written in the event section of the shard table (only in the field index section)
  *
@@ -288,37 +290,6 @@ public interface CompositeIngest {
             return new String[] {str2, str1};
         }
 
-        /**
-         * A helper routine to merge markings when merging fields of a NormalizedContentInterface
-         *
-         * @param markings1
-         *            markings
-         * @param markings2
-         *            different markings
-         * @return the merged markings
-         */
-        protected Markings<?> mergeMarkings(Markings<?> markings1, Markings<?> markings2) {
-            if (markings2 != null) {
-                if (markings1 == null) {
-                    markings1 = markings2;
-                } else {
-                    try {
-                        if (markings1 instanceof AccessExpressionMarkings && markings2 instanceof AccessExpressionMarkings) {
-                            AccessExpressionMarkings aem1 = (AccessExpressionMarkings) markings1;
-                            AccessExpressionMarkings aem2 = (AccessExpressionMarkings) markings2;
-                            return AccessExpressionUtil.combine(markingFunctions, List.of(aem1, aem2));
-                        } else {
-                            throw new RuntimeException(
-                                            String.format("Unknown markings class %s or %s", markings1.getClass().getName(), markings1.getClass().getName()));
-                        }
-                    } catch (MarkingFunctions.Exception e) {
-                        throw new RuntimeException("Unable to combine markings.", e);
-                    }
-                }
-            }
-            return markings1;
-        }
-
         public Multimap<String,NormalizedContentInterface> normalize(Multimap<String,String> fields) {
             Multimap<String,NormalizedContentInterface> eventFields = HashMultimap.create();
             for (Entry<String,String> field : fields.entries()) {
@@ -417,7 +388,7 @@ public interface CompositeIngest {
                                 if (pos + 1 < fields.length) {
                                     addCompositeFields(compositeFields, eventFields, compositeFieldName.replace("*", replacement), replacement,
                                                     (grouping == null ? newGrouping : grouping), groupingPolicy, allowMissing, fields, pos + 1, originalValue,
-                                                    normalizedValue, mergeMarkings(markings, value.getMarkings()), isOverloadedField);
+                                                    normalizedValue, mergeMarkings(markingFunctions, markings, value.getMarkings()), isOverloadedField);
                                 }
                                 originalValue.setLength(oLen);
                                 normalizedValue.setLength(nLen);
@@ -449,7 +420,7 @@ public interface CompositeIngest {
                         }
                         addCompositeFields(compositeFields, eventFields, compositeFieldName, replacement, (grouping == null ? newGrouping : grouping),
                                         groupingPolicy, allowMissing, fields, pos + 1, originalValue, normalizedValue,
-                                        mergeMarkings(markings, value.getMarkings()), isOverloadedField);
+                                        mergeMarkings(markingFunctions, markings, value.getMarkings()), isOverloadedField);
                         originalValue.setLength(oLen);
                         normalizedValue.setLength(nLen);
                     }

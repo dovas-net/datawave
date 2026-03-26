@@ -24,6 +24,8 @@ import datawave.marking.MarkingFunctions;
 import datawave.marking.Markings;
 import datawave.util.time.DateHelper;
 
+import static datawave.core.common.util.AccessExpressionUtil.mergeMarkings;
+
 /**
  * Combines an EdgeDefinition with values obtained from Event data.
  *
@@ -96,7 +98,7 @@ public class EdgeDataBundle {
         // even though event, etc. references are saved above, passing in the event
         // prevents future bug
         this.initFieldMasking(helper, event);
-        this.initMarkings(getSource().getMarkings(), getSink().getMarkings());
+        this.markings = mergeMarkings(markingFunctions, getSource().getMarkings(), getSink().getMarkings());
     }
 
     private int getHour(long time) {
@@ -139,37 +141,6 @@ public class EdgeDataBundle {
 
     public void setMaskedVisibility(ColumnVisibility maskedVisibility) {
         this.maskedVisibility = maskedVisibility;
-    }
-
-    /**
-     * A helper routine to merge markings when merging fields of a NormalizedContentInterface
-     *
-     * @param markings1
-     *            markings
-     * @param markings2
-     *            different markings
-     */
-    protected void initMarkings(Markings<?> markings1, Markings<?> markings2) {
-        if (markings2 != null) {
-            if (markings1 == null) {
-                this.markings = markings2;
-            } else {
-                try {
-                    if (markings1 instanceof AccessExpressionMarkings && markings2 instanceof AccessExpressionMarkings) {
-                        AccessExpressionMarkings aem1 = (AccessExpressionMarkings) markings1;
-                        AccessExpressionMarkings aem2 = (AccessExpressionMarkings) markings2;
-                        this.markings = AccessExpressionUtil.combine(markingFunctions, List.of(aem1, aem2));
-                    } else {
-                        throw new RuntimeException(
-                                        String.format("Unknown markings class %s or %s", markings1.getClass().getName(), markings1.getClass().getName()));
-                    }
-                } catch (MarkingFunctions.Exception e) {
-                    throw new RuntimeException("Unable to combine markings.", e);
-                }
-            }
-        } else {
-            this.markings = markings1;
-        }
     }
 
     public int getDuration() {
