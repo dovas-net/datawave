@@ -483,8 +483,8 @@ public class FieldIndexCountQueryLogic extends ShardQueryLogic {
         private long maxTimestamp = 0L;
         Set<Text> uniqueVisibilities = new HashSet<>();
 
-        public Tuple(MarkingFunctions<?> mf) {
-            tupleMarkingFunctions = mf;
+        public Tuple(MarkingFunctions<?> markingFunctions) {
+            tupleMarkingFunctions = markingFunctions;
         }
 
         public void aggregate(Key key, Value val) {

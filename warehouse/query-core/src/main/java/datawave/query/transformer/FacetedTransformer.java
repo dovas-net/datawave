@@ -146,11 +146,11 @@ public class FacetedTransformer extends DocumentTransformerSupport<Entry<Key,Val
         return myFields;
     }
 
-    protected FacetsBase buildResponse(Document document, Key documentKey, ColumnVisibility eventCV, String colf, String row, MarkingFunctions<?> mf) {
+    protected FacetsBase buildResponse(Document document, Key documentKey, ColumnVisibility eventCV, String colf, String row, MarkingFunctions<?> markingFunctions) {
 
         FacetsBase facetedResponse = responseObjectFactory.getFacets();
 
-        final Collection<FieldCardinalityBase> documentFields = buildFacets(documentKey, null, document, eventCV, mf);
+        final Collection<FieldCardinalityBase> documentFields = buildFacets(documentKey, null, document, eventCV, markingFunctions);
 
         facetedResponse.setMarkings(AccessExpressionUtil.toAccessExpressionMarkings(AccessExpressionUtil.toAccessExpression(eventCV)));
         facetedResponse.setFields(new ArrayList<>(documentFields));

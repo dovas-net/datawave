@@ -163,12 +163,12 @@ public class DocumentTransformer extends DocumentTransformerSupport<Entry<Key,Va
         return output;
     }
 
-    protected EventBase buildResponse(Document document, Key documentKey, ColumnVisibility eventCV, String colf, String row, MarkingFunctions<?> mf) {
+    protected EventBase buildResponse(Document document, Key documentKey, ColumnVisibility eventCV, String colf, String row, MarkingFunctions<?> markingFunctions) {
 
         Markings<?> markings = AccessExpressionUtil.toAccessExpressionMarkings(AccessExpressionUtil.toAccessExpression(eventCV));
 
         EventBase event = null;
-        final Collection<FieldBase<?>> documentFields = buildDocumentFields(documentKey, null, document, eventCV, mf);
+        final Collection<FieldBase<?>> documentFields = buildDocumentFields(documentKey, null, document, eventCV, markingFunctions);
         // if documentFields is empty, then the response contained only timing metadata
         if (!documentFields.isEmpty()) {
             event = this.responseObjectFactory.getEvent();
