@@ -1,5 +1,7 @@
 package datawave.webservice.dictionary.data;
 
+import static org.apache.accumulo.access.examples.ParseExamples.ACCESS;
+
 import java.io.IOException;
 import java.io.Serializable;
 import java.util.HashMap;
@@ -15,15 +17,12 @@ import javax.xml.bind.annotation.XmlTransient;
 import org.apache.accumulo.access.AccessExpression;
 
 import datawave.marking.AccessExpressionMarkings;
-import datawave.marking.MarkingFunctions;
 import datawave.marking.Markings;
 import datawave.webservice.query.result.event.MapSchema;
 import io.protostuff.Input;
 import io.protostuff.Message;
 import io.protostuff.Output;
 import io.protostuff.Schema;
-
-import static org.apache.accumulo.access.examples.ParseExamples.ACCESS;
 
 @XmlAccessorType(XmlAccessType.NONE)
 @XmlAccessorOrder(XmlAccessOrder.ALPHABETICAL)

@@ -1,6 +1,7 @@
 package datawave.webservice.response.objects;
 
 import static java.nio.charset.StandardCharsets.UTF_8;
+
 import static org.apache.accumulo.access.examples.ParseExamples.ACCESS;
 
 import javax.xml.bind.annotation.XmlAccessType;
@@ -10,7 +11,6 @@ import javax.xml.bind.annotation.XmlElement;
 import org.apache.commons.codec.binary.Base64;
 
 import datawave.marking.AccessExpressionMarkings;
-import datawave.marking.MarkingFunctions;
 import datawave.marking.Markings;
 import datawave.webservice.query.util.TypedValue;
 

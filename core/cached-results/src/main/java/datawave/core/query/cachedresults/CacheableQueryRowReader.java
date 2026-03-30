@@ -1,5 +1,7 @@
 package datawave.core.query.cachedresults;
 
+import static org.apache.accumulo.access.examples.ParseExamples.ACCESS;
+
 import java.sql.ResultSet;
 import java.sql.ResultSetMetaData;
 import java.sql.SQLException;
@@ -17,8 +19,6 @@ import datawave.marking.MarkingFunctions;
 import datawave.marking.Markings;
 import datawave.webservice.query.cachedresults.CacheableQueryRow;
 import datawave.webservice.query.result.event.ResponseObjectFactory;
-
-import static org.apache.accumulo.access.examples.ParseExamples.ACCESS;
 
 public class CacheableQueryRowReader {
 
@@ -109,8 +109,7 @@ public class CacheableQueryRowReader {
                         columnMarkingsMap.put(columnName, AccessExpressionUtil.toAccessExpressionMarkings(ACCESS.newExpression(markingStr)));
                         columnVisibilityMap.put(columnName, combinedString.substring(x + 1));
                     } else {
-                        columnMarkingsMap.put(columnName,
-                                        AccessExpressionUtil.toAccessExpressionMarkings(ACCESS.newExpression(combinedString)));
+                        columnMarkingsMap.put(columnName, AccessExpressionUtil.toAccessExpressionMarkings(ACCESS.newExpression(combinedString)));
                         columnVisibilityMap.put(columnName, "");
                     }
                 }

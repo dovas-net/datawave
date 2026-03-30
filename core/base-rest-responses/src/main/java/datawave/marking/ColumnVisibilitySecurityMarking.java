@@ -11,10 +11,10 @@ import javax.xml.bind.annotation.XmlAttribute;
 
 import org.apache.accumulo.access.Access;
 import org.apache.accumulo.access.AccessExpression;
-
-import com.google.common.base.Preconditions;
 import org.apache.accumulo.access.examples.ParseExamples;
 import org.apache.accumulo.access.impl.AccessExpressionImpl;
+
+import com.google.common.base.Preconditions;
 
 @XmlAccessorType(XmlAccessType.NONE)
 @XmlAccessorOrder(XmlAccessOrder.ALPHABETICAL)

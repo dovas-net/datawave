@@ -76,7 +76,7 @@ public class TermInfoAggregation implements Function<Collection<TermInfo>,Discov
 
                 try {
                     AccessExpressionUtil.toAccessExpressionMarkings(AccessExpressionUtil.toAccessExpression(ti.vis)); // just to test
-                                                                                                                // parsing
+                    // parsing
                     columnVisibilities.add(ti.vis);
 
                     // Keep track of counts for individual vis

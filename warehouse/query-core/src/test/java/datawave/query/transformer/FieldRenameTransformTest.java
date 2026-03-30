@@ -12,7 +12,6 @@ import org.apache.accumulo.core.data.Key;
 import org.apache.commons.collections.keyvalue.UnmodifiableMapEntry;
 import org.junit.Test;
 
-import datawave.marking.MarkingFunctions;
 import datawave.query.Constants;
 import datawave.query.attributes.Attributes;
 import datawave.query.attributes.Document;

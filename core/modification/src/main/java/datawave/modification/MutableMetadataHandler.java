@@ -1,5 +1,7 @@
 package datawave.modification;
 
+import static org.apache.accumulo.access.examples.ParseExamples.ACCESS;
+
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
@@ -75,8 +77,6 @@ import datawave.webservice.query.result.event.EventBase;
 import datawave.webservice.result.BaseQueryResponse;
 import datawave.webservice.result.EventQueryResponseBase;
 import datawave.webservice.result.GenericResponse;
-
-import static org.apache.accumulo.access.examples.ParseExamples.ACCESS;
 
 /**
  * Class that handles requests for modification requests (INSERT, UPDATE, DELETE) for metadata in the shard schema. <br>

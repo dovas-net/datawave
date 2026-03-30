@@ -1,6 +1,7 @@
 package datawave.microservice.accumulo.lookup;
 
 import static java.nio.charset.StandardCharsets.UTF_8;
+
 import static org.apache.accumulo.access.examples.ParseExamples.ACCESS;
 
 import java.util.ArrayList;
@@ -220,8 +221,7 @@ public class LookupService {
                     continue;
                 }
 
-                final Markings<?> markings = AccessExpressionUtil
-                                .toAccessExpressionMarkings(ACCESS.newExpression(k.getColumnVisibility().toString()));
+                final Markings<?> markings = AccessExpressionUtil.toAccessExpressionMarkings(ACCESS.newExpression(k.getColumnVisibility().toString()));
 
                 final KeyBase responseKey = responseObjectFactory.createKey();
                 responseKey.setRow(currRow);

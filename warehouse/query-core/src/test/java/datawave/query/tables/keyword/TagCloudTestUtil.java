@@ -5,13 +5,13 @@ import java.util.List;
 import java.util.Map;
 
 import org.apache.accumulo.access.Access;
+import org.apache.accumulo.access.examples.ParseExamples;
 
 import datawave.marking.AccessExpressionMarkings;
 import datawave.marking.Markings;
 import datawave.query.tables.keyword.transform.KeywordResultsTransformer;
 import datawave.webservice.result.keyword.DefaultTagCloud;
 import datawave.webservice.result.keyword.DefaultTagCloudEntry;
-import org.apache.accumulo.access.examples.ParseExamples;
 
 /**
  * Utility for producing TagClouds and supporting objects for tests

@@ -85,8 +85,7 @@ public class MetadataDescriptionsHelper<DESC extends DescriptionBase<DESC>> {
         return descs;
     }
 
-    public SetMultimap<String,DESC> getFieldDescriptions(Set<String> ingestTypeFilter)
-                    throws TableNotFoundException, MarkingFunctions.Exception {
+    public SetMultimap<String,DESC> getFieldDescriptions(Set<String> ingestTypeFilter) throws TableNotFoundException, MarkingFunctions.Exception {
         SetMultimap<MetadataEntry,DESC> descriptions = getDescriptions(ingestTypeFilter);
         SetMultimap<String,DESC> fieldDescriptions = HashMultimap.create();
 
@@ -118,8 +117,7 @@ public class MetadataDescriptionsHelper<DESC extends DescriptionBase<DESC>> {
         setDescriptions(entry, Collections.singleton(desc));
     }
 
-    public void setDescriptions(MetadataEntry entry, Set<? extends DescriptionBase> descs)
-                    throws TableNotFoundException, MutationsRejectedException {
+    public void setDescriptions(MetadataEntry entry, Set<? extends DescriptionBase> descs) throws TableNotFoundException, MutationsRejectedException {
         BatchWriter bw = null;
         try {
             BatchWriterConfig bwConfig = new BatchWriterConfig().setMaxMemory(10000L).setMaxLatency(100L, TimeUnit.MILLISECONDS).setMaxWriteThreads(1);
@@ -153,8 +151,7 @@ public class MetadataDescriptionsHelper<DESC extends DescriptionBase<DESC>> {
      * @throws MutationsRejectedException
      *             if writing the update to Accumulo fails
      */
-    public void removeDescription(MetadataEntry entry, DescriptionBase desc)
-                    throws TableNotFoundException, MutationsRejectedException {
+    public void removeDescription(MetadataEntry entry, DescriptionBase desc) throws TableNotFoundException, MutationsRejectedException {
         BatchWriter bw = null;
         try {
             BatchWriterConfig bwConfig = new BatchWriterConfig().setMaxMemory(10000L).setMaxLatency(100L, TimeUnit.MILLISECONDS).setMaxWriteThreads(1);

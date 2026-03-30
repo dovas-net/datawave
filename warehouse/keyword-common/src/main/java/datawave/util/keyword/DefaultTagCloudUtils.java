@@ -1,5 +1,7 @@
 package datawave.util.keyword;
 
+import static org.apache.accumulo.access.examples.ParseExamples.ACCESS;
+
 import java.io.Serializable;
 import java.util.Collection;
 import java.util.Comparator;
@@ -15,8 +17,6 @@ import org.apache.commons.lang3.StringUtils;
 import datawave.core.common.util.AccessExpressionUtil;
 import datawave.marking.MarkingFunctions;
 import datawave.marking.Markings;
-
-import static org.apache.accumulo.access.examples.ParseExamples.ACCESS;
 
 /**
  * Default implementations for pluggable utilities for generating tag clouds, includes mechanisms to partition keywords into separate tag clouds, combine or

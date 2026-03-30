@@ -11,7 +11,6 @@ import java.util.TreeSet;
 import java.util.stream.Collectors;
 
 import org.apache.accumulo.core.security.Authorizations;
-import org.junit.Assert;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;

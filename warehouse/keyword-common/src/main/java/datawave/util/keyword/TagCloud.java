@@ -1,5 +1,7 @@
 package datawave.util.keyword;
 
+import static org.apache.accumulo.access.examples.ParseExamples.ACCESS;
+
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Comparator;
@@ -15,8 +17,6 @@ import java.util.TreeSet;
 import org.apache.accumulo.access.AccessExpression;
 
 import com.google.gson.Gson;
-
-import static org.apache.accumulo.access.examples.ParseExamples.ACCESS;
 
 /** A tag cloud - a collection of tags that have a keyword, score, frequency and list of sources from which they originated */
 public class TagCloud {

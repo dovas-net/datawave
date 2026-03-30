@@ -1,5 +1,7 @@
 package datawave.microservice.dictionary;
 
+import static org.apache.accumulo.access.examples.ParseExamples.ACCESS;
+
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
@@ -15,7 +17,6 @@ import com.google.common.collect.Maps;
 import com.google.common.collect.Multimap;
 
 import datawave.marking.AccessExpressionMarkings;
-import datawave.marking.MarkingFunctions;
 import datawave.marking.Markings;
 import datawave.microservice.AccumuloConnectionService;
 import datawave.microservice.Connection;
@@ -30,8 +31,6 @@ import datawave.webservice.dictionary.data.DictionaryFieldBase;
 import datawave.webservice.dictionary.data.FieldsBase;
 import datawave.webservice.metadata.MetadataFieldBase;
 import datawave.webservice.result.VoidResponse;
-
-import static org.apache.accumulo.access.examples.ParseExamples.ACCESS;
 
 public class DataDictionaryControllerLogic<DESC extends DescriptionBase<DESC>,DICT extends DataDictionaryBase<DICT,META>,META extends MetadataFieldBase<META,DESC>,FIELD extends DictionaryFieldBase<FIELD,DESC>,FIELDS extends FieldsBase<FIELDS,FIELD,DESC>> {
     private final DataDictionaryProperties dataDictionaryConfiguration;

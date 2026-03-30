@@ -19,7 +19,6 @@ import com.fasterxml.jackson.databind.type.TypeFactory;
 import com.fasterxml.jackson.module.jaxb.JaxbAnnotationIntrospector;
 
 import datawave.marking.AccessExpressionMarkings;
-import datawave.marking.MarkingFunctions;
 import datawave.webservice.query.exception.QueryExceptionType;
 import datawave.webservice.response.objects.DefaultKey;
 import datawave.webservice.response.objects.Entry;
@@ -40,8 +39,7 @@ public class LookupResponseTest {
         lookupResponse = new LookupResponse();
         List<Entry> entryList = new ArrayList<>();
         for (int i = 0; i < 3; i++) {
-            AccessExpressionMarkings markings = AccessExpressionMarkings.builder().accessExpression(ACCESS.newExpression("A&B&C" + i))
-                            .build();
+            AccessExpressionMarkings markings = AccessExpressionMarkings.builder().accessExpression(ACCESS.newExpression("A&B&C" + i)).build();
             KeyBase responseKey = new DefaultKey();
             responseKey.setRow("row" + i);
             responseKey.setColFam("cf" + i);

@@ -2,6 +2,7 @@ package datawave.marking;
 
 import org.apache.accumulo.access.Access;
 import org.apache.accumulo.access.AccessExpression;
+import org.apache.accumulo.access.examples.ParseExamples;
 
 import com.fasterxml.jackson.annotation.JsonAutoDetect;
 import com.fasterxml.jackson.annotation.JsonCreator;
@@ -9,7 +10,6 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 
 import lombok.Builder;
 import lombok.Data;
-import org.apache.accumulo.access.examples.ParseExamples;
 
 @Data
 @Builder

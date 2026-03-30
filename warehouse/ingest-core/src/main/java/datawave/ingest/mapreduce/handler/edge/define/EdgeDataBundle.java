@@ -1,5 +1,7 @@
 package datawave.ingest.mapreduce.handler.edge.define;
 
+import static datawave.core.common.util.AccessExpressionUtil.mergeMarkings;
+
 import java.io.IOException;
 import java.util.Calendar;
 import java.util.List;
@@ -9,7 +11,6 @@ import org.apache.accumulo.core.security.ColumnVisibility;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import datawave.core.common.util.AccessExpressionUtil;
 import datawave.edge.util.EdgeKey;
 import datawave.edge.util.EdgeValue.EdgeValueBuilder;
 import datawave.edge.util.EdgeValueHelper;
@@ -19,12 +20,9 @@ import datawave.ingest.data.config.MaskedFieldHelper;
 import datawave.ingest.data.config.NormalizedContentInterface;
 import datawave.ingest.data.config.ingest.IngestHelperInterface;
 import datawave.ingest.mapreduce.handler.edge.define.VertexValue.ValueType;
-import datawave.marking.AccessExpressionMarkings;
 import datawave.marking.MarkingFunctions;
 import datawave.marking.Markings;
 import datawave.util.time.DateHelper;
-
-import static datawave.core.common.util.AccessExpressionUtil.mergeMarkings;
 
 /**
  * Combines an EdgeDefinition with values obtained from Event data.

@@ -164,7 +164,8 @@ public class DiscoveryIterator implements SortedKeyValueIterator<Key,Value> {
                 // Otherwise, combine the visibilities, and return the aggregated result.
                 try {
                     ColumnVisibility visibility = AccessExpressionUtil.toColumnVisibility(AccessExpressionUtil.combine(markingFunctions,
-                                    visibilities.stream().map(cv -> AccessExpressionUtil.toAccessExpressionMarkings(AccessExpressionUtil.toAccessExpression(cv)))
+                                    visibilities.stream()
+                                                    .map(cv -> AccessExpressionUtil.toAccessExpressionMarkings(AccessExpressionUtil.toAccessExpression(cv)))
                                                     .collect(Collectors.toSet())));
                     MapWritable countsByVis = new MapWritable();
                     visibilityToCounts.forEach((key, value) -> countsByVis.put(new Text(key), new LongWritable(value)));

@@ -40,7 +40,8 @@ public class EventKeyValueFactory {
     }
 
     protected static void parseColumnVisibility(EventKeyValue event, Key key) {
-        event.setMarkings(AccessExpressionUtil.toAccessExpressionMarkings(AccessExpressionUtil.toAccessExpression(new ColumnVisibility(key.getColumnVisibility()))));
+        event.setMarkings(AccessExpressionUtil
+                        .toAccessExpressionMarkings(AccessExpressionUtil.toAccessExpression(new ColumnVisibility(key.getColumnVisibility()))));
     }
 
     public static class EventKeyValue {

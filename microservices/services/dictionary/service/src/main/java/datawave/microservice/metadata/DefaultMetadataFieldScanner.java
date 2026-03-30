@@ -1,5 +1,7 @@
 package datawave.microservice.metadata;
 
+import static org.apache.accumulo.access.examples.ParseExamples.ACCESS;
+
 import java.time.Instant;
 import java.time.ZoneId;
 import java.time.format.DateTimeFormatter;
@@ -33,8 +35,6 @@ import datawave.webservice.dictionary.data.DefaultDescription;
 import datawave.webservice.dictionary.data.DefaultDictionaryField;
 import datawave.webservice.dictionary.data.DefaultFields;
 import datawave.webservice.metadata.DefaultMetadataField;
-
-import static org.apache.accumulo.access.examples.ParseExamples.ACCESS;
 
 public class DefaultMetadataFieldScanner {
 
@@ -278,8 +278,7 @@ public class DefaultMetadataFieldScanner {
         private void setDescriptions() {
             DefaultDescription description = responseObjectFactory.getDescription();
             description.setDescription(currValue.toString());
-            description.setMarkings(
-                            AccessExpressionUtil.toAccessExpressionMarkings(ACCESS.newExpression(currKey.getColumnVisibility().toString())));
+            description.setMarkings(AccessExpressionUtil.toAccessExpressionMarkings(ACCESS.newExpression(currKey.getColumnVisibility().toString())));
             currField.getDescriptions().add(description);
         }
 

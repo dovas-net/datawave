@@ -146,7 +146,8 @@ public class FacetedTransformer extends DocumentTransformerSupport<Entry<Key,Val
         return myFields;
     }
 
-    protected FacetsBase buildResponse(Document document, Key documentKey, ColumnVisibility eventCV, String colf, String row, MarkingFunctions<?> markingFunctions) {
+    protected FacetsBase buildResponse(Document document, Key documentKey, ColumnVisibility eventCV, String colf, String row,
+                    MarkingFunctions<?> markingFunctions) {
 
         FacetsBase facetedResponse = responseObjectFactory.getFacets();
 

@@ -1,5 +1,7 @@
 package datawave.ingest.data.config.ingest;
 
+import static datawave.core.common.util.AccessExpressionUtil.mergeMarkings;
+
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
@@ -25,16 +27,12 @@ import com.google.common.collect.LinkedListMultimap;
 import com.google.common.collect.Multimap;
 import com.google.common.collect.Sets;
 
-import datawave.core.common.util.AccessExpressionUtil;
 import datawave.ingest.data.Type;
 import datawave.ingest.data.config.GroupedNormalizedContentInterface;
 import datawave.ingest.data.config.NormalizedContentInterface;
 import datawave.ingest.data.config.NormalizedFieldAndValue;
-import datawave.marking.AccessExpressionMarkings;
 import datawave.marking.MarkingFunctions;
 import datawave.marking.Markings;
-
-import static datawave.core.common.util.AccessExpressionUtil.mergeMarkings;
 
 /**
  * Similar to VirtualIngest virtual fields, but composite fields are not written in the event section of the shard table (only in the field index section)

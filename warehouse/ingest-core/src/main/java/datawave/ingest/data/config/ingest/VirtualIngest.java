@@ -1,5 +1,7 @@
 package datawave.ingest.data.config.ingest;
 
+import static datawave.core.common.util.AccessExpressionUtil.mergeMarkings;
+
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
@@ -22,17 +24,13 @@ import com.google.common.collect.HashMultimap;
 import com.google.common.collect.Iterables;
 import com.google.common.collect.Multimap;
 
-import datawave.core.common.util.AccessExpressionUtil;
 import datawave.data.type.NoOpType;
 import datawave.ingest.data.Type;
 import datawave.ingest.data.config.GroupedNormalizedContentInterface;
 import datawave.ingest.data.config.NormalizedContentInterface;
 import datawave.ingest.data.config.NormalizedFieldAndValue;
-import datawave.marking.AccessExpressionMarkings;
 import datawave.marking.MarkingFunctions;
 import datawave.marking.Markings;
-
-import static datawave.core.common.util.AccessExpressionUtil.mergeMarkings;
 
 public interface VirtualIngest {
 

@@ -1,5 +1,7 @@
 package datawave.webservice.query.result.event;
 
+import static org.apache.accumulo.access.examples.ParseExamples.ACCESS;
+
 import java.io.IOException;
 import java.io.Serializable;
 import java.util.HashMap;
@@ -19,15 +21,12 @@ import org.apache.commons.lang.builder.HashCodeBuilder;
 
 import datawave.data.type.Type;
 import datawave.marking.AccessExpressionMarkings;
-import datawave.marking.MarkingFunctions;
 import datawave.marking.Markings;
 import datawave.webservice.query.util.TypedValue;
 import io.protostuff.Input;
 import io.protostuff.Message;
 import io.protostuff.Output;
 import io.protostuff.Schema;
-
-import static org.apache.accumulo.access.examples.ParseExamples.ACCESS;
 
 /**
  * This object is contained inside of Event objects to describe name/value pairs of data in the Event.
