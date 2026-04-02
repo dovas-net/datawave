@@ -1,6 +1,6 @@
 package datawave.ingest.mapreduce.handler.edge.define;
 
-import static datawave.core.common.util.AccessExpressionUtil.mergeMarkings;
+import static datawave.marking.AccessExpressionUtil.mergeMarkings;
 
 import java.io.IOException;
 import java.util.Calendar;

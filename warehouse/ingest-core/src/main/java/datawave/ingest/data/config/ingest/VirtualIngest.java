@@ -1,6 +1,6 @@
 package datawave.ingest.data.config.ingest;
 
-import static datawave.core.common.util.AccessExpressionUtil.mergeMarkings;
+import static datawave.marking.AccessExpressionUtil.mergeMarkings;
 
 import java.util.ArrayList;
 import java.util.Arrays;

@@ -1,6 +1,6 @@
 package datawave.util.keyword;
 
-import static org.apache.accumulo.access.examples.ParseExamples.ACCESS;
+import static datawave.marking.AccessExpressionMarkings.ACCESS;
 
 import java.io.Serializable;
 import java.util.Collection;
@@ -14,7 +14,7 @@ import java.util.stream.Collectors;
 import org.apache.accumulo.access.AccessExpression;
 import org.apache.commons.lang3.StringUtils;
 
-import datawave.core.common.util.AccessExpressionUtil;
+import datawave.marking.AccessExpressionUtil;
 import datawave.marking.MarkingFunctions;
 import datawave.marking.Markings;
 

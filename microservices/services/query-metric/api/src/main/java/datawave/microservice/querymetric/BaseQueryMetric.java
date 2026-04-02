@@ -1,5 +1,7 @@
 package datawave.microservice.querymetric;
 
+import static datawave.marking.AccessExpressionMarkings.ACCESS;
+
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.Serializable;
@@ -24,9 +26,7 @@ import javax.xml.bind.annotation.XmlElement;
 import javax.xml.bind.annotation.XmlElementWrapper;
 import javax.xml.bind.annotation.adapters.XmlJavaTypeAdapter;
 
-import org.apache.accumulo.access.Access;
 import org.apache.accumulo.access.AccessExpression;
-import org.apache.accumulo.access.examples.ParseExamples;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.builder.CompareToBuilder;
 import org.apache.commons.lang3.builder.EqualsBuilder;
@@ -1167,8 +1167,6 @@ public abstract class BaseQueryMetric implements HasMarkings, Serializable {
     public void setPredictions(Set<Prediction> predictions) {
         this.predictions = predictions;
     }
-
-    private static final Access ACCESS = ParseExamples.ACCESS;
 
     @Override
     public void setMarkings(Markings<?> markings) {

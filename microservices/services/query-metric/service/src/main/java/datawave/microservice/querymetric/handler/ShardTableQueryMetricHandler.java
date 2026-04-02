@@ -48,7 +48,6 @@ import com.google.common.collect.Maps;
 import com.google.common.collect.Multimap;
 
 import datawave.core.common.connection.AccumuloConnectionFactory;
-import datawave.core.common.util.AccessExpressionUtil;
 import datawave.core.query.util.QueryUtil;
 import datawave.data.hash.UID;
 import datawave.data.hash.UIDBuilder;
@@ -63,6 +62,7 @@ import datawave.ingest.mapreduce.handler.tokenize.ContentIndexingColumnBasedHand
 import datawave.ingest.mapreduce.job.BulkIngestKey;
 import datawave.ingest.protobuf.Uid;
 import datawave.ingest.table.config.TableConfigHelper;
+import datawave.marking.AccessExpressionUtil;
 import datawave.marking.MarkingFunctions;
 import datawave.marking.Markings;
 import datawave.microservice.authorization.user.DatawaveUserDetails;

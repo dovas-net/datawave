@@ -27,7 +27,7 @@ import com.esotericsoftware.kryo.io.Output;
 
 import datawave.core.cache.CaffeineClassCache;
 import datawave.core.cache.ClassCache;
-import datawave.core.common.util.AccessExpressionUtil;
+import datawave.marking.AccessExpressionUtil;
 import datawave.query.Constants;
 import datawave.query.jexl.DatawaveJexlContext;
 

@@ -30,8 +30,8 @@ import com.google.common.collect.ArrayListMultimap;
 import com.google.common.collect.Multimap;
 import com.google.protobuf.InvalidProtocolBufferException;
 
-import datawave.core.common.util.AccessExpressionUtil;
 import datawave.ingest.protobuf.Uid;
+import datawave.marking.AccessExpressionUtil;
 import datawave.marking.MarkingFunctions;
 import datawave.query.Constants;
 

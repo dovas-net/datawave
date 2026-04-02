@@ -9,10 +9,10 @@ import org.apache.hadoop.io.Writable;
 
 import com.google.common.base.Preconditions;
 
-import datawave.core.common.util.AccessExpressionUtil;
 import datawave.core.query.cachedresults.CacheableLogic;
 import datawave.core.query.logic.BaseQueryLogic;
 import datawave.core.query.logic.BaseQueryLogicTransformer;
+import datawave.marking.AccessExpressionUtil;
 import datawave.marking.MarkingFunctions;
 import datawave.marking.Markings;
 import datawave.microservice.query.Query;

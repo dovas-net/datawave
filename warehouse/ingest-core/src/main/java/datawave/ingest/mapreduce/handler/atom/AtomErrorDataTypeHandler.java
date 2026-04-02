@@ -17,7 +17,6 @@ import org.apache.hadoop.mapreduce.TaskInputOutputContext;
 import com.google.common.collect.HashMultimap;
 import com.google.common.collect.Multimap;
 
-import datawave.core.common.util.AccessExpressionUtil;
 import datawave.data.hash.UID;
 import datawave.ingest.config.IngestConfigurationFactory;
 import datawave.ingest.data.RawDataErrorNames;
@@ -30,6 +29,7 @@ import datawave.ingest.data.config.ingest.ErrorShardedIngestHelper;
 import datawave.ingest.mapreduce.handler.error.ErrorShardedDataTypeHandler;
 import datawave.ingest.mapreduce.job.BulkIngestKey;
 import datawave.ingest.mapreduce.job.writer.ContextWriter;
+import datawave.marking.AccessExpressionUtil;
 import datawave.marking.MarkingFunctions;
 import datawave.marking.Markings;
 

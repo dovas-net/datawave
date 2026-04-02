@@ -1,8 +1,8 @@
 package datawave.microservice.querymetric;
 
+import static datawave.marking.AccessExpressionMarkings.ACCESS;
 import static datawave.microservice.querymetric.config.HazelcastMetricCacheConfiguration.INCOMING_METRICS;
 import static datawave.security.authorization.DatawaveUser.UserType.USER;
-import static org.apache.accumulo.access.examples.ParseExamples.ACCESS;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.junit.jupiter.api.Assertions.fail;

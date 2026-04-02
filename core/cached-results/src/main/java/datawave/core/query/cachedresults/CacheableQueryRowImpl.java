@@ -1,5 +1,7 @@
 package datawave.core.query.cachedresults;
 
+import static datawave.marking.AccessExpressionMarkings.ACCESS;
+
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
@@ -9,16 +11,15 @@ import java.util.Map;
 import java.util.Set;
 import java.util.TreeSet;
 
-import org.apache.accumulo.access.impl.AccessExpressionImpl;
 import org.apache.commons.lang.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import com.google.common.collect.Sets;
 
-import datawave.core.common.util.AccessExpressionUtil;
 import datawave.data.type.Type;
 import datawave.marking.AccessExpressionMarkings;
+import datawave.marking.AccessExpressionUtil;
 import datawave.marking.MarkingFunctions;
 import datawave.marking.Markings;
 import datawave.webservice.query.cachedresults.CacheableQueryRow;
@@ -28,7 +29,7 @@ import datawave.webservice.query.util.TypedValue;
 public class CacheableQueryRowImpl extends CacheableQueryRow implements ObjectSizeOf {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(CacheableQueryRowImpl.class);
-    private static final Markings<?> EMPTY_MARKINGS = AccessExpressionMarkings.builder().accessExpression(AccessExpressionImpl.EMPTY).build();
+    private static final Markings<?> EMPTY_MARKINGS = AccessExpressionMarkings.builder().accessExpression(ACCESS.newExpression("")).build();
 
     private String user = null;
     private String queryId = null;

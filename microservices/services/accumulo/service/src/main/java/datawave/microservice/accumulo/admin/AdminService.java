@@ -2,7 +2,7 @@ package datawave.microservice.accumulo.admin;
 
 import static java.nio.charset.StandardCharsets.UTF_8;
 
-import static org.apache.accumulo.access.examples.ParseExamples.ACCESS;
+import static datawave.marking.AccessExpressionMarkings.ACCESS;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -43,7 +43,7 @@ import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.stereotype.Service;
 
-import datawave.core.common.util.AccessExpressionUtil;
+import datawave.marking.AccessExpressionUtil;
 import datawave.marking.MarkingFunctions;
 import datawave.marking.Markings;
 import datawave.webservice.query.util.OptionallyEncodedString;

@@ -24,7 +24,6 @@ import org.slf4j.LoggerFactory;
 import com.google.common.collect.HashMultimap;
 import com.google.common.collect.Multimap;
 
-import datawave.core.common.util.AccessExpressionUtil;
 import datawave.data.hash.UID;
 import datawave.ingest.config.IngestConfiguration;
 import datawave.ingest.config.IngestConfigurationFactory;
@@ -44,6 +43,7 @@ import datawave.ingest.mapreduce.handler.shard.AbstractColumnBasedHandler;
 import datawave.ingest.mapreduce.handler.shard.ShardedDataTypeHandler;
 import datawave.ingest.mapreduce.job.BulkIngestKey;
 import datawave.ingest.mapreduce.job.writer.ContextWriter;
+import datawave.marking.AccessExpressionUtil;
 
 /**
  * Handler that take events with processing errors or fatal errors and dumps them into a processing error table. This table will be used for subsequent

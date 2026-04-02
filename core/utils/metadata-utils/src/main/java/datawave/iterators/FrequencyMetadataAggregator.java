@@ -30,8 +30,8 @@ import org.apache.log4j.Logger;
 
 import com.google.common.base.Splitter;
 
-import datawave.core.common.util.AccessExpressionUtil;
 import datawave.iterator.ReducingIterator;
+import datawave.marking.AccessExpressionUtil;
 import datawave.marking.MarkingFunctions;
 import datawave.query.model.DateFrequencyMap;
 import datawave.util.StringUtils;

@@ -1,6 +1,6 @@
 package datawave.webservice.query.result.event;
 
-import static org.apache.accumulo.access.examples.ParseExamples.ACCESS;
+import static datawave.marking.AccessExpressionMarkings.ACCESS;
 
 import java.io.IOException;
 import java.io.Serializable;

@@ -1,6 +1,6 @@
 package datawave.modification;
 
-import static org.apache.accumulo.access.examples.ParseExamples.ACCESS;
+import static datawave.marking.AccessExpressionMarkings.ACCESS;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -47,12 +47,12 @@ import com.google.common.collect.Iterators;
 import com.google.common.collect.Multimap;
 
 import datawave.core.common.connection.AccumuloConnectionFactory;
-import datawave.core.common.util.AccessExpressionUtil;
 import datawave.core.iterators.FieldIndexDocumentFilter;
 import datawave.data.ColumnFamilyConstants;
 import datawave.data.type.Type;
 import datawave.ingest.protobuf.Uid;
 import datawave.ingest.protobuf.Uid.List.Builder;
+import datawave.marking.AccessExpressionUtil;
 import datawave.marking.MarkingFunctions;
 import datawave.marking.Markings;
 import datawave.microservice.query.DefaultQueryParameters;

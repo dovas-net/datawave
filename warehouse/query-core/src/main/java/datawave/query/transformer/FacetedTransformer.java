@@ -16,10 +16,10 @@ import org.apache.log4j.Logger;
 
 import com.google.common.base.Preconditions;
 
-import datawave.core.common.util.AccessExpressionUtil;
 import datawave.core.query.exception.EmptyObjectException;
 import datawave.core.query.logic.BaseQueryLogic;
 import datawave.data.type.StringType;
+import datawave.marking.AccessExpressionUtil;
 import datawave.marking.MarkingFunctions;
 import datawave.marking.Markings;
 import datawave.microservice.query.Query;

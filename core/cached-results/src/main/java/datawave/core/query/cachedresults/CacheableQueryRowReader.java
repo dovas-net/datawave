@@ -1,6 +1,6 @@
 package datawave.core.query.cachedresults;
 
-import static org.apache.accumulo.access.examples.ParseExamples.ACCESS;
+import static datawave.marking.AccessExpressionMarkings.ACCESS;
 
 import java.sql.ResultSet;
 import java.sql.ResultSetMetaData;
@@ -14,7 +14,7 @@ import java.util.TreeSet;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import datawave.core.common.util.AccessExpressionUtil;
+import datawave.marking.AccessExpressionUtil;
 import datawave.marking.MarkingFunctions;
 import datawave.marking.Markings;
 import datawave.webservice.query.cachedresults.CacheableQueryRow;

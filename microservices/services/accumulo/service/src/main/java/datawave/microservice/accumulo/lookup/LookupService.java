@@ -2,7 +2,7 @@ package datawave.microservice.accumulo.lookup;
 
 import static java.nio.charset.StandardCharsets.UTF_8;
 
-import static org.apache.accumulo.access.examples.ParseExamples.ACCESS;
+import static datawave.marking.AccessExpressionMarkings.ACCESS;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -36,7 +36,7 @@ import org.springframework.util.MultiValueMap;
 import com.google.common.base.Preconditions;
 
 import datawave.accumulo.util.security.UserAuthFunctions;
-import datawave.core.common.util.AccessExpressionUtil;
+import datawave.marking.AccessExpressionUtil;
 import datawave.marking.MarkingFunctions;
 import datawave.marking.Markings;
 import datawave.marking.SecurityMarking;

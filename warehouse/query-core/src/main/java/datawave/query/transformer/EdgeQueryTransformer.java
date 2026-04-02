@@ -11,12 +11,12 @@ import org.apache.log4j.Logger;
 
 import com.google.protobuf.InvalidProtocolBufferException;
 
-import datawave.core.common.util.AccessExpressionUtil;
 import datawave.core.query.cachedresults.CacheableLogic;
 import datawave.edge.model.EdgeModelFields;
 import datawave.edge.util.EdgeKey;
 import datawave.edge.util.EdgeValue;
 import datawave.edge.util.EdgeValueHelper;
+import datawave.marking.AccessExpressionUtil;
 import datawave.marking.MarkingFunctions;
 import datawave.marking.Markings;
 import datawave.microservice.query.Query;

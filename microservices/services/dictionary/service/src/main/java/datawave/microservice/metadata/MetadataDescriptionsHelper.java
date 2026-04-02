@@ -30,8 +30,8 @@ import com.google.common.collect.HashMultimap;
 import com.google.common.collect.Multimaps;
 import com.google.common.collect.SetMultimap;
 
-import datawave.core.common.util.AccessExpressionUtil;
 import datawave.data.ColumnFamilyConstants;
+import datawave.marking.AccessExpressionUtil;
 import datawave.marking.MarkingFunctions;
 import datawave.marking.Markings;
 import datawave.microservice.dictionary.config.ResponseObjectFactory;

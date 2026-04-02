@@ -14,11 +14,11 @@ import org.apache.commons.lang.builder.HashCodeBuilder;
 
 import com.google.protobuf.InvalidProtocolBufferException;
 
-import datawave.core.common.util.AccessExpressionUtil;
 import datawave.core.query.cachedresults.CacheableLogic;
 import datawave.core.query.logic.BaseQueryLogicTransformer;
 import datawave.edge.model.EdgeModelFields;
 import datawave.edge.util.EdgeValue;
+import datawave.marking.AccessExpressionUtil;
 import datawave.marking.MarkingFunctions;
 import datawave.marking.Markings;
 import datawave.microservice.query.Query;

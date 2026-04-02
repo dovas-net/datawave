@@ -12,8 +12,8 @@ import org.apache.log4j.Logger;
 
 import com.google.common.collect.Sets;
 
-import datawave.core.common.util.AccessExpressionUtil;
 import datawave.core.query.logic.ResultPostprocessor;
+import datawave.marking.AccessExpressionUtil;
 import datawave.marking.MarkingFunctions;
 import datawave.webservice.query.result.event.EventBase;
 import datawave.webservice.query.result.event.FieldBase;

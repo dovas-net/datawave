@@ -1,6 +1,6 @@
 package datawave.microservice.metadata;
 
-import static org.apache.accumulo.access.examples.ParseExamples.ACCESS;
+import static datawave.marking.AccessExpressionMarkings.ACCESS;
 
 import java.time.Instant;
 import java.time.ZoneId;
@@ -24,8 +24,8 @@ import org.slf4j.LoggerFactory;
 
 import com.google.common.collect.Maps;
 
-import datawave.core.common.util.AccessExpressionUtil;
 import datawave.data.ColumnFamilyConstants;
+import datawave.marking.AccessExpressionUtil;
 import datawave.marking.MarkingFunctions;
 import datawave.microservice.Connection;
 import datawave.microservice.dictionary.config.ResponseObjectFactory;

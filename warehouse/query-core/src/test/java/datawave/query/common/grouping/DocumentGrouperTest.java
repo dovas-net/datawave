@@ -1,5 +1,7 @@
 package datawave.query.common.grouping;
 
+import static datawave.marking.AccessExpressionMarkings.ACCESS;
+
 import java.math.BigDecimal;
 import java.util.AbstractMap;
 import java.util.ArrayList;
@@ -9,9 +11,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
-import org.apache.accumulo.access.Access;
 import org.apache.accumulo.access.AccessExpression;
-import org.apache.accumulo.access.examples.ParseExamples;
 import org.apache.accumulo.core.data.Key;
 import org.apache.accumulo.core.security.ColumnVisibility;
 import org.assertj.core.util.Sets;
@@ -41,7 +41,6 @@ public class DocumentGrouperTest {
     private static final ColumnVisibility COLVIS_I = new ColumnVisibility("I");
     private static final ColumnVisibility COLVIS_ALL_E_I = new ColumnVisibility("ALL&E&I");
 
-    private static final Access ACCESS = ParseExamples.ACCESS;
     private static final AccessExpression AE_ALL = ACCESS.newExpression("ALL");
     private static final AccessExpression AE_E = ACCESS.newExpression("E");
     private static final AccessExpression AE_I = ACCESS.newExpression("I");

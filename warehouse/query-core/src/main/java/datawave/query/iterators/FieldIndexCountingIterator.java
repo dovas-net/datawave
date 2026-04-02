@@ -30,9 +30,9 @@ import org.apache.hadoop.conf.Configuration;
 import org.apache.hadoop.io.Text;
 import org.apache.log4j.Logger;
 
-import datawave.core.common.util.AccessExpressionUtil;
 import datawave.core.common.util.TypeFilter;
 import datawave.iterators.IteratorSettingHelper;
+import datawave.marking.AccessExpressionUtil;
 import datawave.marking.MarkingFunctions;
 import datawave.query.Constants;
 import datawave.util.CompositeTimestamp;

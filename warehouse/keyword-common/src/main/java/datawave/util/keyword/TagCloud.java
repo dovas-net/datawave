@@ -1,6 +1,6 @@
 package datawave.util.keyword;
 
-import static org.apache.accumulo.access.examples.ParseExamples.ACCESS;
+import static datawave.marking.AccessExpressionMarkings.ACCESS;
 
 import java.util.ArrayList;
 import java.util.Collection;

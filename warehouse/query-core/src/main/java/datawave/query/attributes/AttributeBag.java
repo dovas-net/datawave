@@ -10,7 +10,7 @@ import org.apache.accumulo.core.security.ColumnVisibility;
 import org.apache.commons.lang.mutable.MutableLong;
 import org.apache.log4j.Logger;
 
-import datawave.core.common.util.AccessExpressionUtil;
+import datawave.marking.AccessExpressionUtil;
 import datawave.marking.MarkingFunctions;
 import datawave.marking.MarkingFunctions.Exception;
 

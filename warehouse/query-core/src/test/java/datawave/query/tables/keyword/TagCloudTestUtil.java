@@ -1,11 +1,10 @@
 package datawave.query.tables.keyword;
 
+import static datawave.marking.AccessExpressionMarkings.ACCESS;
+
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
-
-import org.apache.accumulo.access.Access;
-import org.apache.accumulo.access.examples.ParseExamples;
 
 import datawave.marking.AccessExpressionMarkings;
 import datawave.marking.Markings;
@@ -17,7 +16,7 @@ import datawave.webservice.result.keyword.DefaultTagCloudEntry;
  * Utility for producing TagClouds and supporting objects for tests
  */
 public class TagCloudTestUtil {
-    private static final Access ACCESS = ParseExamples.ACCESS;
+
     private static final Markings<?> ALL_MARKINGS = AccessExpressionMarkings.builder().accessExpression(ACCESS.newExpression("ALL")).build();
 
     public static final String SOPRANO_SOURCE = "20130101_0/test/-1kfeoq.-80b5fs.r0262j";

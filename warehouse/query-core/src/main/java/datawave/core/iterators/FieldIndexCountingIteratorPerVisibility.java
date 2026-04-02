@@ -34,8 +34,8 @@ import org.apache.log4j.Logger;
 
 import com.google.common.collect.Sets;
 
-import datawave.core.common.util.AccessExpressionUtil;
 import datawave.iterators.IteratorSettingHelper;
+import datawave.marking.AccessExpressionUtil;
 import datawave.marking.MarkingFunctions;
 import datawave.query.Constants;
 import datawave.util.CompositeTimestamp;

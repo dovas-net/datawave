@@ -1,20 +1,20 @@
-package datawave.core.common.util;
+package datawave.marking;
 
 import static java.nio.charset.StandardCharsets.UTF_8;
 
+import static datawave.marking.AccessExpressionMarkings.ACCESS;
+import static org.apache.accumulo.access.ParsedAccessExpression.ExpressionType.AND;
+import static org.apache.accumulo.access.ParsedAccessExpression.ExpressionType.AUTHORIZATION;
+
 import java.util.Collection;
 import java.util.List;
+import java.util.SortedSet;
+import java.util.TreeSet;
 
 import org.apache.accumulo.access.Access;
 import org.apache.accumulo.access.AccessExpression;
 import org.apache.accumulo.access.ParsedAccessExpression;
-import org.apache.accumulo.access.examples.ParseExamples;
-import org.apache.accumulo.access.impl.AccessExpressionImpl;
 import org.apache.accumulo.core.security.ColumnVisibility;
-
-import datawave.marking.AccessExpressionMarkings;
-import datawave.marking.MarkingFunctions;
-import datawave.marking.Markings;
 
 /**
  * Utility for bridging between Accumulo's {@link ColumnVisibility} (from accumulo-core) and {@link AccessExpression} (from accumulo-access).
@@ -24,9 +24,7 @@ import datawave.marking.Markings;
  */
 public final class AccessExpressionUtil {
 
-    private static final Access ACCESS = ParseExamples.ACCESS;
-
-    private static final AccessExpression EMPTY_EXPRESSION = AccessExpressionImpl.EMPTY;
+    private static final AccessExpression EMPTY_EXPRESSION = ACCESS.newExpression("");
 
     private AccessExpressionUtil() {}
 
@@ -128,7 +126,7 @@ public final class AccessExpressionUtil {
             return expression;
         }
         ParsedAccessExpression parsed = ACCESS.newParsedExpression(expr);
-        return ACCESS.newExpression(ParseExamples.normalize(parsed).expression);
+        return ACCESS.newExpression(normalize(parsed).expression);
     }
 
     /**
@@ -191,5 +189,132 @@ public final class AccessExpressionUtil {
             }
         }
         return markings1;
+    }
+
+    /**
+     * As part of normalizing access expression this class is used to sort and dedupe sub-expressions in a tree set.
+     */
+    public static class NormalizedExpression implements Comparable<NormalizedExpression> {
+        public final String expression;
+        public final ParsedAccessExpression.ExpressionType type;
+
+        NormalizedExpression(String expression, ParsedAccessExpression.ExpressionType type) {
+            this.expression = expression;
+            this.type = type;
+        }
+
+        // determines the sort order of different kinds of subexpressions.
+        private static int typeOrder(ParsedAccessExpression.ExpressionType type) {
+            switch (type) {
+                case AUTHORIZATION:
+                    return 1;
+                case OR:
+                    return 2;
+                case AND:
+                    return 3;
+                case EMPTY:
+                default:
+                    throw new IllegalArgumentException("Unexpected type " + type);
+            }
+        }
+
+        @Override
+        public int compareTo(NormalizedExpression o) {
+            // Changing this comparator would significantly change how expressions are normalized.
+            int cmp = typeOrder(type) - typeOrder(o.type);
+            if (cmp == 0) {
+                if (type == AUTHORIZATION) {
+                    // sort based on the unquoted and unescaped form of the authorization
+                    cmp = ACCESS.unquote(expression).compareTo(ACCESS.unquote(o.expression));
+                } else {
+                    cmp = expression.compareTo(o.expression);
+                }
+
+            }
+            return cmp;
+        }
+
+        @Override
+        public boolean equals(Object o) {
+            return this == o || (o instanceof NormalizedExpression && compareTo((NormalizedExpression) o) == 0);
+        }
+
+        @Override
+        public int hashCode() {
+            return expression.hashCode();
+        }
+    }
+
+    /**
+     * This method helps with the flattening aspect of normalization by recursing down as far as possible the parse tree in the case when the expression type is
+     * the same. As long as the type is the same in the sub expression, keep using the same set.
+     */
+    public static void flatten(ParsedAccessExpression.ExpressionType parentType, ParsedAccessExpression parsed,
+                    SortedSet<NormalizedExpression> normalizedExpressions) {
+        if (parsed.getType() == parentType) {
+            for (var child : parsed.getChildren()) {
+                flatten(parentType, child, normalizedExpressions);
+            }
+        } else {
+            // The type changed, so start again on the subexpression.
+            normalizedExpressions.add(normalize(parsed));
+        }
+    }
+
+    /**
+     * <p>
+     * For a given access expression this example will deduplicate, sort, flatten, and remove unneeded parentheses or quotes in the expressions. The following
+     * list gives examples of what each normalization step does.
+     *
+     * <ul>
+     * <li>As an example of flattening, the expression {@code A&(B&C)} flattens to {@code
+     * A&B&C}.</li>
+     * <li>As an example of sorting, the expression {@code (Z&Y)|(C&B)} sorts to {@code
+     * (B&C)|(Y&Z)}</li>
+     * <li>As an example of deduplication, the expression {@code X&Y&X} normalizes to {@code X&Y}</li>
+     * <li>As an example of unneeded quotes, the expression {@code "ABC"&"XYZ"} normalizes to {@code ABC&XYZ}</li>
+     * <li>As an example of unneeded parentheses, the expression {@code (((ABC)|(XYZ)))} normalizes to {@code ABC|XYZ}</li>
+     * </ul>
+     *
+     * <p>
+     * This algorithm attempts to have the same behavior as the one in the Accumulo 2.1 ColumnVisibility class. However the implementation is very different.
+     */
+    public static NormalizedExpression normalize(ParsedAccessExpression parsed) {
+        if (parsed.getType() == AUTHORIZATION) {
+            // If the authorization is quoted and it does not need to be quoted then the following two
+            // lines will remove the unnecessary quoting.
+            String unquoted = ACCESS.unquote(parsed.getExpression());
+            String quoted = ACCESS.quote(unquoted);
+            return new NormalizedExpression(quoted, parsed.getType());
+        } else {
+            // The tree set does the work of sorting and deduplicating sub expressions.
+            TreeSet<NormalizedExpression> normalizedChildren = new TreeSet<>();
+            for (var child : parsed.getChildren()) {
+                flatten(parsed.getType(), child, normalizedChildren);
+            }
+
+            if (normalizedChildren.size() == 1) {
+                return normalizedChildren.first();
+            } else {
+                String operator = parsed.getType() == AND ? "&" : "|";
+                String sep = "";
+
+                StringBuilder builder = new StringBuilder();
+
+                for (var child : normalizedChildren) {
+                    builder.append(sep);
+                    if (child.type == AUTHORIZATION) {
+                        builder.append(child.expression);
+                    } else {
+                        builder.append("(");
+                        builder.append(child.expression);
+                        builder.append(")");
+                    }
+                    sep = operator;
+                }
+
+                return new NormalizedExpression(builder.toString(), parsed.getType());
+            }
+        }
     }
 }

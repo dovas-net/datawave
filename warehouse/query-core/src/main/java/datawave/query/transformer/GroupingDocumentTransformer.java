@@ -21,9 +21,9 @@ import com.google.common.collect.Multiset;
 import com.google.common.collect.Sets;
 import com.google.common.collect.TreeMultimap;
 
-import datawave.core.common.util.AccessExpressionUtil;
 import datawave.core.query.logic.BaseQueryLogic;
 import datawave.marking.AccessExpressionMarkings;
+import datawave.marking.AccessExpressionUtil;
 import datawave.marking.MarkingFunctions;
 import datawave.marking.Markings;
 import datawave.microservice.query.Query;

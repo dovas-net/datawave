@@ -1,5 +1,7 @@
 package datawave.query.transformer;
 
+import static datawave.marking.AccessExpressionMarkings.ACCESS;
+
 import java.io.File;
 import java.io.IOException;
 import java.text.SimpleDateFormat;
@@ -15,7 +17,6 @@ import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Set;
 
-import org.apache.accumulo.access.impl.AccessExpressionImpl;
 import org.apache.accumulo.core.data.Key;
 import org.apache.accumulo.core.data.Value;
 import org.apache.accumulo.core.security.ColumnVisibility;
@@ -25,12 +26,12 @@ import org.apache.log4j.Logger;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Sets;
 
-import datawave.core.common.util.AccessExpressionUtil;
 import datawave.core.query.exception.EmptyObjectException;
 import datawave.core.query.logic.BaseQueryLogic;
 import datawave.core.query.logic.WritesQueryMetrics;
 import datawave.core.query.logic.WritesResultCardinalities;
 import datawave.marking.AccessExpressionMarkings;
+import datawave.marking.AccessExpressionUtil;
 import datawave.marking.MarkingFunctions;
 import datawave.marking.Markings;
 import datawave.microservice.query.Query;
@@ -72,7 +73,7 @@ public abstract class DocumentTransformerSupport<I,O> extends EventQueryTransfor
     protected Boolean reducedResponse;
 
     private static final Logger log = Logger.getLogger(DocumentTransformerSupport.class);
-    private static final Markings<?> EMPTY_MARKINGS = AccessExpressionMarkings.builder().accessExpression(AccessExpressionImpl.EMPTY).build();
+    private static final Markings<?> EMPTY_MARKINGS = AccessExpressionMarkings.builder().accessExpression(ACCESS.newExpression("")).build();
 
     private long sourceCount = 0;
     private long nextCount = 0;

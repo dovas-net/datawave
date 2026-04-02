@@ -1,15 +1,14 @@
 package datawave.marking;
 
+import static datawave.marking.AccessExpressionMarkings.ACCESS;
+
 import java.util.Collection;
 import java.util.HashSet;
 import java.util.Set;
 import java.util.stream.Collectors;
 
-import org.apache.accumulo.access.Access;
 import org.apache.accumulo.access.AccessExpression;
 import org.apache.accumulo.access.ParsedAccessExpression;
-import org.apache.accumulo.access.examples.ParseExamples;
-import org.apache.accumulo.access.impl.AccessExpressionImpl;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.context.support.ClassPathXmlApplicationContext;
@@ -49,8 +48,8 @@ public interface MarkingFunctions<T extends Markings<?>> {
     }
 
     class Default implements MarkingFunctions<AccessExpressionMarkings> {
-        private static final Access ACCESS = ParseExamples.ACCESS;
-        private static final AccessExpressionMarkings EMPTY_MARKINGS = AccessExpressionMarkings.builder().accessExpression(AccessExpressionImpl.EMPTY).build();
+
+        private static final AccessExpressionMarkings EMPTY_MARKINGS = AccessExpressionMarkings.builder().accessExpression(ACCESS.newExpression("")).build();
 
         @Override
         public AccessExpressionMarkings combine(Collection<AccessExpressionMarkings> markings) {
@@ -80,7 +79,7 @@ public interface MarkingFunctions<T extends Markings<?>> {
 
             // normalize the Parsed Expression and then return a copy without the parse tree
             // FIXME: Using a beta of the accumulo-access API so temporarily using the normalize function from the example code
-            return AccessExpressionMarkings.builder().accessExpression(ACCESS.newExpression(ParseExamples.normalize(expression).expression)).build();
+            return AccessExpressionMarkings.builder().accessExpression(ACCESS.newExpression(AccessExpressionUtil.normalize(expression).expression)).build();
         }
     }
 

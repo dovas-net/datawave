@@ -16,7 +16,7 @@ import org.apache.log4j.Logger;
 import com.google.common.base.Function;
 import com.google.common.collect.Sets;
 
-import datawave.core.common.util.AccessExpressionUtil;
+import datawave.marking.AccessExpressionUtil;
 import datawave.marking.MarkingFunctions;
 
 public class TermInfoAggregation implements Function<Collection<TermInfo>,DiscoveredThing> {

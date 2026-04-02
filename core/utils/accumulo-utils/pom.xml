@@ -68,11 +68,6 @@
             <version>1.0.0-java-11</version>
         </dependency>
         <dependency>
-            <groupId>org.apache.accumulo</groupId>
-            <artifactId>accumulo-access-examples</artifactId>
-            <version>1.0.0-java-11</version>
-        </dependency>
-        <dependency>
             <groupId>org.apache.commons</groupId>
             <artifactId>commons-collections4</artifactId>
         </dependency>

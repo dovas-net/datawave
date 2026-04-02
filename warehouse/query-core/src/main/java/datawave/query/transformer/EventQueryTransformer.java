@@ -14,9 +14,9 @@ import org.apache.accumulo.core.security.ColumnVisibility;
 
 import com.esotericsoftware.kryo.io.Input;
 
-import datawave.core.common.util.AccessExpressionUtil;
 import datawave.core.query.cachedresults.CacheableLogic;
 import datawave.core.query.logic.BaseQueryLogic;
+import datawave.marking.AccessExpressionUtil;
 import datawave.marking.MarkingFunctions;
 import datawave.marking.MarkingFunctions.Exception;
 import datawave.marking.Markings;

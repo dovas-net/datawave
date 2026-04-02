@@ -30,10 +30,10 @@ import org.apache.commons.collections4.iterators.TransformIterator;
 import org.apache.hadoop.io.Text;
 import org.apache.log4j.Logger;
 
-import datawave.core.common.util.AccessExpressionUtil;
 import datawave.core.query.configuration.GenericQueryConfiguration;
 import datawave.core.query.logic.QueryLogicTransformer;
 import datawave.data.type.Type;
+import datawave.marking.AccessExpressionUtil;
 import datawave.marking.MarkingFunctions;
 import datawave.microservice.query.Query;
 import datawave.query.Constants;

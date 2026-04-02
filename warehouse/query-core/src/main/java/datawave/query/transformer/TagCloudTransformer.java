@@ -13,8 +13,8 @@ import org.apache.accumulo.core.security.Authorizations;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import datawave.core.common.util.AccessExpressionUtil;
 import datawave.core.query.logic.BaseQueryLogicTransformer;
+import datawave.marking.AccessExpressionUtil;
 import datawave.marking.MarkingFunctions;
 import datawave.microservice.query.Query;
 import datawave.query.tables.keyword.KeywordQueryState;

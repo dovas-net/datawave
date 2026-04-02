@@ -2,7 +2,6 @@ package datawave.marking;
 
 import org.apache.accumulo.access.Access;
 import org.apache.accumulo.access.AccessExpression;
-import org.apache.accumulo.access.examples.ParseExamples;
 
 import com.fasterxml.jackson.annotation.JsonAutoDetect;
 import com.fasterxml.jackson.annotation.JsonCreator;
@@ -15,8 +14,8 @@ import lombok.Data;
 @Builder
 @JsonAutoDetect(getterVisibility = JsonAutoDetect.Visibility.NONE, isGetterVisibility = JsonAutoDetect.Visibility.NONE)
 public class AccessExpressionMarkings implements Markings<AccessExpression> {
+    public static final Access ACCESS = Access.builder().build();
 
-    private static final Access ACCESS = ParseExamples.ACCESS;
     public static final String COLUMN_VISIBILITY_KEY = "columnVisibility";
 
     private final AccessExpression accessExpression;

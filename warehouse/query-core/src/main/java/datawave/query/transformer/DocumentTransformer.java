@@ -11,12 +11,12 @@ import org.apache.log4j.Logger;
 
 import com.google.common.base.Preconditions;
 
-import datawave.core.common.util.AccessExpressionUtil;
 import datawave.core.query.exception.EmptyObjectException;
 import datawave.core.query.logic.BaseQueryLogic;
 import datawave.core.query.logic.Flushable;
 import datawave.core.query.logic.WritesQueryMetrics;
 import datawave.core.query.logic.WritesResultCardinalities;
+import datawave.marking.AccessExpressionUtil;
 import datawave.marking.MarkingFunctions;
 import datawave.marking.Markings;
 import datawave.microservice.query.Query;

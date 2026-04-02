@@ -9,8 +9,8 @@ import org.apache.accumulo.core.security.Authorizations;
 
 import com.google.protobuf.InvalidProtocolBufferException;
 
-import datawave.core.common.util.AccessExpressionUtil;
 import datawave.ingest.protobuf.TermWeight;
+import datawave.marking.AccessExpressionUtil;
 import datawave.marking.MarkingFunctions;
 import datawave.query.table.parser.EventKeyValueFactory.EventKeyValue;
 

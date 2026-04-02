@@ -44,8 +44,8 @@ import org.apache.lucene.util.fst.FST;
 
 import com.google.common.collect.Maps;
 
-import datawave.core.common.util.AccessExpressionUtil;
 import datawave.core.iterators.DatawaveFieldIndexListIteratorJexl;
+import datawave.marking.AccessExpressionUtil;
 import datawave.marking.MarkingFunctions;
 import datawave.marking.MarkingFunctionsFactory;
 import datawave.query.attributes.Attribute;

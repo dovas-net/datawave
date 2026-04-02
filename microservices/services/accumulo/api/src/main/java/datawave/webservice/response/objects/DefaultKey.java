@@ -2,8 +2,6 @@ package datawave.webservice.response.objects;
 
 import static java.nio.charset.StandardCharsets.UTF_8;
 
-import static org.apache.accumulo.access.examples.ParseExamples.ACCESS;
-
 import javax.xml.bind.annotation.XmlAccessType;
 import javax.xml.bind.annotation.XmlAccessorType;
 import javax.xml.bind.annotation.XmlElement;
@@ -115,7 +113,7 @@ public class DefaultKey extends KeyBase {
     public void setColumnVisibility(String colVis) {
         this.columnVisibility = (colVis == null) ? new TypedValue("") : new TypedValue(colVis);
         String expr = this.columnVisibility.getValue().toString();
-        this.markings = AccessExpressionMarkings.builder().accessExpression(ACCESS.newExpression(expr)).build();
+        this.markings = AccessExpressionMarkings.builder().accessExpression(AccessExpressionMarkings.ACCESS.newExpression(expr)).build();
     }
 
     public void setTimestamp(long timestamp) {

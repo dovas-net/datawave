@@ -28,7 +28,6 @@ import com.google.common.collect.HashMultimap;
 import com.google.common.collect.Multimap;
 
 import datawave.core.common.logging.ThreadConfigurableLogger;
-import datawave.core.common.util.AccessExpressionUtil;
 import datawave.data.normalizer.DateNormalizer;
 import datawave.ingest.data.RawRecordContainer;
 import datawave.ingest.data.Type;
@@ -40,6 +39,7 @@ import datawave.ingest.mapreduce.handler.shard.ShardIdFactory;
 import datawave.ingest.mapreduce.job.BulkIngestKey;
 import datawave.ingest.metadata.RawRecordMetadata;
 import datawave.ingest.table.aggregator.DateIndexDateAggregator;
+import datawave.marking.AccessExpressionUtil;
 
 /**
  * <p>

@@ -16,8 +16,8 @@ import org.slf4j.Logger;
 
 import com.google.common.base.Preconditions;
 
-import datawave.core.common.util.AccessExpressionUtil;
 import datawave.data.type.NumberType;
+import datawave.marking.AccessExpressionUtil;
 import datawave.marking.MarkingFunctions;
 import datawave.query.attributes.Document;
 import datawave.query.attributes.TypeAttribute;

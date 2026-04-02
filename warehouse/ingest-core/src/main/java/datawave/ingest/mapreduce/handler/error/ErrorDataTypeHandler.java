@@ -20,7 +20,6 @@ import org.apache.log4j.Logger;
 
 import com.google.common.collect.Multimap;
 
-import datawave.core.common.util.AccessExpressionUtil;
 import datawave.data.hash.UID;
 import datawave.data.hash.UIDBuilder;
 import datawave.ingest.config.IngestConfiguration;
@@ -37,6 +36,7 @@ import datawave.ingest.mapreduce.handler.ExtendedDataTypeHandler;
 import datawave.ingest.mapreduce.job.BulkIngestKey;
 import datawave.ingest.mapreduce.job.writer.ContextWriter;
 import datawave.ingest.metadata.RawRecordMetadata;
+import datawave.marking.AccessExpressionUtil;
 import datawave.marking.MarkingFunctions;
 import datawave.util.TextUtil;
 import datawave.util.time.DateHelper;

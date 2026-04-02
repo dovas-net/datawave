@@ -1,6 +1,6 @@
 package datawave.microservice.dictionary;
 
-import static org.apache.accumulo.access.examples.ParseExamples.ACCESS;
+import static datawave.marking.AccessExpressionMarkings.ACCESS;
 
 import java.util.Arrays;
 import java.util.Collection;

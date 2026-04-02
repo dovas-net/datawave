@@ -1,6 +1,6 @@
 package datawave.ingest.csv.mr.input;
 
-import static org.apache.accumulo.access.examples.ParseExamples.ACCESS;
+import static datawave.marking.AccessExpressionMarkings.ACCESS;
 
 import java.io.IOException;
 import java.util.Map;
@@ -18,7 +18,6 @@ import com.google.common.collect.ArrayListMultimap;
 import com.google.common.collect.HashMultimap;
 import com.google.common.collect.Multimap;
 
-import datawave.core.common.util.AccessExpressionUtil;
 import datawave.data.hash.UID;
 import datawave.ingest.config.IngestConfiguration;
 import datawave.ingest.config.IngestConfigurationFactory;
@@ -31,6 +30,7 @@ import datawave.ingest.input.reader.event.EventFixer;
 import datawave.ingest.metadata.id.MetadataIdParser;
 import datawave.ingest.validation.EventValidator;
 import datawave.marking.AccessExpressionMarkings;
+import datawave.marking.AccessExpressionUtil;
 
 public class CSVRecordReader extends CSVReaderBase implements EventFixer {
 

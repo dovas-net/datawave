@@ -1,7 +1,7 @@
 package datawave.microservice.querymetric;
 
+import static datawave.marking.AccessExpressionMarkings.ACCESS;
 import static datawave.webservice.query.exception.DatawaveErrorCode.NO_QUERY_RESULTS_FOUND;
-import static org.apache.accumulo.access.examples.ParseExamples.ACCESS;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;

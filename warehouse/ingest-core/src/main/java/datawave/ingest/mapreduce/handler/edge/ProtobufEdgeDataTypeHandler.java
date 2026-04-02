@@ -47,7 +47,6 @@ import com.google.common.hash.HashFunction;
 import com.google.common.hash.Hashing;
 import com.google.common.hash.PrimitiveSink;
 
-import datawave.core.common.util.AccessExpressionUtil;
 import datawave.data.normalizer.DateNormalizer;
 import datawave.edge.util.EdgeKey;
 import datawave.edge.util.EdgeKey.EDGE_FORMAT;
@@ -77,6 +76,7 @@ import datawave.ingest.mapreduce.job.writer.ContextWriter;
 import datawave.ingest.metadata.RawRecordMetadata;
 import datawave.ingest.table.config.LoadDateTableConfigHelper;
 import datawave.ingest.time.Now;
+import datawave.marking.AccessExpressionUtil;
 import datawave.marking.MarkingFunctions;
 import datawave.marking.Markings;
 import datawave.metadata.protobuf.EdgeMetadata;

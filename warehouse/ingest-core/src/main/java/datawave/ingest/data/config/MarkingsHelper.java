@@ -1,11 +1,11 @@
 package datawave.ingest.data.config;
 
+import static datawave.marking.AccessExpressionMarkings.ACCESS;
+
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Map.Entry;
 
-import org.apache.accumulo.access.Access;
-import org.apache.accumulo.access.examples.ParseExamples;
 import org.apache.hadoop.conf.Configuration;
 
 import datawave.ingest.data.Type;
@@ -54,8 +54,6 @@ public interface MarkingsHelper {
      * No-op helper for default AccessExpression implementation. Should only be used for testing purposes.
      */
     class NoOp implements MarkingsHelper {
-
-        private static final Access ACCESS = ParseExamples.ACCESS;
 
         private Map<String,Markings<?>> fieldMarkingMap = new HashMap<>();
         private Markings<?> defaultMarkings = null;
