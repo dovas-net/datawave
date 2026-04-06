@@ -2,6 +2,7 @@ package datawave.marking;
 
 import static datawave.marking.AccessExpressionMarkings.ACCESS;
 
+import java.nio.charset.StandardCharsets;
 import java.util.Collection;
 import java.util.HashSet;
 import java.util.Set;
@@ -9,6 +10,8 @@ import java.util.stream.Collectors;
 
 import org.apache.accumulo.access.AccessExpression;
 import org.apache.accumulo.access.ParsedAccessExpression;
+import org.apache.accumulo.core.security.Authorizations;
+import org.apache.accumulo.core.security.ColumnVisibility;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.context.support.ClassPathXmlApplicationContext;
@@ -22,7 +25,20 @@ import org.springframework.context.support.ClassPathXmlApplicationContext;
 
 public interface MarkingFunctions<T extends Markings<?>> {
 
+    ColumnVisibility combineVisibilities(Collection<ColumnVisibility> visibilities) throws MarkingFunctions.Exception;
+
     T combine(Collection<T> markings) throws MarkingFunctions.Exception;
+
+    ColumnVisibility translateToColumnVisibility(Markings<?> markings) throws MarkingFunctions.Exception;
+
+    Markings<?> translateFromColumnVisibility(ColumnVisibility columnVisibility) throws MarkingFunctions.Exception;
+
+    Markings<?> translateFromColumnVisibilityForAuths(ColumnVisibility columnVisibility, Collection<Authorizations> authorizations)
+                    throws MarkingFunctions.Exception;
+
+    Markings<?> translateFromColumnVisibilityForAuths(ColumnVisibility columnVisibility, Authorizations authorizations) throws MarkingFunctions.Exception;
+
+    byte[] flatten(ColumnVisibility vis);
 
     class Exception extends java.lang.Exception {
 
@@ -52,6 +68,11 @@ public interface MarkingFunctions<T extends Markings<?>> {
         private static final AccessExpressionMarkings EMPTY_MARKINGS = AccessExpressionMarkings.builder().accessExpression(ACCESS.newExpression("")).build();
 
         @Override
+        public ColumnVisibility combineVisibilities(Collection<ColumnVisibility> visibilities) {
+            throw new UnsupportedOperationException();
+        }
+
+        @Override
         public AccessExpressionMarkings combine(Collection<AccessExpressionMarkings> markings) {
 
             Set<AccessExpressionMarkings> uniqueMarkings = new HashSet<>(markings);
@@ -78,8 +99,34 @@ public interface MarkingFunctions<T extends Markings<?>> {
             // @formatter:on
 
             // normalize the Parsed Expression and then return a copy without the parse tree
-            // FIXME: Using a beta of the accumulo-access API so temporarily using the normalize function from the example code
             return AccessExpressionMarkings.builder().accessExpression(ACCESS.newExpression(AccessExpressionUtil.normalize(expression).expression)).build();
+        }
+
+        @Override
+        public ColumnVisibility translateToColumnVisibility(Markings<?> markings) {
+            AccessExpression accessExpression = AccessExpressionUtil.toAccessExpression(markings);
+            return AccessExpressionUtil.toColumnVisibility(AccessExpressionUtil.normalize(accessExpression));
+        }
+
+        @Override
+        public Markings<?> translateFromColumnVisibility(ColumnVisibility expression) {
+            AccessExpression accessExpression = ACCESS.newExpression(new String(expression.getExpression(), StandardCharsets.UTF_8));
+            return AccessExpressionMarkings.builder().accessExpression(AccessExpressionUtil.normalize(accessExpression)).build();
+        }
+
+        @Override
+        public Markings<?> translateFromColumnVisibilityForAuths(ColumnVisibility columnVisibility, Collection<Authorizations> authorizations) {
+            return translateFromColumnVisibility(columnVisibility);
+        }
+
+        @Override
+        public Markings<?> translateFromColumnVisibilityForAuths(ColumnVisibility columnVisibility, Authorizations authorizations) {
+            return translateFromColumnVisibility(columnVisibility);
+        }
+
+        @Override
+        public byte[] flatten(ColumnVisibility vis) {
+            return FlattenedVisibilityCache.flatten(vis);
         }
     }
 
