@@ -5,7 +5,7 @@ import java.util.Comparator;
 import java.util.Map;
 import java.util.Set;
 
-import org.apache.accumulo.access.AccessExpression;
+import datawave.marking.Markings;
 
 /**
  * Interface for pluggable utilities for generating tag clouds, includes mechanisms to partition keywords into separate tag clouds, combine or merge visibility
@@ -17,9 +17,9 @@ public interface TagCloudUtils {
      *
      * @param visibilities
      *            a set of valid visibility strings.
-     * @return a combined {@link AccessExpression}, or {@code null} if there are no visibilities
+     * @return a combined {@link Markings}, or {@code null} if there are no visibilities
      */
-    AccessExpression generateCombinedVisibility(Set<String> visibilities);
+    Markings<?> generateCombinedVisibility(Set<String> visibilities);
 
     /**
      * Aggregate metadata from multiple sources, combining multi-valued entries into a flattened string

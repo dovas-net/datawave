@@ -18,6 +18,9 @@ import org.apache.accumulo.access.AccessExpression;
 
 import com.google.gson.Gson;
 
+import datawave.marking.AccessExpressionMarkings;
+import datawave.marking.Markings;
+
 /** A tag cloud - a collection of tags that have a keyword, score, frequency and list of sources from which they originated */
 public class TagCloud {
 
@@ -42,9 +45,9 @@ public class TagCloud {
      * @param results
      *            the entries that belong in the tag cloud.
      */
-    protected TagCloud(Map<String,String> metadata, AccessExpression visibility, SortedSet<TagCloudEntry> results) {
+    protected TagCloud(Map<String,String> metadata, Markings<?> visibility, SortedSet<TagCloudEntry> results) {
         this.metadata = metadata;
-        this.visibility = (visibility != null) ? visibility.getExpression() : "";
+        this.visibility = (visibility != null) ? ((AccessExpressionMarkings) visibility).getMarkings().getExpression() : "";
         this.results = results;
     }
 
@@ -221,7 +224,7 @@ public class TagCloud {
                 final SortedSet<TagCloudEntry> results = new TreeSet<>(comparator);
                 results.addAll(e.getValue());
                 String partition = getPartition(e.getKey());
-                AccessExpression visibility = utils.generateCombinedVisibility(visibilities.get(partition));
+                Markings<?> visibility = utils.generateCombinedVisibility(visibilities.get(partition));
                 Map<String,String> tagCloudMetadata = utils.generateCombinedMetadata(this.metadata.get(partition));
                 tagClouds.add(new TagCloud(tagCloudMetadata, visibility, results));
             }

@@ -11,7 +11,6 @@ import java.util.Map.Entry;
 import java.util.Set;
 import java.util.stream.Collectors;
 
-import org.apache.accumulo.access.AccessExpression;
 import org.apache.commons.lang3.StringUtils;
 
 import datawave.marking.AccessExpressionUtil;
@@ -27,14 +26,14 @@ public class DefaultTagCloudUtils implements TagCloudUtils, Serializable {
     private static final String MULTI_VALUE_SEPARATOR = ",";
 
     @Override
-    public AccessExpression generateCombinedVisibility(Set<String> visibilities) {
+    public Markings<?> generateCombinedVisibility(Set<String> visibilities) {
         if (visibilities == null || visibilities.isEmpty()) {
             return null;
         }
         Set<Markings<?>> markings = visibilities.stream().map(v -> AccessExpressionUtil.toAccessExpressionMarkings(ACCESS.newExpression(v)))
                         .collect(Collectors.toSet());
         try {
-            return AccessExpressionUtil.toAccessExpression(AccessExpressionUtil.combine(new MarkingFunctions.Default(), markings));
+            return AccessExpressionUtil.combine(new MarkingFunctions.Default(), markings);
         } catch (MarkingFunctions.Exception e) {
             throw new IllegalArgumentException("Failed to combine visibilities", e);
         }
