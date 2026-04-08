@@ -21,10 +21,6 @@ public interface RawRecordContainer {
 
     void setSecurityMarkings(Markings<?> securityMarkings);
 
-    void addSecurityMarking(String domain, String marking);
-
-    boolean hasSecurityMarking(String domain, String marking);
-
     UID getId();
 
     void setId(UID id);

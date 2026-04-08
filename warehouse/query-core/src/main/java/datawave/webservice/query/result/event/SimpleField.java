@@ -136,10 +136,6 @@ public class SimpleField extends FieldBase<SimpleField> implements Serializable,
         this.name = name;
     }
 
-    private void assureMarkings() {
-        // no-op: markings are now Markings<?> and should be set externally
-    }
-
     @Override
     public Markings<?> getMarkings() {
         return this.markings;

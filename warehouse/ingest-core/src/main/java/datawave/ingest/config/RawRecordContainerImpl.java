@@ -101,25 +101,6 @@ public class RawRecordContainerImpl implements Writable, Configurable, RawRecord
         syncSecurityMarkingsToFields();
     }
 
-    @Override
-    public void addSecurityMarking(String domain, String marking) {
-        // Legacy map-based operation — treat marking as an access expression string
-        this.securityMarkings = AccessExpressionMarkings.builder().accessExpression(ACCESS.newExpression(marking)).build();
-        syncSecurityMarkingsToFields();
-    }
-
-    @Override
-    public boolean hasSecurityMarking(String domain, String marking) {
-        if (securityMarkings == null) {
-            return false;
-        }
-        Object m = securityMarkings.getMarkings();
-        if (m instanceof AccessExpression) {
-            return ((AccessExpression) m).getExpression().equals(marking);
-        }
-        return false;
-    }
-
     protected void syncSecurityMarkingsToFields() {
         if (securityMarkings != null) {
             Object m = securityMarkings.getMarkings();

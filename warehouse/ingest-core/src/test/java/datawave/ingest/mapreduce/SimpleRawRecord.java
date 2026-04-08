@@ -59,23 +59,6 @@ public class SimpleRawRecord implements RawRecordContainer, Writable {
     }
 
     @Override
-    public void addSecurityMarking(String domain, String marking) {
-        this.securityMarkings = AccessExpressionMarkings.builder().accessExpression(ACCESS.newExpression(marking)).build();
-    }
-
-    @Override
-    public boolean hasSecurityMarking(String domain, String marking) {
-        if (securityMarkings == null) {
-            return false;
-        }
-        Object m = securityMarkings.getMarkings();
-        if (m instanceof AccessExpression) {
-            return ((AccessExpression) m).getExpression().equals(marking);
-        }
-        return false;
-    }
-
-    @Override
     public UID getId() {
         return id;
     }
