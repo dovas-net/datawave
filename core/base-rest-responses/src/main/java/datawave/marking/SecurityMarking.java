@@ -10,7 +10,7 @@ public interface SecurityMarking extends ParameterValidator {
 
     String toAccessExpressionString();
 
-    Markings<AccessExpression> toMarkings() throws MarkingFunctions.Exception;
+    Markings<?> toMarkings() throws MarkingFunctions.Exception;
 
     void clear();
 }

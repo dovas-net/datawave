@@ -54,7 +54,7 @@ public class ColumnVisibilitySecurityMarking implements SecurityMarking {
     }
 
     @Override
-    public Markings<AccessExpression> toMarkings() {
+    public Markings<?> toMarkings() {
         return AccessExpressionMarkings.builder().accessExpression(toAccessExpression()).build();
     }
 
