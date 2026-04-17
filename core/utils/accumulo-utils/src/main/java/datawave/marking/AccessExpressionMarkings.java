@@ -2,6 +2,7 @@ package datawave.marking;
 
 import org.apache.accumulo.access.Access;
 import org.apache.accumulo.access.AccessExpression;
+import org.apache.accumulo.core.security.ColumnVisibility;
 
 import com.fasterxml.jackson.annotation.JsonAutoDetect;
 import com.fasterxml.jackson.annotation.JsonCreator;
@@ -23,6 +24,16 @@ public class AccessExpressionMarkings implements Markings<AccessExpression> {
     @Override
     public AccessExpression getMarkings() {
         return getAccessExpression();
+    }
+
+    @Override
+    public AccessExpression toAccessExpression() {
+        return accessExpression;
+    }
+
+    @Override
+    public ColumnVisibility toColumnVisibility() {
+        return AccessExpressionUtil.toColumnVisibility(AccessExpressionUtil.normalize(accessExpression));
     }
 
     @Override

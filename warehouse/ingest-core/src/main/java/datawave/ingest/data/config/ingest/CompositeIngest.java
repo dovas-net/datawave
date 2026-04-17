@@ -1,7 +1,5 @@
 package datawave.ingest.data.config.ingest;
 
-import static datawave.marking.AccessExpressionUtil.mergeMarkings;
-
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
@@ -31,6 +29,7 @@ import datawave.ingest.data.Type;
 import datawave.ingest.data.config.GroupedNormalizedContentInterface;
 import datawave.ingest.data.config.NormalizedContentInterface;
 import datawave.ingest.data.config.NormalizedFieldAndValue;
+import datawave.marking.AccessExpressionUtil;
 import datawave.marking.MarkingFunctions;
 import datawave.marking.Markings;
 
@@ -386,7 +385,8 @@ public interface CompositeIngest {
                                 if (pos + 1 < fields.length) {
                                     addCompositeFields(compositeFields, eventFields, compositeFieldName.replace("*", replacement), replacement,
                                                     (grouping == null ? newGrouping : grouping), groupingPolicy, allowMissing, fields, pos + 1, originalValue,
-                                                    normalizedValue, mergeMarkings(markingFunctions, markings, value.getMarkings()), isOverloadedField);
+                                                    normalizedValue, AccessExpressionUtil.mergeMarkings(markingFunctions, markings, value.getMarkings()),
+                                                    isOverloadedField);
                                 }
                                 originalValue.setLength(oLen);
                                 normalizedValue.setLength(nLen);
@@ -418,7 +418,7 @@ public interface CompositeIngest {
                         }
                         addCompositeFields(compositeFields, eventFields, compositeFieldName, replacement, (grouping == null ? newGrouping : grouping),
                                         groupingPolicy, allowMissing, fields, pos + 1, originalValue, normalizedValue,
-                                        mergeMarkings(markingFunctions, markings, value.getMarkings()), isOverloadedField);
+                                        AccessExpressionUtil.mergeMarkings(markingFunctions, markings, value.getMarkings()), isOverloadedField);
                         originalValue.setLength(oLen);
                         normalizedValue.setLength(nLen);
                     }

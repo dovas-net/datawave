@@ -102,8 +102,7 @@ public class EventQueryTransformer extends EventQueryTransformerSupport<Entry<Ke
                 if (getContentFieldNames().contains(fieldName)) {
                     value = baseUid;
                 }
-                values.add(this.makeField(fieldName, fieldMarkings, AccessExpressionUtil.toAccessExpression(fieldMarkings).getExpression(),
-                                entry.getKey().getTimestamp(), value));
+                values.add(this.makeField(fieldName, fieldMarkings, fieldMarkings.toAccessExpression().getExpression(), entry.getKey().getTimestamp(), value));
             }
         }
 

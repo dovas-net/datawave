@@ -124,7 +124,7 @@ public class MetadataDescriptionsHelper<DESC extends DescriptionBase<DESC>> {
             bw = accumuloClient.createBatchWriter(metadataTableName, bwConfig);
             Mutation m = new Mutation(entry.getFieldName());
             for (DescriptionBase desc : descs) {
-                ColumnVisibility cv = AccessExpressionUtil.toColumnVisibility(AccessExpressionUtil.toAccessExpression(desc.getMarkings()));
+                ColumnVisibility cv = desc.getMarkings().toColumnVisibility();
                 m.put(ColumnFamilyConstants.COLF_DESC, new Text(entry.getDatatype()), cv, new Value(desc.getDescription().getBytes(UTF_8)));
             }
             bw.addMutation(m);
@@ -157,7 +157,7 @@ public class MetadataDescriptionsHelper<DESC extends DescriptionBase<DESC>> {
             BatchWriterConfig bwConfig = new BatchWriterConfig().setMaxMemory(10000L).setMaxLatency(100L, TimeUnit.MILLISECONDS).setMaxWriteThreads(1);
             bw = accumuloClient.createBatchWriter(metadataTableName, bwConfig);
             Mutation m = new Mutation(entry.getFieldName());
-            ColumnVisibility cv = AccessExpressionUtil.toColumnVisibility(AccessExpressionUtil.toAccessExpression(desc.getMarkings()));
+            ColumnVisibility cv = desc.getMarkings().toColumnVisibility();
             m.putDelete(ColumnFamilyConstants.COLF_DESC, new Text(entry.getDatatype()), cv);
             bw.addMutation(m);
         } finally {

@@ -661,7 +661,7 @@ public class MutableMetadataHandler extends ModificationServiceConfiguration {
             if (null == markings || markings.isEmpty())
                 throw new IllegalArgumentException("No security information specified. Security markings must be supplied");
 
-            viz = AccessExpressionUtil.toColumnVisibility(AccessExpressionUtil.toAccessExpression(markings));
+            viz = AccessExpressionUtil.toColumnVisibility(markings.toAccessExpression());
         }
 
         insert(writer, shardId, datatype, eventUid, viz, fieldName, fieldValue, ts, isIndexOnlyField, isIndexed, isReverseIndexed, dataTypes, false,

@@ -1,8 +1,6 @@
 package datawave.query.table.parser;
 
 import org.apache.accumulo.core.data.Key;
-import org.apache.accumulo.core.data.Value;
-import org.apache.accumulo.core.security.Authorizations;
 import org.apache.accumulo.core.security.ColumnVisibility;
 
 import datawave.marking.AccessExpressionUtil;
@@ -12,7 +10,7 @@ import datawave.query.Constants;
 
 public class EventKeyValueFactory {
 
-    public static EventKeyValue parse(Key key, Value value, Authorizations auths, MarkingFunctions<?> markingFunctions) throws MarkingFunctions.Exception {
+    public static EventKeyValue parse(Key key) throws MarkingFunctions.Exception {
 
         if (null == key)
             throw new IllegalArgumentException("Cannot pass null key to EventKeyValueFactory");

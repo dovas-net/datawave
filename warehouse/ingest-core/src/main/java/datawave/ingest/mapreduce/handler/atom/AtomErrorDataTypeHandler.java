@@ -29,7 +29,6 @@ import datawave.ingest.data.config.ingest.ErrorShardedIngestHelper;
 import datawave.ingest.mapreduce.handler.error.ErrorShardedDataTypeHandler;
 import datawave.ingest.mapreduce.job.BulkIngestKey;
 import datawave.ingest.mapreduce.job.writer.ContextWriter;
-import datawave.marking.AccessExpressionUtil;
 import datawave.marking.MarkingFunctions;
 import datawave.marking.Markings;
 
@@ -78,7 +77,7 @@ public class AtomErrorDataTypeHandler<KEYIN,KEYOUT,VALUEOUT> extends AtomDataTyp
         }
 
         mHelper = IngestConfigurationFactory.getIngestConfiguration().getMarkingsHelper(conf, record.getDataType());
-        defaultVisibility = AccessExpressionUtil.toAccessExpression(mHelper.getDefaultMarkings());
+        defaultVisibility = mHelper.getDefaultMarkings().toAccessExpression();
 
         // write out the event into a value before we muck with it
         DataOutputBuffer buffer = new DataOutputBuffer();
@@ -180,7 +179,7 @@ public class AtomErrorDataTypeHandler<KEYIN,KEYOUT,VALUEOUT> extends AtomDataTyp
     protected String getVisibilityColumnString(RawRecordContainer event, NormalizedContentInterface value) {
         Markings<?> markings = value.getMarkings();
         if (markings != null && !markings.isEmpty()) {
-            return AccessExpressionUtil.toAccessExpression(markings).getExpression();
+            return markings.toAccessExpression().getExpression();
         }
         ColumnVisibility vis = event.getVisibility();
         if (vis != null) {

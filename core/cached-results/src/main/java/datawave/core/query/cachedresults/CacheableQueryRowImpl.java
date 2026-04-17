@@ -61,7 +61,7 @@ public class CacheableQueryRowImpl extends CacheableQueryRow implements ObjectSi
         if (!this.markings.equals(markings)) {
             if (this.markings.isEmpty()) {
                 // validate the markings
-                AccessExpressionUtil.toAccessExpression(markings);
+                markings.toAccessExpression();
                 if (this.markings.isEmpty()) {
                     // markings were empty, so use the one passed in.
                     this.markings = markings;
@@ -275,7 +275,7 @@ public class CacheableQueryRowImpl extends CacheableQueryRow implements ObjectSi
 
     public void setMarkings(Markings<?> markings) {
         // validate the markings
-        AccessExpressionUtil.toAccessExpression(markings);
+        markings.toAccessExpression();
         this.markings = markings;
     }
 
@@ -301,7 +301,7 @@ public class CacheableQueryRowImpl extends CacheableQueryRow implements ObjectSi
             String v = columnColumnVisibilityMap.get(field);
             String mStr = "";
             if (m != null && !m.isEmpty()) {
-                mStr = AccessExpressionUtil.toAccessExpression(m).getExpression();
+                mStr = m.toAccessExpression().getExpression();
             }
             if (v == null) {
                 combinedMap.put(field, mStr);

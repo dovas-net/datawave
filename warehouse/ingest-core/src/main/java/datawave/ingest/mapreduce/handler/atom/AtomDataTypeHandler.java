@@ -261,7 +261,7 @@ public class AtomDataTypeHandler<KEYIN,KEYOUT,VALUEOUT> implements ExtendedDataT
     protected String getColumnQualifier(RawRecordContainer event, NormalizedContentInterface value) {
         Markings<?> markings = value.getMarkings();
         if (markings != null && !markings.isEmpty()) {
-            return AccessExpressionUtil.toAccessExpression(markings).getExpression();
+            return markings.toAccessExpression().getExpression();
         }
         return flatten(event.getVisibility());
     }

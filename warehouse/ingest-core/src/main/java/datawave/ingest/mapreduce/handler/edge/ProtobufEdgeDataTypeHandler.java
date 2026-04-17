@@ -1337,7 +1337,7 @@ public class ProtobufEdgeDataTypeHandler<KEYIN,KEYOUT,VALUEOUT> implements Exten
         if (null == markings || markings.isEmpty()) {
             return new Text(flatten(event.getVisibility()));
         } else {
-            AccessExpression ae = AccessExpressionUtil.normalize(AccessExpressionUtil.toAccessExpression(markings));
+            AccessExpression ae = AccessExpressionUtil.normalize(markings.toAccessExpression());
             return new Text(ae.getExpression().getBytes(UTF_8));
         }
     }

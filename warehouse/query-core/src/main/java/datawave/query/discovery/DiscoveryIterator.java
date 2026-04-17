@@ -163,10 +163,11 @@ public class DiscoveryIterator implements SortedKeyValueIterator<Key,Value> {
             } else {
                 // Otherwise, combine the visibilities, and return the aggregated result.
                 try {
-                    ColumnVisibility visibility = AccessExpressionUtil.toColumnVisibility(AccessExpressionUtil.combine(markingFunctions,
+                    ColumnVisibility visibility = AccessExpressionUtil.combine(markingFunctions,
                                     visibilities.stream()
                                                     .map(cv -> AccessExpressionUtil.toAccessExpressionMarkings(AccessExpressionUtil.toAccessExpression(cv)))
-                                                    .collect(Collectors.toSet())));
+                                                    .collect(Collectors.toSet()))
+                                    .toColumnVisibility();
                     MapWritable countsByVis = new MapWritable();
                     visibilityToCounts.forEach((key, value) -> countsByVis.put(new Text(key), new LongWritable(value)));
                     String normalizedVis = AccessExpressionUtil.normalize(AccessExpressionUtil.toAccessExpression(visibility)).getExpression();

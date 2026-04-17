@@ -104,7 +104,7 @@ public interface MarkingFunctions<T extends Markings<?>> {
 
         @Override
         public ColumnVisibility translateToColumnVisibility(Markings<?> markings) {
-            AccessExpression accessExpression = AccessExpressionUtil.toAccessExpression(markings);
+            AccessExpression accessExpression = markings.toAccessExpression();
             return AccessExpressionUtil.toColumnVisibility(AccessExpressionUtil.normalize(accessExpression));
         }
 

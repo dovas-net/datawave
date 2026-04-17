@@ -589,9 +589,9 @@ public class FieldIndexCountingIterator extends WrappingIterator implements Sort
         }
         ColumnVisibility cv;
         try {
-            cv = AccessExpressionUtil.toColumnVisibility(AccessExpressionUtil.combine(MarkingFunctions.Factory.createMarkingFunctions(),
-                            columnVisibilities.stream().map(c -> AccessExpressionUtil.toAccessExpressionMarkings(AccessExpressionUtil.toAccessExpression(c)))
-                                            .collect(Collectors.toSet())));
+            cv = AccessExpressionUtil.combine(MarkingFunctions.Factory.createMarkingFunctions(), columnVisibilities.stream()
+                            .map(c -> AccessExpressionUtil.toAccessExpressionMarkings(AccessExpressionUtil.toAccessExpression(c))).collect(Collectors.toSet()))
+                            .toColumnVisibility();
         } catch (MarkingFunctions.Exception e) {
             log.error("Could not combine visibilities: " + visibilitySet + "  " + e);
             return null;

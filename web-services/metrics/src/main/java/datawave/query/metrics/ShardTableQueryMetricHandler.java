@@ -75,7 +75,6 @@ import datawave.ingest.mapreduce.handler.shard.AbstractColumnBasedHandler;
 import datawave.ingest.mapreduce.job.BulkIngestKey;
 import datawave.ingest.mapreduce.job.writer.LiveContextWriter;
 import datawave.ingest.table.config.TableConfigHelper;
-import datawave.marking.AccessExpressionUtil;
 import datawave.marking.Markings;
 import datawave.microservice.query.Query;
 import datawave.microservice.query.QueryImpl;
@@ -284,7 +283,7 @@ public class ShardTableQueryMetricHandler extends BaseQueryMetricHandler<QueryMe
             event.setVisibility(new ColumnVisibility(DEFAULT_SECURITY_MARKING));
         } else {
             try {
-                event.setVisibility(AccessExpressionUtil.toColumnVisibility(markings));
+                event.setVisibility(markings.toColumnVisibility());
             } catch (Exception e) {
                 log.error(e.getMessage(), e);
                 event.setVisibility(new ColumnVisibility(DEFAULT_SECURITY_MARKING));

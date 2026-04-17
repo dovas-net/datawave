@@ -53,7 +53,6 @@ import com.hazelcast.core.HazelcastInstanceNotActiveException;
 import com.hazelcast.map.IMap;
 import com.hazelcast.spring.cache.HazelcastCacheManager;
 
-import datawave.marking.AccessExpressionUtil;
 import datawave.marking.MarkingFunctions;
 import datawave.microservice.authorization.user.DatawaveUserDetails;
 import datawave.microservice.querymetric.config.QueryMetricTransportType;
@@ -479,7 +478,7 @@ public class QueryMetricOperations {
 
     private boolean canViewMetric(DatawaveUserDetails currentUser, BaseQueryMetric metric) throws Exception {
         boolean userCanViewMetric = true;
-        ColumnVisibility columnVisibility = AccessExpressionUtil.toColumnVisibility(AccessExpressionUtil.toAccessExpression(metric.getMarkings()));
+        ColumnVisibility columnVisibility = metric.getMarkings().toColumnVisibility();
         for (DatawaveUser user : currentUser.getProxiedUsers()) {
             Authorizations authorizations = new Authorizations(user.getAuths().toArray(new String[0]));
             VisibilityEvaluator visibilityEvaluator = new VisibilityEvaluator(authorizations);

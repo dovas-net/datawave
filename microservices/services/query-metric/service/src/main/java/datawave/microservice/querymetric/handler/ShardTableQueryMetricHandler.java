@@ -369,7 +369,7 @@ public abstract class ShardTableQueryMetricHandler<T extends BaseQueryMetric> ex
         // get markings from metric, otherwise use the default markings
         Markings<?> markings = updatedQueryMetric.getMarkings();
         if (markings != null && !markings.isEmpty()) {
-            event.setVisibility(AccessExpressionUtil.toColumnVisibility(AccessExpressionUtil.toAccessExpression(markings)));
+            event.setVisibility(AccessExpressionUtil.toColumnVisibility(markings.toAccessExpression()));
         } else {
             event.setVisibility(this.queryMetricHandlerProperties.getDefaultMetricVisibility());
         }

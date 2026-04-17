@@ -1135,7 +1135,7 @@ public abstract class ShardedDataTypeHandler<KEYIN> extends StatsDEnabledDataTyp
     public byte[] getVisibility(RawRecordContainer event, NormalizedContentInterface value) {
         Markings<?> markings = value.getMarkings();
         if (markings != null && !markings.isEmpty()) {
-            return AccessExpressionUtil.toAccessExpression(markings).getExpression().getBytes(UTF_8);
+            return markings.toAccessExpression().getExpression().getBytes(UTF_8);
         }
         return flatten(event.getVisibility());
     }

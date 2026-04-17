@@ -293,8 +293,10 @@ public class ValueToAttributes implements Function<Entry<Key,String>,Iterable<En
         if (log.isDebugEnabled()) {
             log.debug("dataList is " + dataList);
         }
-        ColumnVisibility combinedColumnVisibility = AccessExpressionUtil.toColumnVisibility(AccessExpressionUtil.combine(this.markingFunctions,
-                        accessExpressions.stream().map(AccessExpressionUtil::toAccessExpressionMarkings).collect(Collectors.toList())));
+        ColumnVisibility combinedColumnVisibility = AccessExpressionUtil
+                        .combine(this.markingFunctions,
+                                        accessExpressions.stream().map(AccessExpressionUtil::toAccessExpressionMarkings).collect(Collectors.toList()))
+                        .toColumnVisibility();
         metadata = new Key(metadata.getRow(), metadata.getColumnFamily(), new Text(), combinedColumnVisibility, timestamp);
         if (dataList.size() == 1) {
             return this.attrFactory.create(compositeName, dataList.get(0), metadata, toKeep, true);

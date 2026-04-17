@@ -25,8 +25,24 @@ import org.apache.accumulo.core.security.ColumnVisibility;
 public final class AccessExpressionUtil {
 
     private static final AccessExpression EMPTY_EXPRESSION = ACCESS.newExpression("");
+    private static final ColumnVisibility EMPTY_VISIBILITY = new ColumnVisibility();
 
     private AccessExpressionUtil() {}
+
+    /**
+     * Convert an {@link AccessExpression} to a {@link ColumnVisibility}.
+     *
+     * @param ae
+     *            the access expression
+     * @return the equivalent column visibility
+     */
+    public static ColumnVisibility toColumnVisibility(AccessExpression ae) {
+        String expr = ae.getExpression();
+        if (expr.isEmpty()) {
+            return EMPTY_VISIBILITY;
+        }
+        return new ColumnVisibility(expr);
+    }
 
     /**
      * Convert a {@link ColumnVisibility} to an {@link AccessExpression}.
@@ -44,58 +60,17 @@ public final class AccessExpressionUtil {
     }
 
     /**
-     * Convert a {@link Markings} to an {@link AccessExpression}.
+     * Convert a visibility String to an {@link AccessExpression}.
      *
-     * @param markings
-     *            assumed to be of type AccessExpressionMarkings
-     * @return the embedded access expression
+     * @param visibility
+     *            the visibility String
+     * @return the equivalent access expression
      */
-    public static AccessExpression toAccessExpression(Markings<?> markings) {
-        return (AccessExpression) markings.getMarkings();
-    }
-
-    /**
-     * Convert a {@link AccessExpression} to an {@link AccessExpressionMarkings}.
-     *
-     * @param expression
-     *            The AccessExpression to embed in the wrapper class
-     * @return the wrapped access expression
-     */
-    public static AccessExpressionMarkings toAccessExpressionMarkings(AccessExpression expression) {
-        return AccessExpressionMarkings.builder().accessExpression(expression).build();
-    }
-
-    /**
-     * Convert an {@link Markings} to a {@link ColumnVisibility}.
-     *
-     * @param markings
-     *            the access expression
-     * @return the equivalent column visibility
-     */
-    public static ColumnVisibility toColumnVisibility(Markings<?> markings) {
-        if (markings instanceof AccessExpressionMarkings) {
-            return toColumnVisibility((AccessExpression) markings.getMarkings());
+    public static AccessExpression toAccessExpression(String visibility) {
+        if (visibility == null || visibility.isEmpty()) {
+            return EMPTY_EXPRESSION;
         }
-        String m = markings.toString();
-        if (m.isEmpty()) {
-            return new ColumnVisibility();
-        }
-        return new ColumnVisibility(m);
-    }
-
-    /**
-     * Convert an {@link AccessExpression} to a {@link ColumnVisibility}.
-     *
-     * @param ae
-     *            the access expression
-     * @return the equivalent column visibility
-     */
-    public static ColumnVisibility toColumnVisibility(AccessExpression ae) {
-        String expr = ae.getExpression();
-        if (expr.isEmpty()) {
-            return new ColumnVisibility();
-        }
-        return new ColumnVisibility(expr);
+        return ACCESS.newExpression(visibility);
     }
 
     /**
@@ -110,6 +85,17 @@ public final class AccessExpressionUtil {
             return EMPTY_EXPRESSION;
         }
         return ACCESS.newExpression(new String(visibilityBytes, UTF_8));
+    }
+
+    /**
+     * Convert a {@link AccessExpression} to an {@link AccessExpressionMarkings}.
+     *
+     * @param expression
+     *            The AccessExpression to embed in the wrapper class
+     * @return the wrapped access expression
+     */
+    public static AccessExpressionMarkings toAccessExpressionMarkings(AccessExpression expression) {
+        return AccessExpressionMarkings.builder().accessExpression(expression).build();
     }
 
     /**
@@ -156,8 +142,9 @@ public final class AccessExpressionUtil {
      *             if the markings cannot be combined
      */
     @SuppressWarnings({"unchecked", "rawtypes"})
-    public static Markings<?> combine(MarkingFunctions<?> markingFunctions, Collection<? extends Markings<?>> markings) throws MarkingFunctions.Exception {
-        return ((MarkingFunctions) markingFunctions).combine(markings);
+    public static AccessExpressionMarkings combine(MarkingFunctions<?> markingFunctions, Collection<? extends Markings<?>> markings)
+                    throws MarkingFunctions.Exception {
+        return ((MarkingFunctions.Default) markingFunctions).combine((Collection<AccessExpressionMarkings>) markings);
     }
 
     /**
@@ -169,26 +156,47 @@ public final class AccessExpressionUtil {
      *            different markings
      * @return the merged markings
      */
-    public static Markings<?> mergeMarkings(MarkingFunctions<?> markingFunctions, Markings<?> markings1, Markings<?> markings2) {
+    public static AccessExpressionMarkings mergeMarkings(MarkingFunctions.Default markingFunctions, AccessExpressionMarkings markings1,
+                    AccessExpressionMarkings markings2) {
         if (markings2 != null) {
             if (markings1 == null) {
                 markings1 = markings2;
             } else {
                 try {
-                    if (markings1 instanceof AccessExpressionMarkings && markings2 instanceof AccessExpressionMarkings) {
-                        AccessExpressionMarkings aem1 = (AccessExpressionMarkings) markings1;
-                        AccessExpressionMarkings aem2 = (AccessExpressionMarkings) markings2;
-                        return combine(markingFunctions, List.of(aem1, aem2));
-                    } else {
-                        throw new RuntimeException(
-                                        String.format("Unknown markings class %s or %s", markings1.getClass().getName(), markings1.getClass().getName()));
-                    }
+                    return combine(markingFunctions, List.of(markings1, markings2));
                 } catch (MarkingFunctions.Exception e) {
                     throw new RuntimeException("Unable to combine markings.", e);
                 }
             }
         }
         return markings1;
+    }
+
+    /**
+     * A helper routine to merge markings when merging fields of a NormalizedContentInterface
+     *
+     * @param markings1
+     *            markings
+     * @param markings2
+     *            different markings
+     * @return the merged markings
+     */
+    public static AccessExpressionMarkings mergeMarkings(MarkingFunctions<?> markingFunctions, Markings<?> markings1, Markings<?> markings2) {
+        if (markings2 != null) {
+            if (markings1 == null) {
+                markings1 = markings2;
+            } else {
+                if (markings1 instanceof AccessExpressionMarkings && markings2 instanceof AccessExpressionMarkings) {
+                    AccessExpressionMarkings aem1 = (AccessExpressionMarkings) markings1;
+                    AccessExpressionMarkings aem2 = (AccessExpressionMarkings) markings2;
+                    return mergeMarkings((MarkingFunctions.Default) markingFunctions, aem1, aem2);
+                } else {
+                    throw new RuntimeException(
+                                    String.format("Unknown markings class %s or %s", markings1.getClass().getName(), markings1.getClass().getName()));
+                }
+            }
+        }
+        return (AccessExpressionMarkings) markings1;
     }
 
     /**

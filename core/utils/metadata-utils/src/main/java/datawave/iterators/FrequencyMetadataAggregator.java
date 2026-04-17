@@ -586,9 +586,10 @@ public class FrequencyMetadataAggregator extends WrappingIterator implements Opt
     private ColumnVisibility combineAllVisibilities() {
         Set<ColumnVisibility> visibilities = visibilityToDateFrequencies.keySet();
         try {
-            return AccessExpressionUtil.toColumnVisibility(AccessExpressionUtil.combine(markingFunctions,
+            return AccessExpressionUtil.combine(markingFunctions,
                             visibilities.stream().map(cv -> AccessExpressionUtil.toAccessExpressionMarkings(AccessExpressionUtil.toAccessExpression(cv)))
-                                            .collect(Collectors.toSet())));
+                                            .collect(Collectors.toSet()))
+                            .toColumnVisibility();
         } catch (MarkingFunctions.Exception e) {
             log.error("Failed to combine visibilities " + visibilities);
             throw new IllegalArgumentException("Failed to combine visibilities " + visibilities, e);

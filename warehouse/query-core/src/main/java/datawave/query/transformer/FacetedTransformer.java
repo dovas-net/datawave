@@ -129,7 +129,7 @@ public class FacetedTransformer extends DocumentTransformerSupport<Entry<Key,Val
                     FieldCardinalityBase fc = this.responseObjectFactory.getFieldCardinality();
                     fc.setField(v.getFieldName());
                     fc.setMarkings(AccessExpressionUtil.toAccessExpressionMarkings(AccessExpressionUtil.toAccessExpression(attr.getColumnVisibility())));
-                    fc.setColumnVisibility(AccessExpressionUtil.normalize(AccessExpressionUtil.toAccessExpression(fc.getMarkings())).getExpression());
+                    fc.setColumnVisibility(AccessExpressionUtil.normalize(fc.getMarkings().toAccessExpression()).getExpression());
                     fc.setLower(v.getFloorValue());
                     fc.setUpper(v.getCeilingValue());
                     fc.setCardinality(v.getEstimate().cardinality());
