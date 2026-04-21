@@ -30,13 +30,9 @@ public class DefaultTagCloudUtils implements TagCloudUtils, Serializable {
         if (visibilities == null || visibilities.isEmpty()) {
             return null;
         }
-        Set<Markings<?>> markings = visibilities.stream().map(v -> AccessExpressionUtil.toAccessExpressionMarkings(ACCESS.newExpression(v)))
+        Collection<Markings<?>> markings = visibilities.stream().map(v -> AccessExpressionUtil.toAccessExpressionMarkings(ACCESS.newExpression(v)))
                         .collect(Collectors.toSet());
-        try {
-            return AccessExpressionUtil.combine(new MarkingFunctions.Default(), markings);
-        } catch (MarkingFunctions.Exception e) {
-            throw new IllegalArgumentException("Failed to combine visibilities", e);
-        }
+        return (new MarkingFunctions.Default()).combine(markings);
     }
 
     @Override

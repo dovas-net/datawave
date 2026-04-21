@@ -31,6 +31,7 @@ import org.apache.log4j.Logger;
 import com.google.common.base.Splitter;
 
 import datawave.iterator.ReducingIterator;
+import datawave.marking.AccessExpressionMarkings;
 import datawave.marking.AccessExpressionUtil;
 import datawave.marking.MarkingFunctions;
 import datawave.query.model.DateFrequencyMap;
@@ -56,7 +57,7 @@ public class FrequencyMetadataAggregator extends WrappingIterator implements Opt
 
     private static final Logger log = Logger.getLogger(FrequencyMetadataAggregator.class);
     private static final String NULL_BYTE = "\0";
-    private static final MarkingFunctions<?> markingFunctions = MarkingFunctions.Factory.createMarkingFunctions();
+    private static final MarkingFunctions<AccessExpressionMarkings> markingFunctions = new MarkingFunctions.Default();
 
     private boolean combineVisibilities;
     private String columnsOption;
@@ -586,13 +587,12 @@ public class FrequencyMetadataAggregator extends WrappingIterator implements Opt
     private ColumnVisibility combineAllVisibilities() {
         Set<ColumnVisibility> visibilities = visibilityToDateFrequencies.keySet();
         try {
-            return AccessExpressionUtil.combine(markingFunctions,
+            return markingFunctions.combine(
                             visibilities.stream().map(cv -> AccessExpressionUtil.toAccessExpressionMarkings(AccessExpressionUtil.toAccessExpression(cv)))
                                             .collect(Collectors.toSet()))
                             .toColumnVisibility();
         } catch (MarkingFunctions.Exception e) {
-            log.error("Failed to combine visibilities " + visibilities);
-            throw new IllegalArgumentException("Failed to combine visibilities " + visibilities, e);
+            throw new RuntimeException("Could not combine markings", e);
         }
     }
 

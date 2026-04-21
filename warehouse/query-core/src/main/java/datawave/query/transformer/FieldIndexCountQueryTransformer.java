@@ -141,7 +141,7 @@ public class FieldIndexCountQueryTransformer extends BaseQueryLogicTransformer<E
         response.setFields(variableFieldList);
         response.setEvents(eventList);
         response.setReturnedEvents((long) eventList.size());
-        return (BaseQueryResponse) response;
+        return response;
     }
 
     @Override

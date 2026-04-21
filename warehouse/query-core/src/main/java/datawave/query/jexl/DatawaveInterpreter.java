@@ -47,7 +47,6 @@ import com.google.common.collect.Maps;
 import datawave.core.iterators.DatawaveFieldIndexListIteratorJexl;
 import datawave.marking.AccessExpressionUtil;
 import datawave.marking.MarkingFunctions;
-import datawave.marking.MarkingFunctionsFactory;
 import datawave.query.attributes.Attribute;
 import datawave.query.attributes.Attributes;
 import datawave.query.attributes.ValueTuple;
@@ -470,15 +469,9 @@ public class DatawaveInterpreter extends Interpreter {
             }
         }
 
-        try {
-            cv = AccessExpressionUtil.combine(MarkingFunctionsFactory.createMarkingFunctions(), cvs.stream()
-                            .map(c -> AccessExpressionUtil.toAccessExpressionMarkings(AccessExpressionUtil.toAccessExpression(c))).collect(Collectors.toSet()))
-                            .toColumnVisibility();
-        } catch (MarkingFunctions.Exception e) {
-            log.error("Failed to combine column visibilities while generating HIT_TERM for phrase function for field [" + field + "]");
-            log.error("msg: ", e);
-            return;
-        }
+        cv = (new MarkingFunctions.Default()).combine(cvs.stream()
+                        .map(c -> AccessExpressionUtil.toAccessExpressionMarkings(AccessExpressionUtil.toAccessExpression(c))).collect(Collectors.toSet()))
+                        .toColumnVisibility();
         source.setColumnVisibility(cv);
 
         // create an Attributes<?> backed ValueTuple

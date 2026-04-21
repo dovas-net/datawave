@@ -110,11 +110,9 @@ public class TermInfoAggregation implements Function<Collection<TermInfo>,Discov
                 ColumnVisibility columnVisibility = null;
                 try {
 
-                    columnVisibility = AccessExpressionUtil.combine(MarkingFunctions.Factory.createMarkingFunctions(),
-                                    columnVisibilities.stream()
-                                                    .map(cv -> AccessExpressionUtil.toAccessExpressionMarkings(AccessExpressionUtil.toAccessExpression(cv)))
-                                                    .collect(Collectors.toSet()))
-                                    .toColumnVisibility();
+                    columnVisibility = (new MarkingFunctions.Default()).combine(columnVisibilities.stream()
+                                    .map(cv -> AccessExpressionUtil.toAccessExpressionMarkings(AccessExpressionUtil.toAccessExpression(cv)))
+                                    .collect(Collectors.toSet())).toColumnVisibility();
 
                 } catch (Exception e) {
                     log.warn("Invalid columnvisibility after combining!", e);

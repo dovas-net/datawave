@@ -478,13 +478,13 @@ public class FieldIndexCountQueryLogic extends ShardQueryLogic {
 
     public static class Tuple {
 
-        private final MarkingFunctions<?> tupleMarkingFunctions;
+        private final MarkingFunctions<?> markingFunctions;
         private long count = 0L;
         private long maxTimestamp = 0L;
         Set<Text> uniqueVisibilities = new HashSet<>();
 
         public Tuple(MarkingFunctions<?> markingFunctions) {
-            tupleMarkingFunctions = markingFunctions;
+            this.markingFunctions = markingFunctions;
         }
 
         public void aggregate(Key key, Value val) {
@@ -504,21 +504,14 @@ public class FieldIndexCountQueryLogic extends ShardQueryLogic {
         }
 
         public ColumnVisibility getColumnVisibility() {
-            try {
-                Set<ColumnVisibility> columnVisibilities = new HashSet<>();
-                for (Text t : this.uniqueVisibilities) {
-                    columnVisibilities.add(new ColumnVisibility(t));
-                }
-                return AccessExpressionUtil.combine(tupleMarkingFunctions,
-                                columnVisibilities.stream()
-                                                .map(c -> AccessExpressionUtil.toAccessExpressionMarkings(AccessExpressionUtil.toAccessExpression(c)))
-                                                .collect(Collectors.toList()))
-                                .toColumnVisibility();
-
-            } catch (MarkingFunctions.Exception e) {
-                logger.error("Could not create combined column visibility for the count", e);
-                return null;
+            Set<ColumnVisibility> columnVisibilities = new HashSet<>();
+            for (Text t : this.uniqueVisibilities) {
+                columnVisibilities.add(new ColumnVisibility(t));
             }
+            return (new MarkingFunctions.Default()).combine(columnVisibilities.stream()
+                            .map(c -> AccessExpressionUtil.toAccessExpressionMarkings(AccessExpressionUtil.toAccessExpression(c))).collect(Collectors.toList()))
+                            .toColumnVisibility();
+
         }
     }
 

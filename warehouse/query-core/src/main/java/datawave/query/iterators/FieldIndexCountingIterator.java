@@ -588,14 +588,9 @@ public class FieldIndexCountingIterator extends WrappingIterator implements Sort
             columnVisibilities.add(new ColumnVisibility(t));
         }
         ColumnVisibility cv;
-        try {
-            cv = AccessExpressionUtil.combine(MarkingFunctions.Factory.createMarkingFunctions(), columnVisibilities.stream()
-                            .map(c -> AccessExpressionUtil.toAccessExpressionMarkings(AccessExpressionUtil.toAccessExpression(c))).collect(Collectors.toSet()))
-                            .toColumnVisibility();
-        } catch (MarkingFunctions.Exception e) {
-            log.error("Could not combine visibilities: " + visibilitySet + "  " + e);
-            return null;
-        }
+        cv = (new MarkingFunctions.Default()).combine(columnVisibilities.stream()
+                        .map(c -> AccessExpressionUtil.toAccessExpressionMarkings(AccessExpressionUtil.toAccessExpression(c))).collect(Collectors.toSet()))
+                        .toColumnVisibility();
 
         return new Key(this.currentRow, new Text(this.currentFieldName), cq, new Text(cv.getExpression()), this.maxTimeStamp);
     }

@@ -19,7 +19,6 @@ import com.google.common.collect.Sets;
 
 import datawave.data.type.Type;
 import datawave.marking.AccessExpressionMarkings;
-import datawave.marking.AccessExpressionUtil;
 import datawave.marking.MarkingFunctions;
 import datawave.marking.Markings;
 import datawave.webservice.query.cachedresults.CacheableQueryRow;
@@ -69,7 +68,7 @@ public class CacheableQueryRowImpl extends CacheableQueryRow implements ObjectSi
             } else {
                 try {
                     // use combined marking as new markings
-                    this.markings = AccessExpressionUtil.combine(markingFunctions, List.of(this.markings, markings));
+                    this.markings = markingFunctions.combine(this.markings, markings);
                 } catch (MarkingFunctions.Exception e) {
                     LOGGER.error("Invalid markings {} skipping column {} = {}", markings, columnName, columnTypedValue, e);
                     return;
@@ -129,7 +128,7 @@ public class CacheableQueryRowImpl extends CacheableQueryRow implements ObjectSi
 
             if (!currMarkings.equals(markings)) {
                 try {
-                    Markings<?> combinedMarkings = AccessExpressionUtil.combine(markingFunctions, List.of(currMarkings, markings));
+                    Markings<?> combinedMarkings = markingFunctions.combine(currMarkings, markings);
 
                     // use combined marking as new markings
                     columnMarkingsMap.put(columnName, combinedMarkings);

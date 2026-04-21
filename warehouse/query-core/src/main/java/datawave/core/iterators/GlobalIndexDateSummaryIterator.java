@@ -258,11 +258,9 @@ public class GlobalIndexDateSummaryIterator implements SortedKeyValueIterator<Ke
                     Set<ColumnVisibility> columnVisibilities = this.columnVisibilitiesMap.get(datatype);
 
                     // Note that the access controls found in the combined ColumnVisibility will be pulled out appropriately here
-                    ColumnVisibility cv = AccessExpressionUtil.combine(MarkingFunctions.Factory.createMarkingFunctions(),
-                                    columnVisibilities.stream()
-                                                    .map(c -> AccessExpressionUtil.toAccessExpressionMarkings(AccessExpressionUtil.toAccessExpression(c)))
-                                                    .collect(Collectors.toSet()))
-                                    .toColumnVisibility();
+                    ColumnVisibility cv = (new MarkingFunctions.Default()).combine(columnVisibilities.stream()
+                                    .map(c -> AccessExpressionUtil.toAccessExpressionMarkings(AccessExpressionUtil.toAccessExpression(c)))
+                                    .collect(Collectors.toSet())).toColumnVisibility();
 
                     // Create a new Key compatible with the shardIndex key format
                     Key k = new Key(this.fieldValue, this.fieldName, this.date + '\0' + datatype, new String(cv.getExpression()));

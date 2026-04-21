@@ -6,8 +6,6 @@ import static datawave.marking.AccessExpressionMarkings.ACCESS;
 import static org.apache.accumulo.access.ParsedAccessExpression.ExpressionType.AND;
 import static org.apache.accumulo.access.ParsedAccessExpression.ExpressionType.AUTHORIZATION;
 
-import java.util.Collection;
-import java.util.List;
 import java.util.SortedSet;
 import java.util.TreeSet;
 
@@ -130,76 +128,6 @@ public final class AccessExpressionUtil {
     }
 
     /**
-     * Helper to call {@link MarkingFunctions#combine(Collection)} with a wildcard-typed {@link MarkingFunctions}. This avoids the wildcard-capture issue that
-     * arises when callers hold a {@code MarkingFunctions<?>} reference.
-     *
-     * @param markingFunctions
-     *            the marking functions instance
-     * @param markings
-     *            the markings to combine
-     * @return the combined markings
-     * @throws MarkingFunctions.Exception
-     *             if the markings cannot be combined
-     */
-    @SuppressWarnings({"unchecked", "rawtypes"})
-    public static AccessExpressionMarkings combine(MarkingFunctions<?> markingFunctions, Collection<? extends Markings<?>> markings)
-                    throws MarkingFunctions.Exception {
-        return ((MarkingFunctions.Default) markingFunctions).combine((Collection<AccessExpressionMarkings>) markings);
-    }
-
-    /**
-     * A helper routine to merge markings when merging fields of a NormalizedContentInterface
-     *
-     * @param markings1
-     *            markings
-     * @param markings2
-     *            different markings
-     * @return the merged markings
-     */
-    public static AccessExpressionMarkings mergeMarkings(MarkingFunctions.Default markingFunctions, AccessExpressionMarkings markings1,
-                    AccessExpressionMarkings markings2) {
-        if (markings2 != null) {
-            if (markings1 == null) {
-                markings1 = markings2;
-            } else {
-                try {
-                    return combine(markingFunctions, List.of(markings1, markings2));
-                } catch (MarkingFunctions.Exception e) {
-                    throw new RuntimeException("Unable to combine markings.", e);
-                }
-            }
-        }
-        return markings1;
-    }
-
-    /**
-     * A helper routine to merge markings when merging fields of a NormalizedContentInterface
-     *
-     * @param markings1
-     *            markings
-     * @param markings2
-     *            different markings
-     * @return the merged markings
-     */
-    public static AccessExpressionMarkings mergeMarkings(MarkingFunctions<?> markingFunctions, Markings<?> markings1, Markings<?> markings2) {
-        if (markings2 != null) {
-            if (markings1 == null) {
-                markings1 = markings2;
-            } else {
-                if (markings1 instanceof AccessExpressionMarkings && markings2 instanceof AccessExpressionMarkings) {
-                    AccessExpressionMarkings aem1 = (AccessExpressionMarkings) markings1;
-                    AccessExpressionMarkings aem2 = (AccessExpressionMarkings) markings2;
-                    return mergeMarkings((MarkingFunctions.Default) markingFunctions, aem1, aem2);
-                } else {
-                    throw new RuntimeException(
-                                    String.format("Unknown markings class %s or %s", markings1.getClass().getName(), markings1.getClass().getName()));
-                }
-            }
-        }
-        return (AccessExpressionMarkings) markings1;
-    }
-
-    /**
      * As part of normalizing access expression this class is used to sort and dedupe sub-expressions in a tree set.
      */
     public static class NormalizedExpression implements Comparable<NormalizedExpression> {
@@ -257,7 +185,7 @@ public final class AccessExpressionUtil {
      * This method helps with the flattening aspect of normalization by recursing down as far as possible the parse tree in the case when the expression type is
      * the same. As long as the type is the same in the sub expression, keep using the same set.
      */
-    public static void flatten(ParsedAccessExpression.ExpressionType parentType, ParsedAccessExpression parsed,
+    private static void flatten(ParsedAccessExpression.ExpressionType parentType, ParsedAccessExpression parsed,
                     SortedSet<NormalizedExpression> normalizedExpressions) {
         if (parsed.getType() == parentType) {
             for (var child : parsed.getChildren()) {
@@ -304,25 +232,30 @@ public final class AccessExpressionUtil {
             if (normalizedChildren.size() == 1) {
                 return normalizedChildren.first();
             } else {
-                String operator = parsed.getType() == AND ? "&" : "|";
-                String sep = "";
-
-                StringBuilder builder = new StringBuilder();
-
-                for (var child : normalizedChildren) {
-                    builder.append(sep);
-                    if (child.type == AUTHORIZATION) {
-                        builder.append(child.expression);
-                    } else {
-                        builder.append("(");
-                        builder.append(child.expression);
-                        builder.append(")");
-                    }
-                    sep = operator;
-                }
+                StringBuilder builder = getStringBuilder(parsed, normalizedChildren);
 
                 return new NormalizedExpression(builder.toString(), parsed.getType());
             }
         }
+    }
+
+    private static StringBuilder getStringBuilder(ParsedAccessExpression parsed, TreeSet<NormalizedExpression> normalizedChildren) {
+        String operator = parsed.getType() == AND ? "&" : "|";
+        String sep = "";
+
+        StringBuilder builder = new StringBuilder();
+
+        for (var child : normalizedChildren) {
+            builder.append(sep);
+            if (child.type == AUTHORIZATION) {
+                builder.append(child.expression);
+            } else {
+                builder.append("(");
+                builder.append(child.expression);
+                builder.append(")");
+            }
+            sep = operator;
+        }
+        return builder;
     }
 }

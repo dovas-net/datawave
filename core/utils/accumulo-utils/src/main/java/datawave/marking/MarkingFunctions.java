@@ -5,6 +5,7 @@ import static datawave.marking.AccessExpressionMarkings.ACCESS;
 import java.nio.charset.StandardCharsets;
 import java.util.Collection;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Set;
 import java.util.stream.Collectors;
 
@@ -27,7 +28,9 @@ public interface MarkingFunctions<T extends Markings<?>> {
 
     ColumnVisibility combineVisibilities(Collection<ColumnVisibility> visibilities) throws MarkingFunctions.Exception;
 
-    T combine(Collection<T> markings) throws MarkingFunctions.Exception;
+    T combine(Collection<Markings<?>> markings) throws MarkingFunctions.Exception;
+
+    T combine(Markings<?> markings1, Markings<?> markings2) throws MarkingFunctions.Exception;
 
     ColumnVisibility translateToColumnVisibility(Markings<?> markings) throws MarkingFunctions.Exception;
 
@@ -73,9 +76,16 @@ public interface MarkingFunctions<T extends Markings<?>> {
         }
 
         @Override
-        public AccessExpressionMarkings combine(Collection<AccessExpressionMarkings> markings) {
+        public AccessExpressionMarkings combine(Collection<Markings<?>> markings) {
 
-            Set<AccessExpressionMarkings> uniqueMarkings = new HashSet<>(markings);
+            Set<AccessExpressionMarkings> uniqueMarkings = new HashSet<>();
+
+            for (Markings<?> marking : markings) {
+                if (!(marking instanceof AccessExpressionMarkings)) {
+                    throw new RuntimeException(String.format("Unknown markings class %s", marking.getClass().getName()));
+                }
+                uniqueMarkings.add((AccessExpressionMarkings) marking);
+            }
 
             if (uniqueMarkings.isEmpty()) {
                 return EMPTY_MARKINGS;
@@ -85,7 +95,7 @@ public interface MarkingFunctions<T extends Markings<?>> {
                 return uniqueMarkings.stream().findFirst().get();
             }
 
-            Set<AccessExpression> uniqueExpressions = markings.stream().map(AccessExpressionMarkings::getMarkings).collect(Collectors.toSet());
+            Set<AccessExpression> uniqueExpressions = uniqueMarkings.stream().map(AccessExpressionMarkings::getMarkings).collect(Collectors.toSet());
 
             // filter out any empty expressions and concatenate with '&'
             // @formatter:off
@@ -100,6 +110,25 @@ public interface MarkingFunctions<T extends Markings<?>> {
 
             // normalize the Parsed Expression and then return a copy without the parse tree
             return AccessExpressionMarkings.builder().accessExpression(ACCESS.newExpression(AccessExpressionUtil.normalize(expression).expression)).build();
+        }
+
+        @Override
+        public AccessExpressionMarkings combine(Markings<?> markings1, Markings<?> markings2) {
+            if (markings2 != null) {
+                if (markings1 == null) {
+                    markings1 = markings2;
+                } else {
+                    if (markings1 instanceof AccessExpressionMarkings && markings2 instanceof AccessExpressionMarkings) {
+                        AccessExpressionMarkings aem1 = (AccessExpressionMarkings) markings1;
+                        AccessExpressionMarkings aem2 = (AccessExpressionMarkings) markings2;
+                        return combine(List.of(aem1, aem2));
+                    } else {
+                        throw new RuntimeException(
+                                        String.format("Unknown markings class %s or %s", markings1.getClass().getName(), markings2.getClass().getName()));
+                    }
+                }
+            }
+            return markings1 == null ? EMPTY_MARKINGS : (AccessExpressionMarkings) markings1;
         }
 
         @Override

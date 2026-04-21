@@ -1,7 +1,5 @@
 package datawave.ingest.data.config.ingest;
 
-import static datawave.marking.AccessExpressionUtil.mergeMarkings;
-
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
@@ -578,10 +576,14 @@ public interface VirtualIngest {
                                 normalizedValue.append(endSeparator);
 
                                 // recurse for the next virtual field definition segment
-                                addVirtualFields(virtualFields, eventFields, groupings, virtualFieldName.replace("*", replacement), replacement,
-                                                (grouping == null ? newGrouping : grouping), groupingPolicy, allowMissing, fields, pos + 1,
-                                                this.defaultStartSeparator, this.defaultEndSeparator, originalValue, normalizedValue,
-                                                mergeMarkings(markingFunctions, markings, value.getMarkings()));
+                                try {
+                                    addVirtualFields(virtualFields, eventFields, groupings, virtualFieldName.replace("*", replacement), replacement,
+                                                    (grouping == null ? newGrouping : grouping), groupingPolicy, allowMissing, fields, pos + 1,
+                                                    this.defaultStartSeparator, this.defaultEndSeparator, originalValue, normalizedValue,
+                                                    markingFunctions.combine(markings, value.getMarkings()));
+                                } catch (MarkingFunctions.Exception e) {
+                                    throw new RuntimeException("Could not combine markings", e);
+                                }
 
                                 // reset the values to the original length
                                 originalValue.setLength(oLen);
@@ -617,9 +619,13 @@ public interface VirtualIngest {
                         normalizedValue.append(endSeparator);
 
                         // recurse on the next virtual field segment
-                        addVirtualFields(virtualFields, eventFields, groupings, virtualFieldName, replacement, (grouping == null ? newGrouping : grouping),
-                                        groupingPolicy, allowMissing, fields, pos + 1, this.defaultStartSeparator, this.defaultEndSeparator, originalValue,
-                                        normalizedValue, mergeMarkings(markingFunctions, markings, value.getMarkings()));
+                        try {
+                            addVirtualFields(virtualFields, eventFields, groupings, virtualFieldName, replacement, (grouping == null ? newGrouping : grouping),
+                                            groupingPolicy, allowMissing, fields, pos + 1, this.defaultStartSeparator, this.defaultEndSeparator, originalValue,
+                                            normalizedValue, markingFunctions.combine(markings, value.getMarkings()));
+                        } catch (MarkingFunctions.Exception e) {
+                            throw new RuntimeException("Could not combine markings", e);
+                        }
 
                         // reset the values to the original length
                         originalValue.setLength(oLen);

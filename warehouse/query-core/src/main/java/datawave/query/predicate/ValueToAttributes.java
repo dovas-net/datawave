@@ -48,7 +48,6 @@ public class ValueToAttributes implements Function<Entry<Key,String>,Iterable<En
 
     private Map<String,Multimap<String,String>> compositeToFieldMap;
     private Map<String,Map<String,String>> compositeFieldSeparatorsByType;
-    private final MarkingFunctions<?> markingFunctions;
     private final Multimap<String,Attribute<?>> componentFieldToValues = ArrayListMultimap.create();
 
     private final EventDataQueryFilter attrFilter;
@@ -93,7 +92,6 @@ public class ValueToAttributes implements Function<Entry<Key,String>,Iterable<En
     public ValueToAttributes(AttributeFactory attributeFactory, CompositeMetadata compositeMetadata, EventDataQueryFilter attrFilter,
                     MarkingFunctions<?> markingFunctions, boolean fromIndex) {
         this.attrFactory = attributeFactory;
-        this.markingFunctions = markingFunctions;
         this.attrFilter = attrFilter;
         if (compositeMetadata != null) {
             this.compositeToFieldMap = compositeMetadata.getCompositeFieldMapByType();
@@ -293,9 +291,8 @@ public class ValueToAttributes implements Function<Entry<Key,String>,Iterable<En
         if (log.isDebugEnabled()) {
             log.debug("dataList is " + dataList);
         }
-        ColumnVisibility combinedColumnVisibility = AccessExpressionUtil
-                        .combine(this.markingFunctions,
-                                        accessExpressions.stream().map(AccessExpressionUtil::toAccessExpressionMarkings).collect(Collectors.toList()))
+        ColumnVisibility combinedColumnVisibility = (new MarkingFunctions.Default())
+                        .combine(accessExpressions.stream().map(AccessExpressionUtil::toAccessExpressionMarkings).collect(Collectors.toList()))
                         .toColumnVisibility();
         metadata = new Key(metadata.getRow(), metadata.getColumnFamily(), new Text(), combinedColumnVisibility, timestamp);
         if (dataList.size() == 1) {

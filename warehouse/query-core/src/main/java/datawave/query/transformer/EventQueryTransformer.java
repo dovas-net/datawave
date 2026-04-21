@@ -16,9 +16,9 @@ import com.esotericsoftware.kryo.io.Input;
 
 import datawave.core.query.cachedresults.CacheableLogic;
 import datawave.core.query.logic.BaseQueryLogic;
+import datawave.marking.AccessExpressionMarkings;
 import datawave.marking.AccessExpressionUtil;
 import datawave.marking.MarkingFunctions;
-import datawave.marking.MarkingFunctions.Exception;
 import datawave.marking.Markings;
 import datawave.microservice.query.Query;
 import datawave.query.Constants;
@@ -84,7 +84,7 @@ public class EventQueryTransformer extends EventQueryTransformerSupport<Entry<Ke
 
         // Hold unique Markings and merge them at the end
         // for the overall event visibility.
-        Set<Markings<?>> markingsToMerge = new HashSet<>();
+        Collection<Markings<?>> markingsToMerge = new HashSet<>();
 
         for (Entry<String,Collection<FieldValue>> e : eventFields.asMap().entrySet()) {
             origFieldName = e.getKey();
@@ -95,7 +95,8 @@ public class EventQueryTransformer extends EventQueryTransformerSupport<Entry<Ke
             }
 
             for (FieldValue fv : e.getValue()) {
-                Markings<?> fieldMarkings = AccessExpressionUtil.toAccessExpressionMarkings(AccessExpressionUtil.toAccessExpression(fv.getVisibility()));
+                AccessExpressionMarkings fieldMarkings = AccessExpressionUtil
+                                .toAccessExpressionMarkings(AccessExpressionUtil.toAccessExpression(fv.getVisibility()));
                 markingsToMerge.add(fieldMarkings);
                 String value = new String(fv.getValue(), StandardCharsets.UTF_8);
                 // if this is a content field name, then replace the value with the uid
@@ -106,11 +107,7 @@ public class EventQueryTransformer extends EventQueryTransformerSupport<Entry<Ke
             }
         }
 
-        try {
-            event.setMarkings(AccessExpressionUtil.combine(this.markingFunctions, markingsToMerge));
-        } catch (Exception e1) {
-            throw new RuntimeException("could not combine markings");
-        }
+        event.setMarkings((new MarkingFunctions.Default()).combine(markingsToMerge));
         event.setFields(new ArrayList<>(values));
 
         Metadata metadata = new Metadata();

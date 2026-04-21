@@ -567,11 +567,9 @@ public class FieldIndexCountingIteratorPerVisibility extends WrappingIterator im
             ColumnVisibility cv = null;
             try {
                 // Calculate the columnVisibility for this key from the combiner.
-                cv = AccessExpressionUtil.combine(MarkingFunctions.Factory.createMarkingFunctions(),
-                                columnVisibilities.stream()
-                                                .map(c -> AccessExpressionUtil.toAccessExpressionMarkings(AccessExpressionUtil.toAccessExpression(c)))
-                                                .collect(Collectors.toSet()))
-                                .toColumnVisibility();
+                cv = (new MarkingFunctions.Default()).combine(columnVisibilities.stream()
+                                .map(c -> AccessExpressionUtil.toAccessExpressionMarkings(AccessExpressionUtil.toAccessExpression(c)))
+                                .collect(Collectors.toSet())).toColumnVisibility();
             } catch (Exception e) {
                 log.error("Could not create combined columnVisibility for the count", e);
                 return null;

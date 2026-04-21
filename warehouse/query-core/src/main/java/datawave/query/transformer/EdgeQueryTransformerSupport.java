@@ -18,7 +18,6 @@ import datawave.core.query.cachedresults.CacheableLogic;
 import datawave.core.query.logic.BaseQueryLogicTransformer;
 import datawave.edge.model.EdgeModelFields;
 import datawave.edge.util.EdgeValue;
-import datawave.marking.AccessExpressionUtil;
 import datawave.marking.MarkingFunctions;
 import datawave.marking.Markings;
 import datawave.microservice.query.Query;
@@ -108,7 +107,7 @@ public abstract class EdgeQueryTransformerSupport<I,O> extends BaseQueryLogicTra
                 response.addEdge(edge);
             }
 
-            response.setMarkings(AccessExpressionUtil.combine(this.markingFunctions, uniqueMarkings));
+            response.setMarkings(markingFunctions.combine(uniqueMarkings));
             return response;
         } catch (Exception ex) {
             throw new RuntimeException("could not handle markings in resultList ", ex);

@@ -29,7 +29,6 @@ import datawave.ingest.data.Type;
 import datawave.ingest.data.config.GroupedNormalizedContentInterface;
 import datawave.ingest.data.config.NormalizedContentInterface;
 import datawave.ingest.data.config.NormalizedFieldAndValue;
-import datawave.marking.AccessExpressionUtil;
 import datawave.marking.MarkingFunctions;
 import datawave.marking.Markings;
 
@@ -383,10 +382,14 @@ public interface CompositeIngest {
                                 normalizedValue.append(separator);
                                 normalizedValue.append(value.getIndexedFieldValue());
                                 if (pos + 1 < fields.length) {
-                                    addCompositeFields(compositeFields, eventFields, compositeFieldName.replace("*", replacement), replacement,
-                                                    (grouping == null ? newGrouping : grouping), groupingPolicy, allowMissing, fields, pos + 1, originalValue,
-                                                    normalizedValue, AccessExpressionUtil.mergeMarkings(markingFunctions, markings, value.getMarkings()),
-                                                    isOverloadedField);
+                                    try {
+                                        addCompositeFields(compositeFields, eventFields, compositeFieldName.replace("*", replacement), replacement,
+                                                        (grouping == null ? newGrouping : grouping), groupingPolicy, allowMissing, fields, pos + 1,
+                                                        originalValue, normalizedValue, markingFunctions.combine(markings, value.getMarkings()),
+                                                        isOverloadedField);
+                                    } catch (MarkingFunctions.Exception e) {
+                                        throw new RuntimeException("Could not combine markings", e);
+                                    }
                                 }
                                 originalValue.setLength(oLen);
                                 normalizedValue.setLength(nLen);
@@ -406,7 +409,7 @@ public interface CompositeIngest {
                                 continue;
                             }
                         }
-                        if (!isOverloadedField || (isOverloadedField && pos == 0)) {
+                        if (!isOverloadedField || pos == 0) {
                             originalValue.append(separator);
                             originalValue.append(value.getEventFieldValue());
                         }
@@ -416,9 +419,13 @@ public interface CompositeIngest {
                         } else {
                             normalizedValue.append(value.getIndexedFieldValue());
                         }
-                        addCompositeFields(compositeFields, eventFields, compositeFieldName, replacement, (grouping == null ? newGrouping : grouping),
-                                        groupingPolicy, allowMissing, fields, pos + 1, originalValue, normalizedValue,
-                                        AccessExpressionUtil.mergeMarkings(markingFunctions, markings, value.getMarkings()), isOverloadedField);
+                        try {
+                            addCompositeFields(compositeFields, eventFields, compositeFieldName, replacement, (grouping == null ? newGrouping : grouping),
+                                            groupingPolicy, allowMissing, fields, pos + 1, originalValue, normalizedValue,
+                                            markingFunctions.combine(markings, value.getMarkings()), isOverloadedField);
+                        } catch (MarkingFunctions.Exception e) {
+                            throw new RuntimeException("Could not combine markings", e);
+                        }
                         originalValue.setLength(oLen);
                         normalizedValue.setLength(nLen);
                     }

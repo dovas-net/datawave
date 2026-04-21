@@ -23,7 +23,7 @@ public abstract class AttributeBag<T extends Comparable<T>> extends Attribute<T>
 
     private static final long ONE_DAY_MS = 1000l * 60 * 60 * 24;
 
-    public MarkingFunctions getMarkingFunctions() {
+    public MarkingFunctions<?> getMarkingFunctions() {
         return MarkingFunctions.Factory.createMarkingFunctions();
     }
 
@@ -43,8 +43,8 @@ public abstract class AttributeBag<T extends Comparable<T>> extends Attribute<T>
         this.validMetadata = false;
     }
 
-    public boolean isValidMetadata() {
-        return (this.validMetadata && isMetadataSet());
+    public boolean isNotValidMetadata() {
+        return (!this.validMetadata || !isMetadataSet());
     }
 
     public abstract Collection<Attribute<? extends Comparable<?>>> getAttributes();
@@ -54,14 +54,14 @@ public abstract class AttributeBag<T extends Comparable<T>> extends Attribute<T>
     @Override
     public long getTimestamp() {
         // calling isMetadataSet first to update the metadata as needed
-        if (isValidMetadata() == false)
+        if (isNotValidMetadata())
             this.updateMetadata();
         return super.getTimestamp();
     }
 
     @Override
     public ColumnVisibility getColumnVisibility() {
-        if (isValidMetadata() == false)
+        if (isNotValidMetadata())
             this.updateMetadata();
         return super.getColumnVisibility();
     }
@@ -81,9 +81,8 @@ public abstract class AttributeBag<T extends Comparable<T>> extends Attribute<T>
     protected ColumnVisibility combineAndSetColumnVisibilities(Collection<Attribute<? extends Comparable<?>>> attributes) throws Exception {
         Collection<AccessExpression> accessExpressions = attributes.stream().map(attr -> AccessExpressionUtil.toAccessExpression(attr.getColumnVisibility()))
                         .collect(Collectors.toSet());
-        return AccessExpressionUtil
-                        .combine(MarkingFunctions.Factory.createMarkingFunctions(),
-                                        accessExpressions.stream().map(AccessExpressionUtil::toAccessExpressionMarkings).collect(Collectors.toList()))
+        return (new MarkingFunctions.Default())
+                        .combine(accessExpressions.stream().map(AccessExpressionUtil::toAccessExpressionMarkings).collect(Collectors.toList()))
                         .toColumnVisibility();
     }
 

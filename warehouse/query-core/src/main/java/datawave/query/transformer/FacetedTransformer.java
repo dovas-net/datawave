@@ -167,7 +167,7 @@ public class FacetedTransformer extends DocumentTransformerSupport<Entry<Key,Val
     @Override
     public BaseQueryResponse createResponse(List<Object> resultList) {
         FacetQueryResponseBase response = responseObjectFactory.getFacetQueryResponse();
-        Set<Markings<?>> combinedMarkings = new HashSet<>();
+        Collection<Markings<?>> combinedMarkings = new HashSet<>();
 
         for (Object result : resultList) {
             FacetsBase facet = (FacetsBase) result;
@@ -184,12 +184,7 @@ public class FacetedTransformer extends DocumentTransformerSupport<Entry<Key,Val
             }
         }
 
-        try {
-            response.setMarkings(AccessExpressionUtil.combine(this.markingFunctions, combinedMarkings));
-        } catch (MarkingFunctions.Exception e) {
-            log.warn(e);
-            // original ignored these exceptions
-        }
+        response.setMarkings((new MarkingFunctions.Default()).combine(combinedMarkings));
 
         return response;
     }

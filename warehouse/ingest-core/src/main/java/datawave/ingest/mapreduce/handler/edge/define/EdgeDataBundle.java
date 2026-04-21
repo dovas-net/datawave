@@ -1,7 +1,5 @@
 package datawave.ingest.mapreduce.handler.edge.define;
 
-import static datawave.marking.AccessExpressionUtil.mergeMarkings;
-
 import java.io.IOException;
 import java.util.Calendar;
 import java.util.List;
@@ -96,7 +94,11 @@ public class EdgeDataBundle {
         // even though event, etc. references are saved above, passing in the event
         // prevents future bug
         this.initFieldMasking(helper, event);
-        this.markings = mergeMarkings(markingFunctions, getSource().getMarkings(), getSink().getMarkings());
+        try {
+            this.markings = markingFunctions.combine(getSource().getMarkings(), getSink().getMarkings());
+        } catch (MarkingFunctions.Exception e) {
+            throw new RuntimeException("Could not combine markings", e);
+        }
     }
 
     private int getHour(long time) {
