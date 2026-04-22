@@ -44,6 +44,7 @@ import org.junit.jupiter.api.TestMethodOrder;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import datawave.annotation.data.AnnotationUpdateException;
 import datawave.annotation.protobuf.v1.Annotation;
 import datawave.annotation.protobuf.v1.AnnotationSource;
 import datawave.annotation.protobuf.v1.Segment;
@@ -358,7 +359,7 @@ public class AnnotationDataAccessTest {
         try {
             dao.updateAnnotation(nonExistentId, sourceAnnotation);
             fail("Expected AnnotationUpdateException to be thrown");
-        } catch (datawave.annotation.data.AnnotationUpdateException e) {
+        } catch (AnnotationUpdateException e) {
             assertTrue(e.getMessage().contains("Unable to find annotation to update"));
         }
     }
@@ -397,15 +398,11 @@ public class AnnotationDataAccessTest {
         String uid = "nonexistent-uid-12345";
         String annotationId = "nonexistent-annotation-id";
 
-        // This should not throw an exception (delete handles empty iterator gracefully)
-        // Note: if delete returns null mutation, writer.addMutation is called with null which throws
         try {
             dao.delete(shard, dataType, uid, annotationId);
-            // If we get here, the delete handled empty results correctly
-        } catch (IllegalArgumentException e) {
-            // This is expected if mutationAdapter returns null and writer.addMutation is called with null
-            // The implementation should be fixed to check for null mutations
-            assertTrue(e.getMessage().contains("m is null"));
+            fail("Expected AnnotationUpdateException to be thrown");
+        } catch (AnnotationUpdateException e) {
+            assertTrue(e.getMessage().contains("Unable to find annotation to delete"));
         }
     }
 

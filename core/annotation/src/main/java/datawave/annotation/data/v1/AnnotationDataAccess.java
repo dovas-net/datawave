@@ -398,6 +398,10 @@ public class AnnotationDataAccess {
 
             Iterator<Map.Entry<Key,Value>> it = scanner.iterator(); // these contain the entries for which we need to generate delete mutations.
             Mutation m = AccumuloAnnotationUtil.mutationAdapter(it, true);
+            if (m == null || m.getUpdates().isEmpty()) {
+                throw new AnnotationUpdateException("Unable to find annotation to delete for document: " + shard + "/" + datatype + "/" + uid
+                                + " and annotation id: " + annotationId);
+            }
             writer.addMutation(m);
         } catch (TableNotFoundException | AnnotationSerializationException | MutationsRejectedException e) {
             throw new AnnotationUpdateException(
