@@ -1366,7 +1366,7 @@ public class ProtobufEdgeDataTypeHandler<KEYIN,KEYOUT,VALUEOUT> implements Exten
      * @return the flattened visibility
      */
     protected byte[] flatten(ColumnVisibility vis) {
-        return AccessExpressionUtil.normalize(AccessExpressionUtil.toAccessExpression(vis)).getExpression().getBytes(UTF_8);
+        return markingFunctions == null ? vis.flatten() : markingFunctions.flatten(vis);
     }
 
     @Override

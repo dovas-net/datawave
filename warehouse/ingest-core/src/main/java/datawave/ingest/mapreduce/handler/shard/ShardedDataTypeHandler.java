@@ -51,7 +51,6 @@ import datawave.ingest.table.config.LoadDateTableConfigHelper;
 import datawave.ingest.util.BloomFilterUtil;
 import datawave.ingest.util.BloomFilterWrapper;
 import datawave.ingest.util.DiskSpaceStarvationStrategy;
-import datawave.marking.AccessExpressionUtil;
 import datawave.marking.MarkingFunctions;
 import datawave.marking.Markings;
 import datawave.query.model.Direction;
@@ -1148,7 +1147,7 @@ public abstract class ShardedDataTypeHandler<KEYIN> extends StatsDEnabledDataTyp
      * @return the normalized visibility bytes
      */
     protected byte[] flatten(ColumnVisibility vis) {
-        return AccessExpressionUtil.normalize(AccessExpressionUtil.toAccessExpression(vis)).getExpression().getBytes(UTF_8);
+        return markingFunctions == null ? vis.flatten() : markingFunctions.flatten(vis);
     }
 
     /**

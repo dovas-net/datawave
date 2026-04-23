@@ -36,7 +36,6 @@ import datawave.ingest.mapreduce.handler.ExtendedDataTypeHandler;
 import datawave.ingest.mapreduce.job.BulkIngestKey;
 import datawave.ingest.mapreduce.job.writer.ContextWriter;
 import datawave.ingest.metadata.RawRecordMetadata;
-import datawave.marking.AccessExpressionUtil;
 import datawave.marking.MarkingFunctions;
 import datawave.util.TextUtil;
 import datawave.util.time.DateHelper;
@@ -335,7 +334,7 @@ public class ErrorDataTypeHandler<KEYIN,KEYOUT,VALUEOUT> implements ExtendedData
      * @return the normalized visibility bytes
      */
     protected byte[] flatten(ColumnVisibility vis) {
-        return AccessExpressionUtil.normalize(AccessExpressionUtil.toAccessExpression(vis)).getExpression().getBytes(UTF_8);
+        return markingFunctions == null ? vis.flatten() : markingFunctions.flatten(vis);
     }
 
     @Override

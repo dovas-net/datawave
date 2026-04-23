@@ -1,7 +1,5 @@
 package datawave.ingest.mapreduce.handler.facet;
 
-import static java.nio.charset.StandardCharsets.UTF_8;
-
 import java.io.IOException;
 import java.lang.reflect.InvocationTargetException;
 import java.util.ArrayList;
@@ -47,7 +45,6 @@ import datawave.ingest.mapreduce.handler.shard.ShardIdFactory;
 import datawave.ingest.mapreduce.job.BulkIngestKey;
 import datawave.ingest.mapreduce.job.writer.ContextWriter;
 import datawave.ingest.metadata.RawRecordMetadata;
-import datawave.marking.AccessExpressionUtil;
 import datawave.marking.MarkingFunctions;
 import datawave.util.time.DateHelper;
 
@@ -195,7 +192,7 @@ public class FacetHandler<KEYIN,KEYOUT,VALUEOUT> implements ExtendedDataTypeHand
     }
 
     protected byte[] flatten(ColumnVisibility vis) {
-        return AccessExpressionUtil.normalize(AccessExpressionUtil.toAccessExpression(vis)).getExpression().getBytes(UTF_8);
+        return markingFunctions == null ? vis.flatten() : markingFunctions.flatten(vis);
     }
 
     @Override
