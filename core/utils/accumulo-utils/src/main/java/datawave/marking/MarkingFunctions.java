@@ -68,8 +68,6 @@ public interface MarkingFunctions<T extends Markings<?>> {
 
     class Default implements MarkingFunctions<AccessExpressionMarkings> {
 
-        private static final AccessExpressionMarkings EMPTY_MARKINGS = AccessExpressionMarkings.builder().accessExpression(ACCESS.newExpression("")).build();
-
         @Override
         public ColumnVisibility combineVisibilities(Collection<ColumnVisibility> visibilities) {
             return AccessExpressionUtil.toColumnVisibility(combine(
@@ -91,7 +89,7 @@ public interface MarkingFunctions<T extends Markings<?>> {
             }
 
             if (uniqueMarkings.isEmpty()) {
-                return EMPTY_MARKINGS;
+                return null;
             }
 
             if (uniqueMarkings.size() == 1) {
@@ -131,7 +129,7 @@ public interface MarkingFunctions<T extends Markings<?>> {
                     }
                 }
             }
-            return markings1 == null ? EMPTY_MARKINGS : (AccessExpressionMarkings) markings1;
+            return markings1 == null ? null : (AccessExpressionMarkings) markings1;
         }
 
         @Override

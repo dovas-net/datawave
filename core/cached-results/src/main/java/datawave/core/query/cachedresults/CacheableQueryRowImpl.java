@@ -1,7 +1,5 @@
 package datawave.core.query.cachedresults;
 
-import static datawave.marking.AccessExpressionMarkings.ACCESS;
-
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
@@ -18,7 +16,6 @@ import org.slf4j.LoggerFactory;
 import com.google.common.collect.Sets;
 
 import datawave.data.type.Type;
-import datawave.marking.AccessExpressionMarkings;
 import datawave.marking.MarkingFunctions;
 import datawave.marking.Markings;
 import datawave.webservice.query.cachedresults.CacheableQueryRow;
@@ -28,7 +25,6 @@ import datawave.webservice.query.util.TypedValue;
 public class CacheableQueryRowImpl extends CacheableQueryRow implements ObjectSizeOf {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(CacheableQueryRowImpl.class);
-    private static final Markings<?> EMPTY_MARKINGS = AccessExpressionMarkings.builder().accessExpression(ACCESS.newExpression("")).build();
 
     private String user = null;
     private String queryId = null;
@@ -37,7 +33,7 @@ public class CacheableQueryRowImpl extends CacheableQueryRow implements ObjectSi
     private String eventId = null;
     private String row = null;
     private String colFam = null;
-    private Markings<?> markings = EMPTY_MARKINGS;
+    private Markings<?> markings = null;
     private Map<String,Markings<?>> columnMarkingsMap = new HashMap<>();
     private Map<String,String> columnColumnVisibilityMap = new HashMap<>();
     private Map<String,String> columnTypeMap = new HashMap<>();
@@ -183,8 +179,6 @@ public class CacheableQueryRowImpl extends CacheableQueryRow implements ObjectSi
             markings = this.columnMarkingsMap.get("_DEFAULT_");
         }
 
-        if (markings == null)
-            markings = EMPTY_MARKINGS;
         return markings;
     }
 
