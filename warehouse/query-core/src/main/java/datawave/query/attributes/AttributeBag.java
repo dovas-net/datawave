@@ -4,13 +4,11 @@ import java.io.Serializable;
 import java.util.Collection;
 import java.util.stream.Collectors;
 
-import org.apache.accumulo.access.AccessExpression;
 import org.apache.accumulo.core.data.Key;
 import org.apache.accumulo.core.security.ColumnVisibility;
 import org.apache.commons.lang.mutable.MutableLong;
 import org.apache.log4j.Logger;
 
-import datawave.marking.AccessExpressionUtil;
 import datawave.marking.MarkingFunctions;
 import datawave.marking.MarkingFunctions.Exception;
 
@@ -79,11 +77,8 @@ public abstract class AttributeBag<T extends Comparable<T>> extends Attribute<T>
     }
 
     protected ColumnVisibility combineAndSetColumnVisibilities(Collection<Attribute<? extends Comparable<?>>> attributes) throws Exception {
-        Collection<AccessExpression> accessExpressions = attributes.stream().map(attr -> AccessExpressionUtil.toAccessExpression(attr.getColumnVisibility()))
-                        .collect(Collectors.toSet());
-        return (new MarkingFunctions.Default())
-                        .combine(accessExpressions.stream().map(AccessExpressionUtil::toAccessExpressionMarkings).collect(Collectors.toList()))
-                        .toColumnVisibility();
+        Collection<ColumnVisibility> visibilities = attributes.stream().map(Attribute::getColumnVisibility).collect(Collectors.toList());
+        return (getMarkingFunctions()).combineVisibilities(visibilities);
     }
 
     private long updateTimestamps() {

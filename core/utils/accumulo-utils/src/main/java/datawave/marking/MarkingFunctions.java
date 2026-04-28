@@ -72,7 +72,10 @@ public interface MarkingFunctions<T extends Markings<?>> {
 
         @Override
         public ColumnVisibility combineVisibilities(Collection<ColumnVisibility> visibilities) {
-            throw new UnsupportedOperationException();
+            return AccessExpressionUtil.toColumnVisibility(combine(
+                            visibilities.stream().map(vis -> AccessExpressionUtil.toAccessExpressionMarkings(AccessExpressionUtil.toAccessExpression(vis)))
+                                            .collect(Collectors.toList()))
+                            .toAccessExpression());
         }
 
         @Override

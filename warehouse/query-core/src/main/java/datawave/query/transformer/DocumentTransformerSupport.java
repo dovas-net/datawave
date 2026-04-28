@@ -1,7 +1,5 @@
 package datawave.query.transformer;
 
-import static datawave.marking.AccessExpressionMarkings.ACCESS;
-
 import java.io.File;
 import java.io.IOException;
 import java.text.SimpleDateFormat;
@@ -30,7 +28,6 @@ import datawave.core.query.exception.EmptyObjectException;
 import datawave.core.query.logic.BaseQueryLogic;
 import datawave.core.query.logic.WritesQueryMetrics;
 import datawave.core.query.logic.WritesResultCardinalities;
-import datawave.marking.AccessExpressionMarkings;
 import datawave.marking.AccessExpressionUtil;
 import datawave.marking.MarkingFunctions;
 import datawave.marking.Markings;
@@ -73,7 +70,6 @@ public abstract class DocumentTransformerSupport<I,O> extends EventQueryTransfor
     protected Boolean reducedResponse;
 
     private static final Logger log = Logger.getLogger(DocumentTransformerSupport.class);
-    private static final Markings<?> EMPTY_MARKINGS = AccessExpressionMarkings.builder().accessExpression(ACCESS.newExpression("")).build();
 
     private long sourceCount = 0;
     private long nextCount = 0;
@@ -476,7 +472,7 @@ public abstract class DocumentTransformerSupport<I,O> extends EventQueryTransfor
                 }
             } else {
                 // noinspection RedundantCast
-                FieldBase<?> f = createField(fieldName, (Long) null, attr, EMPTY_MARKINGS, (String) null);
+                FieldBase<?> f = createField(fieldName, (Long) null, attr, null, (String) null);
                 myFields.add(f);
             }
         }
