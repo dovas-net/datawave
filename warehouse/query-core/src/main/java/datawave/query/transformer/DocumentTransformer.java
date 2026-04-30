@@ -16,7 +16,6 @@ import datawave.core.query.logic.BaseQueryLogic;
 import datawave.core.query.logic.Flushable;
 import datawave.core.query.logic.WritesQueryMetrics;
 import datawave.core.query.logic.WritesResultCardinalities;
-import datawave.marking.AccessExpressionUtil;
 import datawave.marking.MarkingFunctions;
 import datawave.marking.Markings;
 import datawave.microservice.query.Query;
@@ -166,7 +165,12 @@ public class DocumentTransformer extends DocumentTransformerSupport<Entry<Key,Va
     protected EventBase buildResponse(Document document, Key documentKey, ColumnVisibility eventCV, String colf, String row,
                     MarkingFunctions<?> markingFunctions) {
 
-        Markings<?> markings = AccessExpressionUtil.toAccessExpressionMarkings(AccessExpressionUtil.toAccessExpression(eventCV));
+        Markings<?> markings;
+        try {
+            markings = markingFunctions.translateFromColumnVisibility(eventCV);
+        } catch (MarkingFunctions.Exception e) {
+            throw new RuntimeException(e);
+        }
 
         EventBase event = null;
         final Collection<FieldBase<?>> documentFields = buildDocumentFields(documentKey, null, document, eventCV, markingFunctions);
