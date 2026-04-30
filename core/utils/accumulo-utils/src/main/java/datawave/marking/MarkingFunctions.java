@@ -75,7 +75,7 @@ public interface MarkingFunctions<T extends Markings<?>> {
                                             .collect(Collectors.toList()));
 
             if (null == accessExpressionMarkings) {
-                return null;
+                return new ColumnVisibility();
             }
 
             return AccessExpressionUtil.toColumnVisibility(accessExpressionMarkings.toAccessExpression());
