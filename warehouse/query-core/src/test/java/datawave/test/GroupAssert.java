@@ -5,7 +5,7 @@ import java.util.Arrays;
 import java.util.Collection;
 import java.util.Objects;
 
-import org.apache.accumulo.access.AccessExpression;
+import org.apache.accumulo.core.security.ColumnVisibility;
 import org.assertj.core.api.AbstractAssert;
 import org.assertj.core.api.Assertions;
 
@@ -34,20 +34,20 @@ public class GroupAssert extends AbstractAssert<GroupAssert,Group> {
         return this;
     }
 
-    public GroupAssert hasAccessExpressionsForKey(GroupingAttribute<?> key, AccessExpression... expressions) {
+    public GroupAssert hasVisibilitiesForKey(GroupingAttribute<?> key, ColumnVisibility... visibilities) {
         isNotNull();
-        Collection<AccessExpression> actualExpressions = actual.getAccessExpressionsForAttribute(key);
-        Assertions.assertThat(actualExpressions).isNotNull().withFailMessage("Expected access expressions for %s to contain exactly %s but was %s", key,
-                        Arrays.toString(expressions), actualExpressions).containsExactlyInAnyOrder(expressions);
+        Collection<ColumnVisibility> actualVisibilities = actual.getColumnVisibilitiesForAttribute(key);
+        Assertions.assertThat(actualVisibilities).isNotNull().withFailMessage("Expected access expressions for %s to contain exactly %s but was %s", key,
+                        Arrays.toString(visibilities), actualVisibilities).containsExactlyInAnyOrder(visibilities);
         return this;
     }
 
-    public GroupAssert hasDocumentExpressions(AccessExpression... expressions) {
+    public GroupAssert hasDocumentVisibilities(ColumnVisibility... visibilities) {
         isNotNull();
-        Collection<AccessExpression> actualExpressions = actual.getDocumentExpressions();
-        Assertions.assertThat(actualExpressions).isNotNull()
-                        .withFailMessage("Expected document expressions to contain exactly %s but was %s", Arrays.toString(expressions), actualExpressions)
-                        .containsExactlyInAnyOrder(expressions);
+        Collection<ColumnVisibility> actualVisibilities = actual.getDocumentVisibilities();
+        Assertions.assertThat(actualVisibilities).isNotNull()
+                        .withFailMessage("Expected document expressions to contain exactly %s but was %s", Arrays.toString(visibilities), actualVisibilities)
+                        .containsExactlyInAnyOrder(visibilities);
         return this;
     }
 

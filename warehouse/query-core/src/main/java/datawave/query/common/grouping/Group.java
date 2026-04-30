@@ -3,12 +3,16 @@ package datawave.query.common.grouping;
 import java.util.Collection;
 import java.util.HashSet;
 import java.util.Set;
+import java.util.stream.Collectors;
 
 import org.apache.accumulo.access.AccessExpression;
+import org.apache.accumulo.core.security.ColumnVisibility;
 import org.apache.commons.lang.builder.ToStringBuilder;
 
 import com.google.common.collect.HashMultimap;
 import com.google.common.collect.Multimap;
+
+import datawave.marking.AccessExpressionUtil;
 
 /**
  * Represents a grouping of values for fields specified via the #GROUP_BY functionality, with information about the total number of times the grouping was seen,
@@ -82,6 +86,17 @@ public class Group {
     }
 
     /**
+     * Return the set of visibilities seen for the given attribute.
+     *
+     * @param attribute
+     *            the attribute
+     * @return the access expressions converted to ColumnVisibilities seen for the given attribute
+     */
+    public Collection<ColumnVisibility> getColumnVisibilitiesForAttribute(GroupingAttribute<?> attribute) {
+        return attributeExpressions.get(attribute).stream().map(AccessExpressionUtil::toColumnVisibility).collect(Collectors.toSet());
+    }
+
+    /**
      * Return the set of access expressions seen for the given attribute.
      *
      * @param attribute
@@ -109,6 +124,15 @@ public class Group {
      */
     public Set<AccessExpression> getDocumentExpressions() {
         return documentExpressions;
+    }
+
+    /**
+     * Return the set of all distinct visibilities from documents that we have seen this group in.
+     *
+     * @return the document access expressions converted into ColumnVisibilities
+     */
+    public Set<ColumnVisibility> getDocumentVisibilities() {
+        return documentExpressions.stream().map(AccessExpressionUtil::toColumnVisibility).collect(Collectors.toSet());
     }
 
     /**

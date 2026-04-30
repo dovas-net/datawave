@@ -47,8 +47,7 @@ public class GroupingUtils {
      */
     public static ColumnVisibility combineVisibilities(Collection<AccessExpression> expressions, MarkingFunctions<?> markingFunctions, boolean failOnError) {
         try {
-            return markingFunctions.combine(expressions.stream().map(AccessExpressionUtil::toAccessExpressionMarkings).collect(Collectors.toList()))
-                            .toColumnVisibility();
+            return markingFunctions.combineVisibilities(expressions.stream().map(AccessExpressionUtil::toColumnVisibility).collect(Collectors.toList()));
         } catch (MarkingFunctions.Exception e) {
             if (failOnError) {
                 throw new IllegalArgumentException("Unable to combine access expressions: " + expressions, e);
