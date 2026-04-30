@@ -7,9 +7,7 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
-import java.util.stream.Collectors;
 
-import org.apache.accumulo.access.AccessExpression;
 import org.apache.accumulo.core.data.ByteSequence;
 import org.apache.accumulo.core.data.Key;
 import org.apache.accumulo.core.security.ColumnVisibility;
@@ -25,7 +23,6 @@ import com.google.common.collect.Multimaps;
 import datawave.data.type.OneToManyNormalizerType;
 import datawave.data.type.Type;
 import datawave.ingest.data.config.ingest.CompositeIngest;
-import datawave.marking.AccessExpressionUtil;
 import datawave.marking.MarkingFunctions;
 import datawave.marking.MarkingFunctions.Exception;
 import datawave.query.attributes.Attribute;
@@ -54,6 +51,7 @@ public class ValueToAttributes implements Function<Entry<Key,String>,Iterable<En
 
     // Whether the value is from the index
     private final boolean fromIndex;
+    private MarkingFunctions<?> markingFunctions;
 
     /**
      * Constructor that accepts raw components
@@ -226,7 +224,7 @@ public class ValueToAttributes implements Function<Entry<Key,String>,Iterable<En
     }
 
     public Attribute<?> joinAttributes(String compositeName, Collection<Attribute<?>> in, boolean isOverloadedComposite, String separator) throws Exception {
-        Collection<AccessExpression> accessExpressions = new HashSet<>();
+        Collection<ColumnVisibility> columnVisibilities = new HashSet<>();
         List<String> dataList = new ArrayList<>();
         long timestamp = 0;
         boolean toKeep = false;
@@ -261,7 +259,7 @@ public class ValueToAttributes implements Function<Entry<Key,String>,Iterable<En
                                     dataList.add(base + value);
                             }
                             timestamp = Math.max(timestamp, attrs.getTimestamp());
-                            accessExpressions.add(AccessExpressionUtil.toAccessExpression(attrs.getColumnVisibility()));
+                            columnVisibilities.add(attrs.getColumnVisibility());
                         }
                     }
                 }
@@ -285,16 +283,25 @@ public class ValueToAttributes implements Function<Entry<Key,String>,Iterable<En
                     }
                 }
                 timestamp = Math.max(timestamp, attr.getTimestamp());
-                accessExpressions.add(AccessExpressionUtil.toAccessExpression(attr.getColumnVisibility()));
+                columnVisibilities.add(attr.getColumnVisibility());
             }
         }
         if (log.isDebugEnabled()) {
             log.debug("dataList is " + dataList);
         }
-        ColumnVisibility combinedColumnVisibility = (new MarkingFunctions.Default())
-                        .combine(accessExpressions.stream().map(AccessExpressionUtil::toAccessExpressionMarkings).collect(Collectors.toList()))
-                        .toColumnVisibility();
-        metadata = new Key(metadata.getRow(), metadata.getColumnFamily(), new Text(), combinedColumnVisibility, timestamp);
+        ColumnVisibility columnVisibility;
+        try {
+            if (null == markingFunctions) {
+                markingFunctions = MarkingFunctions.Factory.createMarkingFunctions();
+            }
+            columnVisibility = markingFunctions.combineVisibilities(columnVisibilities);
+        } catch (java.lang.Exception e) {
+            log.warn("Invalid columnvisibility after combining!", e);
+            return null;
+        }
+
+        assert columnVisibility != null;
+        metadata = new Key(metadata.getRow(), metadata.getColumnFamily(), new Text(), columnVisibility, timestamp);
         if (dataList.size() == 1) {
             return this.attrFactory.create(compositeName, dataList.get(0), metadata, toKeep, true);
         } else {

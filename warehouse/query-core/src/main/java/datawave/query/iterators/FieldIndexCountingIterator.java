@@ -11,7 +11,6 @@ import java.util.Map;
 import java.util.Set;
 import java.util.TimeZone;
 import java.util.TreeSet;
-import java.util.stream.Collectors;
 
 import org.apache.accumulo.core.client.IteratorSetting;
 import org.apache.accumulo.core.data.ArrayByteSequence;
@@ -32,7 +31,6 @@ import org.apache.log4j.Logger;
 
 import datawave.core.common.util.TypeFilter;
 import datawave.iterators.IteratorSettingHelper;
-import datawave.marking.AccessExpressionUtil;
 import datawave.marking.MarkingFunctions;
 import datawave.query.Constants;
 import datawave.util.CompositeTimestamp;
@@ -93,6 +91,7 @@ public class FieldIndexCountingIterator extends WrappingIterator implements Sort
     public static final Text fi_PREFIX_TEXT = new Text("fi\u0000");
 
     private Set<Text> visibilitySet = new HashSet<>();
+    private MarkingFunctions<?> markingFunctions;
 
     // -------------------------------------------------------------------------
     // ------------- Constructors
@@ -587,12 +586,19 @@ public class FieldIndexCountingIterator extends WrappingIterator implements Sort
         for (Text t : this.visibilitySet) {
             columnVisibilities.add(new ColumnVisibility(t));
         }
-        ColumnVisibility cv;
-        cv = (new MarkingFunctions.Default()).combine(columnVisibilities.stream()
-                        .map(c -> AccessExpressionUtil.toAccessExpressionMarkings(AccessExpressionUtil.toAccessExpression(c))).collect(Collectors.toSet()))
-                        .toColumnVisibility();
+        ColumnVisibility columnVisibility;
+        try {
+            if (null == markingFunctions) {
+                markingFunctions = MarkingFunctions.Factory.createMarkingFunctions();
+            }
+            columnVisibility = markingFunctions.combineVisibilities(columnVisibilities);
+        } catch (Exception e) {
+            log.warn("Invalid columnvisibility after combining!", e);
+            return null;
+        }
 
-        return new Key(this.currentRow, new Text(this.currentFieldName), cq, new Text(cv.getExpression()), this.maxTimeStamp);
+        assert columnVisibility != null;
+        return new Key(this.currentRow, new Text(this.currentFieldName), cq, new Text(columnVisibility.getExpression()), this.maxTimeStamp);
     }
 
     /* TODO: make this a mutable long, also check wrap up current method */

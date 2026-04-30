@@ -5,7 +5,6 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Set;
-import java.util.stream.Collectors;
 
 import org.apache.accumulo.core.security.ColumnVisibility;
 import org.apache.hadoop.io.MapWritable;
@@ -26,6 +25,7 @@ public class TermInfoAggregation implements Function<Collection<TermInfo>,Discov
     private final boolean separateCountsByColumnVisibility;
     private boolean showReferenceCountInsteadOfTermCount = false;
     private boolean reverseIndex = false;
+    private MarkingFunctions<?> markingFunctions;
 
     public TermInfoAggregation() {
         this.separateCountsByColumnVisibility = false;
@@ -107,13 +107,12 @@ public class TermInfoAggregation implements Function<Collection<TermInfo>,Discov
                     log.trace("Did not aggregate any counts for [" + term + "][" + field + "][" + type + "][" + date + "]. Returning null.");
                 return null;
             } else {
-                ColumnVisibility columnVisibility = null;
+                ColumnVisibility columnVisibility;
                 try {
-
-                    columnVisibility = (new MarkingFunctions.Default()).combine(columnVisibilities.stream()
-                                    .map(cv -> AccessExpressionUtil.toAccessExpressionMarkings(AccessExpressionUtil.toAccessExpression(cv)))
-                                    .collect(Collectors.toSet())).toColumnVisibility();
-
+                    if (null == markingFunctions) {
+                        markingFunctions = MarkingFunctions.Factory.createMarkingFunctions();
+                    }
+                    columnVisibility = markingFunctions.combineVisibilities(columnVisibilities);
                 } catch (Exception e) {
                     log.warn("Invalid columnvisibility after combining!", e);
                     return null;
@@ -124,6 +123,7 @@ public class TermInfoAggregation implements Function<Collection<TermInfo>,Discov
                     countsByVis.put(new Text(entry.getKey()), new VLongWritable(entry.getValue()));
                 }
 
+                assert columnVisibility != null;
                 return new DiscoveredThing(term, field, type, date,
                                 AccessExpressionUtil.normalize(AccessExpressionUtil.toAccessExpression(columnVisibility)).getExpression(), count, countsByVis);
             }

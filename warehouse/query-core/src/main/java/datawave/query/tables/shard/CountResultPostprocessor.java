@@ -5,7 +5,6 @@ import static datawave.query.transformer.ShardQueryCountTableTransformer.COUNT_C
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;
-import java.util.stream.Collectors;
 
 import org.apache.accumulo.core.security.ColumnVisibility;
 import org.apache.log4j.Logger;
@@ -13,7 +12,6 @@ import org.apache.log4j.Logger;
 import com.google.common.collect.Sets;
 
 import datawave.core.query.logic.ResultPostprocessor;
-import datawave.marking.AccessExpressionUtil;
 import datawave.marking.MarkingFunctions;
 import datawave.webservice.query.result.event.EventBase;
 import datawave.webservice.query.result.event.FieldBase;
@@ -21,7 +19,7 @@ import datawave.webservice.query.result.event.FieldBase;
 public class CountResultPostprocessor implements ResultPostprocessor {
     private static final Logger log = Logger.getLogger(CountResultPostprocessor.class);
 
-    private final MarkingFunctions<?> markingFunctions;
+    private MarkingFunctions<?> markingFunctions;
 
     public CountResultPostprocessor(MarkingFunctions<?> markingFunctions) {
         this.markingFunctions = markingFunctions;
@@ -72,9 +70,10 @@ public class CountResultPostprocessor implements ResultPostprocessor {
             if (success) {
                 ColumnVisibility columnVisibility = null;
                 try {
-                    columnVisibility = (new MarkingFunctions.Default()).combine(columnVisibilities.stream()
-                                    .map(cv -> AccessExpressionUtil.toAccessExpressionMarkings(AccessExpressionUtil.toAccessExpression(cv)))
-                                    .collect(Collectors.toSet())).toColumnVisibility();
+                    if (null == markingFunctions) {
+                        markingFunctions = MarkingFunctions.Factory.createMarkingFunctions();
+                    }
+                    columnVisibility = markingFunctions.combineVisibilities(columnVisibilities);
                 } catch (Exception e) {
                     log.error("Could not create combined columnVisibilities for the count", e);
                 }

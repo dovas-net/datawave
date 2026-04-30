@@ -82,10 +82,6 @@ public class Document extends AttributeBag<Document> implements Serializable {
 
     private static final long ONE_DAY_MS = 1000L * 60 * 60 * 24;
 
-    public MarkingFunctions<?> getMarkingFunctions() {
-        return MarkingFunctions.Factory.createMarkingFunctions();
-    }
-
     public Markings<?> getMarkings() {
         return AccessExpressionUtil.toAccessExpressionMarkings(AccessExpressionUtil.toAccessExpression(getColumnVisibility()));
     }

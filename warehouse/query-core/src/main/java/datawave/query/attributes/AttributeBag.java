@@ -18,11 +18,15 @@ public abstract class AttributeBag<T extends Comparable<T>> extends Attribute<T>
     private static final Logger log = Logger.getLogger(AttributeBag.class);
     protected long shardTimestamp = Long.MAX_VALUE;
     protected boolean validMetadata = false;
+    private MarkingFunctions<?> markingFunctions;
 
     private static final long ONE_DAY_MS = 1000l * 60 * 60 * 24;
 
     public MarkingFunctions<?> getMarkingFunctions() {
-        return MarkingFunctions.Factory.createMarkingFunctions();
+        if (null == markingFunctions) {
+            markingFunctions = MarkingFunctions.Factory.createMarkingFunctions();
+        }
+        return markingFunctions;
     }
 
     protected AttributeBag() {
@@ -78,7 +82,8 @@ public abstract class AttributeBag<T extends Comparable<T>> extends Attribute<T>
 
     protected ColumnVisibility combineAndSetColumnVisibilities(Collection<Attribute<? extends Comparable<?>>> attributes) throws Exception {
         Collection<ColumnVisibility> visibilities = attributes.stream().map(Attribute::getColumnVisibility).collect(Collectors.toList());
-        return (getMarkingFunctions()).combineVisibilities(visibilities);
+        markingFunctions = getMarkingFunctions();
+        return markingFunctions.combineVisibilities(visibilities);
     }
 
     private long updateTimestamps() {

@@ -15,7 +15,6 @@ import java.util.Iterator;
 import java.util.Map;
 import java.util.Set;
 import java.util.SortedSet;
-import java.util.stream.Collectors;
 
 import org.apache.accumulo.core.data.Range;
 import org.apache.accumulo.core.security.ColumnVisibility;
@@ -45,7 +44,6 @@ import org.apache.lucene.util.fst.FST;
 import com.google.common.collect.Maps;
 
 import datawave.core.iterators.DatawaveFieldIndexListIteratorJexl;
-import datawave.marking.AccessExpressionUtil;
 import datawave.marking.MarkingFunctions;
 import datawave.query.attributes.Attribute;
 import datawave.query.attributes.Attributes;
@@ -72,6 +70,7 @@ import datawave.query.jexl.visitors.JexlStringBuildingVisitor;
 public class DatawaveInterpreter extends Interpreter {
 
     protected Map<String,Object> resultMap;
+    private MarkingFunctions<?> markingFunctions;
 
     private static final Logger log = Logger.getLogger(DatawaveInterpreter.class);
 
@@ -453,7 +452,7 @@ public class DatawaveInterpreter extends Interpreter {
     private void addHitsForFunction(String field, ASTFunctionNode node, HitListArithmetic hitListArithmetic) {
         ColumnVisibility cv;
         // aggregate individual hits for the content function
-        Collection<ColumnVisibility> cvs = new HashSet<>();
+        Collection<ColumnVisibility> columnVisibilities = new HashSet<>();
         Attributes source = new Attributes(true);
         ContentFunctionsDescriptor.ContentJexlArgumentDescriptor jexlArgDescriptor = new ContentFunctionsDescriptor().getArgumentDescriptor(node);
 
@@ -464,15 +463,25 @@ public class DatawaveInterpreter extends Interpreter {
                 if (values.contains(tuple.getNormalizedValue())) {
                     Attribute<?> attr = tuple.getSource();
                     source.add(attr);
-                    cvs.add(attr.getColumnVisibility());
+                    columnVisibilities.add(attr.getColumnVisibility());
                 }
             }
         }
 
-        cv = (new MarkingFunctions.Default()).combine(cvs.stream()
-                        .map(c -> AccessExpressionUtil.toAccessExpressionMarkings(AccessExpressionUtil.toAccessExpression(c))).collect(Collectors.toSet()))
-                        .toColumnVisibility();
-        source.setColumnVisibility(cv);
+        if (null == markingFunctions) {
+            markingFunctions = MarkingFunctions.Factory.createMarkingFunctions();
+        }
+        ColumnVisibility columnVisibility;
+        try {
+            columnVisibility = markingFunctions.combineVisibilities(columnVisibilities);
+        } catch (MarkingFunctions.Exception e) {
+            String message = "Could not create combined ColumnVisibility";
+            log.error(message, e);
+            throw new RuntimeException(message, e);
+        }
+
+        assert columnVisibility != null;
+        source.setColumnVisibility(columnVisibility);
 
         // create an Attributes<?> backed ValueTuple
         String phrase = jexlArgDescriptor.getHitTermValue();

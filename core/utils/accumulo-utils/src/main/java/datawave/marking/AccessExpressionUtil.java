@@ -35,6 +35,9 @@ public final class AccessExpressionUtil {
      * @return the equivalent column visibility
      */
     public static ColumnVisibility toColumnVisibility(AccessExpression ae) {
+        if (null == ae) {
+            return null;
+        }
         String expr = ae.getExpression();
         if (expr.isEmpty()) {
             return EMPTY_VISIBILITY;
@@ -50,6 +53,9 @@ public final class AccessExpressionUtil {
      * @return the equivalent access expression
      */
     public static AccessExpression toAccessExpression(ColumnVisibility cv) {
+        if (null == cv) {
+            return null;
+        }
         byte[] expr = cv.getExpression();
         if (expr.length == 0) {
             return EMPTY_EXPRESSION;

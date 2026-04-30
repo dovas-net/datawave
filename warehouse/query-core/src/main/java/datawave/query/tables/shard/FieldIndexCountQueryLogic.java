@@ -14,7 +14,6 @@ import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Set;
 import java.util.TreeSet;
-import java.util.stream.Collectors;
 
 import org.apache.accumulo.core.client.AccumuloClient;
 import org.apache.accumulo.core.client.BatchScanner;
@@ -33,7 +32,6 @@ import org.apache.log4j.Logger;
 import datawave.core.query.configuration.GenericQueryConfiguration;
 import datawave.core.query.logic.QueryLogicTransformer;
 import datawave.data.type.Type;
-import datawave.marking.AccessExpressionUtil;
 import datawave.marking.MarkingFunctions;
 import datawave.microservice.query.Query;
 import datawave.query.Constants;
@@ -478,7 +476,7 @@ public class FieldIndexCountQueryLogic extends ShardQueryLogic {
 
     public static class Tuple {
 
-        private final MarkingFunctions<?> markingFunctions;
+        private MarkingFunctions<?> markingFunctions;
         private long count = 0L;
         private long maxTimestamp = 0L;
         Set<Text> uniqueVisibilities = new HashSet<>();
@@ -508,9 +506,15 @@ public class FieldIndexCountQueryLogic extends ShardQueryLogic {
             for (Text t : this.uniqueVisibilities) {
                 columnVisibilities.add(new ColumnVisibility(t));
             }
-            return (new MarkingFunctions.Default()).combine(columnVisibilities.stream()
-                            .map(c -> AccessExpressionUtil.toAccessExpressionMarkings(AccessExpressionUtil.toAccessExpression(c))).collect(Collectors.toList()))
-                            .toColumnVisibility();
+            try {
+                if (null == markingFunctions) {
+                    markingFunctions = MarkingFunctions.Factory.createMarkingFunctions();
+                }
+                return markingFunctions.combineVisibilities(columnVisibilities);
+            } catch (Exception e) {
+                log.warn("Invalid columnvisibility after combining!", e);
+                return null;
+            }
 
         }
     }

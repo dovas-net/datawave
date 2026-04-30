@@ -7,7 +7,6 @@ import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.TimeUnit;
-import java.util.stream.Collectors;
 
 import org.apache.accumulo.core.client.BatchScanner;
 import org.apache.accumulo.core.data.ByteSequence;
@@ -32,7 +31,6 @@ import com.google.common.cache.Cache;
 import com.google.common.cache.CacheBuilder;
 import com.google.common.collect.Sets;
 
-import datawave.marking.AccessExpressionUtil;
 import datawave.marking.MarkingFunctions;
 
 /**
@@ -68,6 +66,7 @@ public class ResultCountingIterator extends WrappingIterator {
 
     private String threadName = null;
     protected Set<ColumnVisibility> columnVisibilities = Sets.newHashSet();
+    protected MarkingFunctions<?> markingFunctions;
 
     public ResultCountingIterator() {
         threadName = Thread.currentThread().getName();
@@ -208,13 +207,19 @@ public class ResultCountingIterator extends WrappingIterator {
 
         sw.start();
 
-        ColumnVisibility cv = null;
+        if (null == markingFunctions) {
+            markingFunctions = MarkingFunctions.Factory.createMarkingFunctions();
+        }
+        ColumnVisibility columnVisibility;
+        try {
+            columnVisibility = markingFunctions.combineVisibilities(columnVisibilities);
+        } catch (MarkingFunctions.Exception e) {
+            String message = "Could not create combined ColumnVisibility";
+            log.error(message, e);
+            throw new RuntimeException(message, e);
+        }
 
-        cv = (new MarkingFunctions.Default()).combine(columnVisibilities.stream()
-                        .map(c -> AccessExpressionUtil.toAccessExpressionMarkings(AccessExpressionUtil.toAccessExpression(c))).collect(Collectors.toSet()))
-                        .toColumnVisibility();
-
-        ResultCountTuple result = new ResultCountTuple(this.count, cv);
+        ResultCountTuple result = new ResultCountTuple(this.count, columnVisibility);
         ByteArrayOutputStream baos = new ByteArrayOutputStream();
         Output kryoOutput = new Output(baos);
         kryo.writeObject(kryoOutput, result);

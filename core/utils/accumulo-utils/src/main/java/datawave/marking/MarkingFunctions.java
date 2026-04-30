@@ -70,10 +70,15 @@ public interface MarkingFunctions<T extends Markings<?>> {
 
         @Override
         public ColumnVisibility combineVisibilities(Collection<ColumnVisibility> visibilities) {
-            return AccessExpressionUtil.toColumnVisibility(combine(
+            AccessExpressionMarkings accessExpressionMarkings = combine(
                             visibilities.stream().map(vis -> AccessExpressionUtil.toAccessExpressionMarkings(AccessExpressionUtil.toAccessExpression(vis)))
-                                            .collect(Collectors.toList()))
-                            .toAccessExpression());
+                                            .collect(Collectors.toList()));
+
+            if (null == accessExpressionMarkings) {
+                return null;
+            }
+
+            return AccessExpressionUtil.toColumnVisibility(accessExpressionMarkings.toAccessExpression());
         }
 
         @Override

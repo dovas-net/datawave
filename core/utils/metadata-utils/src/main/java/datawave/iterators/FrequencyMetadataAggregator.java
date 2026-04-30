@@ -10,7 +10,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.TreeMap;
-import java.util.stream.Collectors;
 
 import org.apache.accumulo.core.data.ByteSequence;
 import org.apache.accumulo.core.data.Key;
@@ -31,8 +30,6 @@ import org.apache.log4j.Logger;
 import com.google.common.base.Splitter;
 
 import datawave.iterator.ReducingIterator;
-import datawave.marking.AccessExpressionMarkings;
-import datawave.marking.AccessExpressionUtil;
 import datawave.marking.MarkingFunctions;
 import datawave.query.model.DateFrequencyMap;
 import datawave.util.StringUtils;
@@ -57,7 +54,7 @@ public class FrequencyMetadataAggregator extends WrappingIterator implements Opt
 
     private static final Logger log = Logger.getLogger(FrequencyMetadataAggregator.class);
     private static final String NULL_BYTE = "\0";
-    private static final MarkingFunctions<AccessExpressionMarkings> markingFunctions = new MarkingFunctions.Default();
+    private final MarkingFunctions<?> markingFunctions;
 
     private boolean combineVisibilities;
     private String columnsOption;
@@ -85,6 +82,7 @@ public class FrequencyMetadataAggregator extends WrappingIterator implements Opt
         cache = new TreeMap<>();
         visibilityToDateFrequencies = new HashMap<>();
         visibilityToMaxTimestamp = new HashMap<>();
+        markingFunctions = MarkingFunctions.Factory.createMarkingFunctions();
     }
 
     @Override
@@ -587,10 +585,7 @@ public class FrequencyMetadataAggregator extends WrappingIterator implements Opt
     private ColumnVisibility combineAllVisibilities() {
         Set<ColumnVisibility> visibilities = visibilityToDateFrequencies.keySet();
         try {
-            return markingFunctions.combine(
-                            visibilities.stream().map(cv -> AccessExpressionUtil.toAccessExpressionMarkings(AccessExpressionUtil.toAccessExpression(cv)))
-                                            .collect(Collectors.toSet()))
-                            .toColumnVisibility();
+            return markingFunctions.combineVisibilities(visibilities);
         } catch (MarkingFunctions.Exception e) {
             throw new RuntimeException("Could not combine markings", e);
         }

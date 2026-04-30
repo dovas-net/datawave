@@ -31,7 +31,6 @@ import com.google.common.collect.Multimap;
 import com.google.protobuf.InvalidProtocolBufferException;
 
 import datawave.ingest.protobuf.Uid;
-import datawave.marking.AccessExpressionMarkings;
 import datawave.marking.AccessExpressionUtil;
 import datawave.marking.MarkingFunctions;
 import datawave.query.Constants;
@@ -39,7 +38,6 @@ import datawave.query.Constants;
 public class DiscoveryIterator implements SortedKeyValueIterator<Key,Value> {
 
     private static final Logger log = Logger.getLogger(DiscoveryIterator.class);
-    private static final MarkingFunctions<AccessExpressionMarkings> markingFunctions = new MarkingFunctions.Default();
 
     private Key key;
     private Value value;
@@ -48,6 +46,7 @@ public class DiscoveryIterator implements SortedKeyValueIterator<Key,Value> {
     private boolean showReferenceCount = false;
     private boolean reverseIndex = false;
     private boolean sumCounts = false;
+    private MarkingFunctions<?> markingFunctions;
 
     @Override
     public DiscoveryIterator deepCopy(IteratorEnvironment env) {
@@ -164,9 +163,11 @@ public class DiscoveryIterator implements SortedKeyValueIterator<Key,Value> {
             } else {
                 // Otherwise, combine the visibilities, and return the aggregated result.
                 try {
-                    ColumnVisibility visibility = markingFunctions.combine(visibilities.stream()
-                                    .map(cv -> AccessExpressionUtil.toAccessExpressionMarkings(AccessExpressionUtil.toAccessExpression(cv)))
-                                    .collect(Collectors.toSet())).toColumnVisibility();
+                    if (null == markingFunctions) {
+                        markingFunctions = MarkingFunctions.Factory.createMarkingFunctions();
+                    }
+                    ColumnVisibility visibility = markingFunctions.combineVisibilities(visibilities);
+
                     MapWritable countsByVis = new MapWritable();
                     visibilityToCounts.forEach((key, value) -> countsByVis.put(new Text(key), new LongWritable(value)));
                     String normalizedVis = AccessExpressionUtil.normalize(AccessExpressionUtil.toAccessExpression(visibility)).getExpression();

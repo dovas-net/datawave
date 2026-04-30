@@ -8,7 +8,6 @@ import java.util.Map.Entry;
 import java.util.Set;
 import java.util.SortedMap;
 import java.util.TreeMap;
-import java.util.stream.Collectors;
 
 import org.apache.accumulo.core.data.ByteSequence;
 import org.apache.accumulo.core.data.Key;
@@ -28,7 +27,6 @@ import com.google.protobuf.InvalidProtocolBufferException;
 
 import datawave.ingest.protobuf.Uid;
 import datawave.ingest.protobuf.Uid.List.Builder;
-import datawave.marking.AccessExpressionUtil;
 import datawave.marking.MarkingFunctions;
 import datawave.query.Constants;
 
@@ -203,6 +201,7 @@ public class GlobalIndexDateSummaryIterator implements SortedKeyValueIterator<Ke
         private String date = null;
         private Map<String,MutableLong> summary = new HashMap<>();
         private Map<String,Set<ColumnVisibility>> columnVisibilitiesMap = Maps.newHashMap();
+        protected MarkingFunctions<?> markingFunctions;
 
         public TermInfoSummary(String fieldValue, String fieldName, String date) {
             this.fieldValue = fieldValue;
@@ -257,12 +256,14 @@ public class GlobalIndexDateSummaryIterator implements SortedKeyValueIterator<Ke
                     // Calculate the ColumnVisibility for this key from the combiner.
                     Set<ColumnVisibility> columnVisibilities = this.columnVisibilitiesMap.get(datatype);
 
+                    if (null == markingFunctions) {
+                        markingFunctions = MarkingFunctions.Factory.createMarkingFunctions();
+                    }
                     // Note that the access controls found in the combined ColumnVisibility will be pulled out appropriately here
-                    ColumnVisibility cv = (new MarkingFunctions.Default()).combine(columnVisibilities.stream()
-                                    .map(c -> AccessExpressionUtil.toAccessExpressionMarkings(AccessExpressionUtil.toAccessExpression(c)))
-                                    .collect(Collectors.toSet())).toColumnVisibility();
+                    ColumnVisibility cv = markingFunctions.combineVisibilities(columnVisibilities);
 
                     // Create a new Key compatible with the shardIndex key format
+                    assert cv != null;
                     Key k = new Key(this.fieldValue, this.fieldName, this.date + '\0' + datatype, new String(cv.getExpression()));
 
                     // Create a UID object with just the count for the Value

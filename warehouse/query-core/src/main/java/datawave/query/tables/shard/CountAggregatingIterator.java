@@ -13,7 +13,6 @@ import java.util.concurrent.Executors;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.atomic.AtomicLong;
-import java.util.stream.Collectors;
 
 import org.apache.accumulo.core.data.Key;
 import org.apache.accumulo.core.data.Value;
@@ -26,7 +25,6 @@ import com.esotericsoftware.kryo.Kryo;
 import com.esotericsoftware.kryo.io.Input;
 import com.google.common.collect.Maps;
 
-import datawave.marking.AccessExpressionUtil;
 import datawave.marking.MarkingFunctions;
 import datawave.webservice.query.result.event.DefaultEvent;
 
@@ -127,7 +125,7 @@ public class CountAggregatingIterator extends TransformIterator {
         private final Set<ColumnVisibility> columnVisibilities = new HashSet<>();
 
         private final Transformer transformer;
-        private final MarkingFunctions<?> markingFunctions;
+        private MarkingFunctions<?> markingFunctions;
 
         public CountEntryAggregator(Transformer transformer, MarkingFunctions<?> markingFunctions) {
             this.transformer = transformer;
@@ -154,9 +152,10 @@ public class CountAggregatingIterator extends TransformIterator {
 
         private ColumnVisibility getCombinedColumnVisibility() {
             try {
-                return (new MarkingFunctions.Default()).combine(columnVisibilities.stream()
-                                .map(c -> AccessExpressionUtil.toAccessExpressionMarkings(AccessExpressionUtil.toAccessExpression(c)))
-                                .collect(Collectors.toSet())).toColumnVisibility();
+                if (null == markingFunctions) {
+                    markingFunctions = MarkingFunctions.Factory.createMarkingFunctions();
+                }
+                return markingFunctions.combineVisibilities(columnVisibilities);
             } catch (Exception e) {
                 log.error("Could not combine columnVisibilities for the count", e);
                 return null;

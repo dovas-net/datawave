@@ -12,7 +12,6 @@ import java.util.Set;
 import java.util.TimeZone;
 import java.util.TreeMap;
 import java.util.TreeSet;
-import java.util.stream.Collectors;
 
 import org.apache.accumulo.core.client.IteratorSetting;
 import org.apache.accumulo.core.data.ArrayByteSequence;
@@ -35,7 +34,6 @@ import org.apache.log4j.Logger;
 import com.google.common.collect.Sets;
 
 import datawave.iterators.IteratorSettingHelper;
-import datawave.marking.AccessExpressionUtil;
 import datawave.marking.MarkingFunctions;
 import datawave.query.Constants;
 import datawave.util.CompositeTimestamp;
@@ -100,6 +98,7 @@ public class FieldIndexCountingIteratorPerVisibility extends WrappingIterator im
 
     private Set<ColumnVisibility> columnVisibilities = Sets.newHashSet();
     private TreeMap<Key,Value> keyCache = null;
+    private MarkingFunctions<?> markingFunctions;
 
     // -------------------------------------------------------------------------
     // ------------- Constructors
@@ -564,12 +563,13 @@ public class FieldIndexCountingIteratorPerVisibility extends WrappingIterator im
                 }
             }
 
-            ColumnVisibility cv = null;
+            ColumnVisibility cv;
             try {
+                if (null == markingFunctions) {
+                    markingFunctions = MarkingFunctions.Factory.createMarkingFunctions();
+                }
                 // Calculate the columnVisibility for this key from the combiner.
-                cv = (new MarkingFunctions.Default()).combine(columnVisibilities.stream()
-                                .map(c -> AccessExpressionUtil.toAccessExpressionMarkings(AccessExpressionUtil.toAccessExpression(c)))
-                                .collect(Collectors.toSet())).toColumnVisibility();
+                cv = markingFunctions.combineVisibilities(columnVisibilities);
             } catch (Exception e) {
                 log.error("Could not create combined columnVisibility for the count", e);
                 return null;
