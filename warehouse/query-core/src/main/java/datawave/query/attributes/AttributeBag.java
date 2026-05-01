@@ -18,7 +18,7 @@ public abstract class AttributeBag<T extends Comparable<T>> extends Attribute<T>
     private static final Logger log = Logger.getLogger(AttributeBag.class);
     protected long shardTimestamp = Long.MAX_VALUE;
     protected boolean validMetadata = false;
-    private MarkingFunctions<?> markingFunctions;
+    protected MarkingFunctions<?> markingFunctions;
 
     private static final long ONE_DAY_MS = 1000l * 60 * 60 * 24;
 

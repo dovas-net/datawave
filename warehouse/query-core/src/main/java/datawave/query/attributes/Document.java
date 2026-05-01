@@ -33,7 +33,6 @@ import com.google.common.cache.LoadingCache;
 import com.google.common.collect.Iterators;
 import com.google.common.collect.Sets;
 
-import datawave.marking.AccessExpressionUtil;
 import datawave.marking.MarkingFunctions;
 import datawave.marking.Markings;
 import datawave.query.Constants;
@@ -83,7 +82,12 @@ public class Document extends AttributeBag<Document> implements Serializable {
     private static final long ONE_DAY_MS = 1000L * 60 * 60 * 24;
 
     public Markings<?> getMarkings() {
-        return AccessExpressionUtil.toAccessExpressionMarkings(AccessExpressionUtil.toAccessExpression(getColumnVisibility()));
+        try {
+            markingFunctions = getMarkingFunctions();
+            return markingFunctions.translateFromColumnVisibility(getColumnVisibility());
+        } catch (MarkingFunctions.Exception ignored) {
+            return null;
+        }
     }
 
     public Document() {
